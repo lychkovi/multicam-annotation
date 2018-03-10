@@ -42,7 +42,15 @@ namespace VideoAnnotationAPP
         public static extern int add(int a, int b);
 
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern Int32 load_image(String filepath, out IntPtr ret);
+        public static extern int load_image(String filepath, out IntPtr ret);
+
+        [DllImport("OcvWrapperMfcDLL.dll")]
+        public static extern void detect_targets(
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] double[] inputValues,
+            int inputValuesCount,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] out double[] outputValues,
+            out int outputValuesCount
+        );
 
         public Form1()
         {
@@ -71,7 +79,7 @@ namespace VideoAnnotationAPP
         {
             IntPtr ret;
             String filepath = "..\\Data\\" + txtFileName.Text;
-            Int32 errcode = load_image(filepath, out ret);
+            int errcode = load_image(filepath, out ret);
             if (errcode == 0)
             {
                 pictureBox1.Image = Image.FromHbitmap(ret);
@@ -86,6 +94,30 @@ namespace VideoAnnotationAPP
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             
+        }
+
+        private void btnAppendList_Click(object sender, EventArgs e)
+        {
+            lstInputValues.Items.Add(txtNewValue.Text);
+        }
+
+        private void btnProcessList_Click(object sender, EventArgs e)
+        {
+            int inputValuesCount, outputValuesCount;
+            double[] inputValues, outputValues;
+
+            inputValuesCount = lstInputValues.Items.Count;
+            inputValues = new double[inputValuesCount];
+            for (int i = 0; i < inputValuesCount; i++)
+            {
+                inputValues[i] = Double.Parse(lstInputValues.Items[i].ToString());
+            }
+
+            detect_targets(inputValues, inputValuesCount, out outputValues, out outputValuesCount);
+            for (int i = 0; i < outputValuesCount; i++)
+            {
+                lstOutputValues.Items.Add(outputValues[i].ToString());
+            }
         }
     }
 }

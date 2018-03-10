@@ -129,4 +129,24 @@ extern "C"
         
         return S_OK;
     }
+
+    __declspec(dllexport) void __stdcall detect_targets(
+        double* inputValues, long inputValuesCount, 
+        double **outputValues, long* outputValuesCount)
+    {
+        std::vector<double> outputVector;
+        double outputValue;
+        
+        for (int i = 1; i < inputValuesCount; i++)
+        {
+            outputValue = inputValues[i-1] + inputValues[i];
+            outputVector.push_back(outputValue);
+        }
+
+        *outputValuesCount = outputVector.size();
+        auto size = (*outputValuesCount)*sizeof(double);
+
+        *outputValues = static_cast<double*>(CoTaskMemAlloc(size));
+        memcpy(*outputValues, outputVector.data(), size);
+    }
 }
