@@ -96,6 +96,58 @@ CBitmap* IplImageToCBitmap(IplImage* img)
     return bmp;
 }
 
+
+IplImage* HBITMAPToIplImage(HBITMAP hBitmap) 
+{
+    CDC dc;
+    CDC memDC;
+    IplImage* img;
+    int bmpwidth, bmpheight;
+
+    if (!dc.CreateDC("DISPLAY", NULL, NULL, NULL))
+        return NULL;
+
+    if (!memDC.CreateCompatibleDC(&dc))
+        return NULL;
+    
+    HGDIOBJ pOldBitmap;
+    pOldBitmap = memDC.SelectObject(hBitmap);
+
+    CBitmap* bmp = new CBitmap();
+    BITMAP pBitmapInfo;
+
+    // Узнаём размеры битмапа
+    bmp->Attach(hBitmap);
+    bmp->GetBitmap(&pBitmapInfo);
+    bmpwidth = pBitmapInfo.bmWidth;
+    bmpheight = pBitmapInfo.bmHeight;
+    img = cvCreateImage(cvSize(bmpwidth, bmpheight), 8, 4);
+
+    // Создаем структуру BitmapInfoHeader, которая задает формат для сохранения данных битмапа
+    struct { BITMAPINFO info; RGBQUAD moreColors[255]; } fbi;
+    memset(&fbi.info, 0, sizeof(BITMAPINFO));
+    fbi.info.bmiHeader.biSize = sizeof(fbi.info.bmiHeader);
+    if (!GetDIBits(memDC.m_hDC, hBitmap, 0, bmpheight, NULL, &fbi.info, DIB_RGB_COLORS))
+        return NULL;
+    fbi.info.bmiHeader.biHeight = -fbi.info.bmiHeader.biHeight; // иначе будет вверх ногами
+
+    // Выполняем собственно копирование данных
+    if (!GetDIBits(memDC.m_hDC, hBitmap, 0, bmpheight, img->imageData, &fbi.info, DIB_RGB_COLORS))
+        return NULL;
+
+    // Освобождаем память
+    bmp->Detach();
+    bmp->DeleteObject();
+    delete bmp;
+    bmp = NULL;
+
+    memDC.SelectObject(pOldBitmap);
+    memDC.DeleteDC();
+    dc.DeleteDC();
+
+    return img;
+}
+
 // Экспортируемые функции
 
 extern "C"  
@@ -130,9 +182,25 @@ extern "C"
         return S_OK;
     }
 
+    __declspec(dllexport) HRESULT save_image(
+        const char* filepath, HBITMAP hBitmap)
+    {
+
+        IplImage* img = HBITMAPToIplImage(hBitmap);
+        if (!img)
+            return S_FALSE;
+
+        if (!cvSaveImage(filepath, img))
+            return S_FALSE;
+
+        cvReleaseImage(&img);
+        
+        return S_OK;
+    }
+
     __declspec(dllexport) void __stdcall detect_targets(
         double* inputValues, long inputValuesCount, 
-        double **outputValues, long* outputValuesCount)
+        /* out */ double **outputValues, /* out */ long* outputValuesCount)
     {
         std::vector<double> outputVector;
         double outputValue;

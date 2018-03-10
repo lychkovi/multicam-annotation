@@ -37,7 +37,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnLoadImage = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.txtFileName = new System.Windows.Forms.TextBox();
+            this.txtInputFile = new System.Windows.Forms.TextBox();
             this.lstInputValues = new System.Windows.Forms.ListBox();
             this.lstOutputValues = new System.Windows.Forms.ListBox();
             this.btnProcessList = new System.Windows.Forms.Button();
@@ -46,6 +46,9 @@
             this.label6 = new System.Windows.Forms.Label();
             this.txtNewValue = new System.Windows.Forms.TextBox();
             this.btnAppendList = new System.Windows.Forms.Button();
+            this.btnSaveImage = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtOutputFile = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -111,9 +114,9 @@
             // 
             // btnLoadImage
             // 
-            this.btnLoadImage.Location = new System.Drawing.Point(37, 422);
+            this.btnLoadImage.Location = new System.Drawing.Point(173, 377);
             this.btnLoadImage.Name = "btnLoadImage";
-            this.btnLoadImage.Size = new System.Drawing.Size(75, 23);
+            this.btnLoadImage.Size = new System.Drawing.Size(52, 23);
             this.btnLoadImage.TabIndex = 7;
             this.btnLoadImage.Text = "Load Image";
             this.btnLoadImage.UseVisualStyleBackColor = true;
@@ -124,37 +127,37 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(37, 382);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(52, 13);
+            this.label3.Size = new System.Drawing.Size(50, 13);
             this.label3.TabIndex = 8;
-            this.label3.Text = "File name";
+            this.label3.Text = "Input File";
             // 
-            // txtFileName
+            // txtInputFile
             // 
-            this.txtFileName.Location = new System.Drawing.Point(125, 379);
-            this.txtFileName.Name = "txtFileName";
-            this.txtFileName.Size = new System.Drawing.Size(100, 20);
-            this.txtFileName.TabIndex = 9;
-            this.txtFileName.Text = "lena.jpg";
+            this.txtInputFile.Location = new System.Drawing.Point(100, 379);
+            this.txtInputFile.Name = "txtInputFile";
+            this.txtInputFile.Size = new System.Drawing.Size(60, 20);
+            this.txtInputFile.TabIndex = 9;
+            this.txtInputFile.Text = "lena.jpg";
             // 
             // lstInputValues
             // 
             this.lstInputValues.FormattingEnabled = true;
-            this.lstInputValues.Location = new System.Drawing.Point(40, 234);
+            this.lstInputValues.Location = new System.Drawing.Point(38, 211);
             this.lstInputValues.Name = "lstInputValues";
-            this.lstInputValues.Size = new System.Drawing.Size(72, 121);
+            this.lstInputValues.Size = new System.Drawing.Size(72, 108);
             this.lstInputValues.TabIndex = 10;
             // 
             // lstOutputValues
             // 
             this.lstOutputValues.FormattingEnabled = true;
-            this.lstOutputValues.Location = new System.Drawing.Point(151, 234);
+            this.lstOutputValues.Location = new System.Drawing.Point(149, 211);
             this.lstOutputValues.Name = "lstOutputValues";
-            this.lstOutputValues.Size = new System.Drawing.Size(76, 121);
+            this.lstOutputValues.Size = new System.Drawing.Size(76, 108);
             this.lstOutputValues.TabIndex = 11;
             // 
             // btnProcessList
             // 
-            this.btnProcessList.Location = new System.Drawing.Point(149, 422);
+            this.btnProcessList.Location = new System.Drawing.Point(150, 338);
             this.btnProcessList.Name = "btnProcessList";
             this.btnProcessList.Size = new System.Drawing.Size(75, 23);
             this.btnProcessList.TabIndex = 12;
@@ -165,7 +168,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(37, 218);
+            this.label4.Location = new System.Drawing.Point(35, 195);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(66, 13);
             this.label4.TabIndex = 13;
@@ -174,7 +177,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(153, 218);
+            this.label5.Location = new System.Drawing.Point(151, 195);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(74, 13);
             this.label5.TabIndex = 14;
@@ -207,11 +210,41 @@
             this.btnAppendList.UseVisualStyleBackColor = true;
             this.btnAppendList.Click += new System.EventHandler(this.btnAppendList_Click);
             // 
+            // btnSaveImage
+            // 
+            this.btnSaveImage.Location = new System.Drawing.Point(173, 417);
+            this.btnSaveImage.Name = "btnSaveImage";
+            this.btnSaveImage.Size = new System.Drawing.Size(52, 23);
+            this.btnSaveImage.TabIndex = 18;
+            this.btnSaveImage.Text = "Save";
+            this.btnSaveImage.UseVisualStyleBackColor = true;
+            this.btnSaveImage.Click += new System.EventHandler(this.btnSaveImage_Click);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(37, 422);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(55, 13);
+            this.label7.TabIndex = 19;
+            this.label7.Text = "OutputFile";
+            // 
+            // txtOutputFile
+            // 
+            this.txtOutputFile.Location = new System.Drawing.Point(100, 419);
+            this.txtOutputFile.Name = "txtOutputFile";
+            this.txtOutputFile.Size = new System.Drawing.Size(60, 20);
+            this.txtOutputFile.TabIndex = 20;
+            this.txtOutputFile.Text = "lena.png";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(765, 498);
+            this.ClientSize = new System.Drawing.Size(765, 492);
+            this.Controls.Add(this.txtOutputFile);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.btnSaveImage);
             this.Controls.Add(this.btnAppendList);
             this.Controls.Add(this.txtNewValue);
             this.Controls.Add(this.label6);
@@ -220,7 +253,7 @@
             this.Controls.Add(this.btnProcessList);
             this.Controls.Add(this.lstOutputValues);
             this.Controls.Add(this.lstInputValues);
-            this.Controls.Add(this.txtFileName);
+            this.Controls.Add(this.txtInputFile);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnLoadImage);
             this.Controls.Add(this.pictureBox1);
@@ -250,7 +283,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button btnLoadImage;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox txtFileName;
+        private System.Windows.Forms.TextBox txtInputFile;
         private System.Windows.Forms.ListBox lstInputValues;
         private System.Windows.Forms.ListBox lstOutputValues;
         private System.Windows.Forms.Button btnProcessList;
@@ -259,6 +292,9 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtNewValue;
         private System.Windows.Forms.Button btnAppendList;
+        private System.Windows.Forms.Button btnSaveImage;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox txtOutputFile;
     }
 }
 

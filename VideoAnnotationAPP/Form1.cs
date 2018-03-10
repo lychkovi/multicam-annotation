@@ -42,7 +42,10 @@ namespace VideoAnnotationAPP
         public static extern int add(int a, int b);
 
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int load_image(String filepath, out IntPtr ret);
+        public static extern int load_image(String filepath, out IntPtr hBitmap);
+
+        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int save_image(String filepath, IntPtr hBitmap);
 
         [DllImport("OcvWrapperMfcDLL.dll")]
         public static extern void detect_targets(
@@ -75,22 +78,6 @@ namespace VideoAnnotationAPP
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void btnLoadImage_Click(object sender, EventArgs e)
-        {
-            IntPtr ret;
-            String filepath = "..\\Data\\" + txtFileName.Text;
-            int errcode = load_image(filepath, out ret);
-            if (errcode == 0)
-            {
-                pictureBox1.Image = Image.FromHbitmap(ret);
-            }
-            else
-            {
-                MessageBox.Show("Unable to load input image!", "Error!",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             
@@ -118,6 +105,33 @@ namespace VideoAnnotationAPP
             {
                 lstOutputValues.Items.Add(outputValues[i].ToString());
             }
+        }
+
+        private void btnLoadImage_Click(object sender, EventArgs e)
+        {
+            IntPtr hBitmap;
+            String filepath = "..\\Data\\" + txtInputFile.Text;
+            int errcode = load_image(filepath, out hBitmap);
+            if (errcode == 0)
+            {
+                pictureBox1.Image = Image.FromHbitmap(hBitmap);
+            }
+            else
+            {
+                MessageBox.Show("Unable to load input image!", "Error!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnSaveImage_Click(object sender, EventArgs e)
+        {
+            IntPtr hBitmap;
+            Bitmap bmp;
+            String filepath = "..\\Data\\" + txtOutputFile.Text;
+
+            bmp = new Bitmap(pictureBox1.Image);
+            hBitmap = bmp.GetHbitmap();
+            int errcode = save_image(filepath, hBitmap);
         }
     }
 }
