@@ -4,15 +4,7 @@
 #include "stdafx.h"
 #include "OcvWrapperMfcDLL.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-using namespace cv;
-
-// Вспомогательные функции OpenCV IplImage <--> Microsoft HBITMAP из CvvImage.cpp
-
-extern CBitmap* IplImageToCBitmap(IplImage* img); 
-extern IplImage* HBITMAPToIplImage(HBITMAP hBitmap); 
+#include "ocvhelpers.h"         // Преобразование OpenCV Mat <--> Microsoft HBITMAP
 
 
 #ifdef _DEBUG
@@ -74,20 +66,29 @@ BOOL COcvWrapperMfcDLLApp::InitInstance()
 }
 
 
+// Хранимые данные
+
+VideoCapture cap;           // объект для чтения кадров из видео файла
+Mat prevFrame;              // последний считанный из видео файла кадр
+int prevFrameNum = 0;       // номер последнего считанного из видео файла кадра
+
 // Экспортируемые функции
 
 extern "C"  
 {
+    // Пробная функция вычисляет сумму двух чисел
     __declspec(dllexport) int add(int a, int b) 
     {
         return a+b;
     }
 
+    // Пробная функция вычисляет разность двух чисел
     __declspec(dllexport) int subtract(int a, int b) 
     {
         return a-b;
     }
 
+    // Функция загружает изображение из файла на диске
     __declspec(dllexport) HRESULT load_image(
         const char* filepath, /* out */ HBITMAP * hBitmap)
     {
@@ -95,27 +96,19 @@ extern "C"
         if (img.empty())
             return S_FALSE;
 
-        IplImage iplim = img;
-        CBitmap* bmp = IplImageToCBitmap(&iplim);
-        if (!bmp)
+        if (!copyMatToHbitmap(img, hBitmap))
             return S_FALSE;
-
-        *hBitmap = (HBITMAP)bmp->Detach();
-        bmp->DeleteObject();
-        delete bmp;
-        bmp = NULL;
         
         return S_OK;
     }
 
+    // Функция сохраняет изображение в файл на диске
     __declspec(dllexport) HRESULT save_image(
         const char* filepath, HBITMAP hBitmap)
     {
-        IplImage* iplim = HBITMAPToIplImage(hBitmap);
-        if (!iplim)
+        Mat img;
+        if (!copyHbitmapToMat(hBitmap, img))
             return S_FALSE;
-        Mat img = Mat(iplim, true);
-        cvReleaseImage(&iplim);
 
         if (!imwrite(filepath, img))
             return S_FALSE;
@@ -123,6 +116,7 @@ extern "C"
         return S_OK;
     }
 
+    // Пробная функция для обработки массива чисел
     __declspec(dllexport) void __stdcall detect_targets(
         double* inputValues, long inputValuesCount, 
         /* out */ double **outputValues, /* out */ long* outputValuesCount)
@@ -141,5 +135,38 @@ extern "C"
 
         *outputValues = static_cast<double*>(CoTaskMemAlloc(size));
         memcpy(*outputValues, outputVector.data(), size);
+    }
+
+    // Функция открывает видео файл, считывает из него первый кадр и 
+    // возвращает первый кадр, количество кадров и частоту кадров в секунду
+    __declspec(dllexport) HRESULT open_video(
+        const char* filepath, /* out */ HBITMAP * hBitmap, 
+        /* out */ int* nframes, /* out */ double* fps)
+    {
+        // Открываем видео файл для чтения
+        cap.open(filepath);
+        if (!cap.isOpened())
+            return S_FALSE;
+
+        // Считываем первый кадр из видео файла
+        cap >> prevFrame;
+        if (prevFrame.empty())
+            return S_FALSE;
+
+        if (!copyMatToHbitmap(prevFrame, hBitmap))
+            return S_FALSE;
+
+        // Возвращаем параметры видео в вызывающую программу
+        *nframes = (long) cap.get(CV_CAP_PROP_FRAME_COUNT);
+        *fps = (double) cap.get(CV_CAP_PROP_FPS);
+
+        return S_OK;
+    }
+
+    // Функция закрывает видео файл, ранее открытый функцией open_video()
+    __declspec(dllexport) HRESULT close_video()
+    {
+        cap.release();
+        return S_OK;
     }
 }
