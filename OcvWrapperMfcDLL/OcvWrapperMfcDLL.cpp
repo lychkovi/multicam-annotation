@@ -98,8 +98,6 @@ CBitmap* IplImageToCBitmap(IplImage* img)
 
 // Ёкспортируемые функции
 
-HBITMAP * pBitmap = NULL;
-
 extern "C"  
 {
     __declspec(dllexport) int add(int a, int b) 
@@ -119,7 +117,6 @@ extern "C"
 
         IplImage* img = cvLoadImage("lena.jpg", CV_LOAD_IMAGE_COLOR);
         CBitmap* bmp = IplImageToCBitmap(img);
-        pBitmap = hBitmap;
         *hBitmap = (HBITMAP)bmp->Detach();
         bmp->DeleteObject();
         delete bmp;
@@ -127,14 +124,5 @@ extern "C"
 
         cvReleaseImage(&img);
         return S_OK;
-    }
-
-    __declspec(dllexport) HRESULT release_image()
-    {
-        CBitmap* bmp;
-        bmp = (CBitmap*) pBitmap;
-        bmp->DeleteObject();
-        //delete bmp;
-        return true;
     }
 }

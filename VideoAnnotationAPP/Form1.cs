@@ -2,13 +2,19 @@
 // https://www.c-sharpcorner.com/uploadfile/tanmayit08/unmanaged-cpp-dll-call-from-managed-C-Sharp-application/
 //
 // Создаем решение из двух проектов: 
-// 1) C++ Win32 Console Application (при создании проекта ставим галки DLL, empty project)
+// 1) Visual C++ >> MFC > Библиотека DLL MFC
 // 2) C# Windows Forms Application
 //
 // В настройках проекта C# 
 // 1) На вкладке Построение указываем Путь выхода: 
 // ..\Debug\ (чтобы исполняемый файл находился в той же директории, что и DLL)
 // 2) На вкладке Отладка ставим галку Разрешить отладку неуправляемого кода
+//
+// В настройках библиотеки DLL MFC На вкладке Общие
+// 1) Использование MFC выставляем в Использовать MFC в статической библиотеке,
+// иначе будут утечки памяти. 
+// 2) Набор символов выставляем в Использовать много байтную кодировку, 
+// инче будут проблемы с обработкой строк системными библиотеками.
 //
 // После этого можно дедлать пошаговую отладку приложения с заходом в DLL.
 //
@@ -37,9 +43,6 @@ namespace VideoAnnotationAPP
 
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern Int32 load_image(out IntPtr ret);
-
-        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern Int32 release_image();
 
         public Form1()
         {
@@ -70,14 +73,10 @@ namespace VideoAnnotationAPP
             Int32 result = load_image(out ret);
             Bitmap b = Image.FromHbitmap(ret);
             pictureBox1.Image = b;
-            //b.Dispose();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            release_image();
-            //Marshal.FreeHGlobal(ret);
-            //Marshal.FreeCoTaskMem(ret);
             
         }
     }
