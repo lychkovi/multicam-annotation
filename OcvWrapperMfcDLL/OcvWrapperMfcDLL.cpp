@@ -110,19 +110,23 @@ extern "C"
         return a-b;
     }
 
-    __declspec(dllexport) HRESULT load_image(/* out */ HBITMAP * hBitmap)
+    __declspec(dllexport) HRESULT load_image(
+        const char* filepath, /* out */ HBITMAP * hBitmap)
     {
-        //cv::Mat aMat;
-        //CBitmap *aCBitmap = IplImageToCBitmap((IplImage*) &aMat);
+        IplImage* img = cvLoadImage(filepath, CV_LOAD_IMAGE_COLOR);
+        if (!img)
+            return S_FALSE;
 
-        IplImage* img = cvLoadImage("lena.jpg", CV_LOAD_IMAGE_COLOR);
         CBitmap* bmp = IplImageToCBitmap(img);
+        cvReleaseImage(&img);
+        if (!bmp)
+            return S_FALSE;
+
         *hBitmap = (HBITMAP)bmp->Detach();
         bmp->DeleteObject();
         delete bmp;
         bmp = NULL;
-
-        cvReleaseImage(&img);
+        
         return S_OK;
     }
 }

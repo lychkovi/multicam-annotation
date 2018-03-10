@@ -42,7 +42,7 @@ namespace VideoAnnotationAPP
         public static extern int add(int a, int b);
 
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern Int32 load_image(out IntPtr ret);
+        public static extern Int32 load_image(String filepath, out IntPtr ret);
 
         public Form1()
         {
@@ -51,8 +51,8 @@ namespace VideoAnnotationAPP
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            int x = Convert.ToInt32(textBox1.Text);
-            int y = Convert.ToInt32(textBox2.Text);
+            int x = Convert.ToInt32(txtNumber1.Text);
+            int y = Convert.ToInt32(txtNumber2.Text);
             int z = add(x, y);
             MessageBox.Show("Required Answer is " + Convert.ToString(z), "Answer",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -60,8 +60,8 @@ namespace VideoAnnotationAPP
 
         private void btnSubtract_Click(object sender, EventArgs e)
         {
-            int x = Convert.ToInt32(textBox1.Text);
-            int y = Convert.ToInt32(textBox2.Text);
+            int x = Convert.ToInt32(txtNumber1.Text);
+            int y = Convert.ToInt32(txtNumber2.Text);
             int z = subtract(x, y);
             MessageBox.Show("Required Answer is " + Convert.ToString(z), "Answer", 
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -70,9 +70,17 @@ namespace VideoAnnotationAPP
         private void btnLoadImage_Click(object sender, EventArgs e)
         {
             IntPtr ret;
-            Int32 result = load_image(out ret);
-            Bitmap b = Image.FromHbitmap(ret);
-            pictureBox1.Image = b;
+            String filepath = "..\\Data\\" + txtFileName.Text;
+            Int32 errcode = load_image(filepath, out ret);
+            if (errcode == 0)
+            {
+                pictureBox1.Image = Image.FromHbitmap(ret);
+            }
+            else
+            {
+                MessageBox.Show("Unable to load input image!", "Error!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)

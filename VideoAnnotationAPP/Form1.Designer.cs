@@ -28,25 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtNumber1 = new System.Windows.Forms.TextBox();
             this.btnAdd = new System.Windows.Forms.Button();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.txtNumber2 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnSubtract = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnLoadImage = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.txtFileName = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
-            // textBox1
+            // txtNumber1
             // 
-            this.textBox1.Location = new System.Drawing.Point(125, 34);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 20);
-            this.textBox1.TabIndex = 0;
+            this.txtNumber1.Location = new System.Drawing.Point(125, 34);
+            this.txtNumber1.Name = "txtNumber1";
+            this.txtNumber1.Size = new System.Drawing.Size(100, 20);
+            this.txtNumber1.TabIndex = 0;
             // 
             // btnAdd
             // 
@@ -58,12 +58,12 @@
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
-            // textBox2
+            // txtNumber2
             // 
-            this.textBox2.Location = new System.Drawing.Point(125, 88);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 20);
-            this.textBox2.TabIndex = 2;
+            this.txtNumber2.Location = new System.Drawing.Point(125, 88);
+            this.txtNumber2.Name = "txtNumber2";
+            this.txtNumber2.Size = new System.Drawing.Size(100, 20);
+            this.txtNumber2.TabIndex = 2;
             // 
             // label1
             // 
@@ -120,28 +120,29 @@
             this.label3.TabIndex = 8;
             this.label3.Text = "Image file name";
             // 
-            // textBox3
+            // txtFileName
             // 
-            this.textBox3.Location = new System.Drawing.Point(125, 347);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 20);
-            this.textBox3.TabIndex = 9;
+            this.txtFileName.Location = new System.Drawing.Point(125, 347);
+            this.txtFileName.Name = "txtFileName";
+            this.txtFileName.Size = new System.Drawing.Size(100, 20);
+            this.txtFileName.TabIndex = 9;
+            this.txtFileName.Text = "lena.jpg";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(714, 453);
-            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.txtFileName);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnLoadImage);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.btnSubtract);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.txtNumber2);
             this.Controls.Add(this.btnAdd);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtNumber1);
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
@@ -153,16 +154,16 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtNumber1;
         private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox txtNumber2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnSubtract;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button btnLoadImage;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox txtFileName;
     }
 }
 
