@@ -60,10 +60,13 @@
             // 
             // trackBar1
             // 
+            this.trackBar1.LargeChange = 30;
             this.trackBar1.Location = new System.Drawing.Point(246, 424);
+            this.trackBar1.Maximum = 100;
             this.trackBar1.Name = "trackBar1";
             this.trackBar1.Size = new System.Drawing.Size(628, 45);
             this.trackBar1.TabIndex = 0;
+            this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
             // 
             // pictureBox1
             // 
@@ -168,6 +171,7 @@
             this.btnGoToPosition.TabIndex = 13;
             this.btnGoToPosition.Text = "Go To Position";
             this.btnGoToPosition.UseVisualStyleBackColor = true;
+            this.btnGoToPosition.Click += new System.EventHandler(this.btnGoToPosition_Click);
             // 
             // btnPlay10x
             // 

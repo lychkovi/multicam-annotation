@@ -149,16 +149,47 @@ extern "C"
             return S_FALSE;
 
         // Считываем первый кадр из видео файла
-        cap >> prevFrame;
-        if (prevFrame.empty())
+        Mat img;
+        cap >> img;
+        if (img.empty())
             return S_FALSE;
 
-        if (!copyMatToHbitmap(prevFrame, hBitmap))
+        if (!copyMatToHbitmap(img, hBitmap))
             return S_FALSE;
 
         // Возвращаем параметры видео в вызывающую программу
         *nframes = (long) cap.get(CV_CAP_PROP_FRAME_COUNT);
         *fps = (double) cap.get(CV_CAP_PROP_FPS);
+        
+        // Обновляем переменные состояния проигрывателя
+        img.copyTo(prevFrame);
+        prevFrameNum = 0;
+
+        return S_OK;
+    }
+
+    // Функция перематывает видео до нужного момента времени (мс)
+    __declspec(dllexport) HRESULT seek_video(double video_time_ms, 
+        /* out */ HBITMAP* hBitmap, /* out */ int* iframe)
+    {
+        // Перемещаемся в нужную позицию видеофайла
+        if (!cap.set(CV_CAP_PROP_POS_MSEC, video_time_ms))
+            return S_FALSE;
+
+        // Считываем кадр видео в текущей позиции
+        Mat img;
+        cap >> img;
+        if (img.empty())
+            return S_FALSE;
+
+        // Возвращаем считанный кадр и его номер в приложение
+        if (!copyMatToHbitmap(img, hBitmap))
+            return S_FALSE;
+        *iframe = cap.get(CV_CAP_PROP_POS_FRAMES);
+
+        // Обновляем переменные состояния проигрывателя
+        img.copyTo(prevFrame);
+        prevFrameNum = *iframe;
 
         return S_OK;
     }
@@ -167,6 +198,8 @@ extern "C"
     __declspec(dllexport) HRESULT close_video()
     {
         cap.release();
+        prevFrame.release();
+        prevFrameNum = -1;
         return S_OK;
     }
 }

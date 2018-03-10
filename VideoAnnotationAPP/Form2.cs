@@ -18,6 +18,10 @@ namespace VideoAnnotationAPP
             out int nframes, out double fps);
 
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int seek_video(double video_time_ms, out IntPtr hBitmap,
+            out int iframe);
+
+        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int close_video();
 
         bool isVideo;           // признак успешно открытого видеофайла
@@ -31,6 +35,30 @@ namespace VideoAnnotationAPP
         {
             InitializeComponent();
             isVideo = false;
+        }
+
+        // Метод перематывает видео до нужной позиции
+        private void GoToPosition(double video_time_ms)
+        {
+            // Перематываем видеофайл
+            IntPtr hBitmap;
+            int iframe;
+            int errcode;
+            errcode = seek_video(video_time_ms, out hBitmap, out iframe);
+            if (errcode != 0)
+            {
+                MessageBox.Show("Unable to seek position in video!", "Error!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Сохраняем информацию о текущей позиции видео в полях класса
+            ixFrameCurr = iframe;
+            frameCurr = Image.FromHbitmap(hBitmap);
+
+            // Отображаем информацию о текущей позиции видео на форме
+            txtCurrentFrame.Text = ixFrameCurr.ToString();
+            pictureBox1.Image = frameCurr;
         }
 
         private void CloseVideo()
@@ -70,7 +98,7 @@ namespace VideoAnnotationAPP
             // Сохраняем информацию о видеофайле в полях класса
             ixFrameCurr = 0;
             frameCurr = Image.FromHbitmap(hBitmap);
-            videoDurationMs = videoFramesTotal / videoFps;
+            videoDurationMs = 1000.0 * videoFramesTotal / videoFps;
             isVideo = true;
 
             // Отображаем информацию о видеофайле на форме
@@ -91,6 +119,18 @@ namespace VideoAnnotationAPP
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)
         {
             CloseVideo();
+        }
+
+        private void btnGoToPosition_Click(object sender, EventArgs e)
+        {
+            double video_time_ms = 200.0;
+            GoToPosition(video_time_ms);
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            double video_time_ms = trackBar1.Value * videoDurationMs / trackBar1.Maximum;
+            GoToPosition(video_time_ms);
         }
 
     }
