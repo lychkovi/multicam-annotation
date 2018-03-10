@@ -315,4 +315,89 @@ void  CvvImage::Fill( int color )
 {
 	cvSet( m_img, cvScalar(color&255,(color>>8)&255,(color>>16)&255,(color>>24)&255) );
 }
+
+
+// Вспомогательные функции
+
+CBitmap* IplImageToCBitmap(IplImage* img) 
+{
+    CDC dc;
+    CDC memDC;
+
+    if (!dc.CreateDC("DISPLAY", NULL, NULL, NULL))
+        return NULL;
+
+    if (!memDC.CreateCompatibleDC(&dc))
+        return NULL;
+
+    CBitmap* bmp = new CBitmap();
+    CBitmap* pOldBitmap;
+
+    bmp->CreateCompatibleBitmap(&dc, img->width, img->height);
+    pOldBitmap = memDC.SelectObject(bmp);
+
+    CvvImage cvImage; // you will need OpenCV_2.2.0- to use CvvImage 
+    cvImage.CopyOf(img);
+    cvImage.Show(memDC.m_hDC, 0, 0, img->width, img->height, 0, 0);
+    cvImage.Destroy();
+
+    memDC.SelectObject(pOldBitmap);
+    memDC.DeleteDC();
+    dc.DeleteDC();
+
+    return bmp;
+}
+
+
+IplImage* HBITMAPToIplImage(HBITMAP hBitmap) 
+{
+    CDC dc;
+    CDC memDC;
+    IplImage* img;
+    int bmpwidth, bmpheight;
+
+    if (!dc.CreateDC("DISPLAY", NULL, NULL, NULL))
+        return NULL;
+
+    if (!memDC.CreateCompatibleDC(&dc))
+        return NULL;
+    
+    HGDIOBJ pOldBitmap;
+    pOldBitmap = memDC.SelectObject(hBitmap);
+
+    CBitmap* bmp = new CBitmap();
+    BITMAP pBitmapInfo;
+
+    // Узнаём размеры битмапа
+    bmp->Attach(hBitmap);
+    bmp->GetBitmap(&pBitmapInfo);
+    bmpwidth = pBitmapInfo.bmWidth;
+    bmpheight = pBitmapInfo.bmHeight;
+    img = cvCreateImage(cvSize(bmpwidth, bmpheight), 8, pBitmapInfo.bmBitsPixel/8);
+
+    // Создаем структуру BitmapInfoHeader, которая задает формат для сохранения данных битмапа
+    struct { BITMAPINFO info; RGBQUAD moreColors[255]; } fbi;
+    memset(&fbi.info, 0, sizeof(BITMAPINFO));
+    fbi.info.bmiHeader.biSize = sizeof(fbi.info.bmiHeader);
+    if (!GetDIBits(memDC.m_hDC, hBitmap, 0, bmpheight, NULL, &fbi.info, DIB_RGB_COLORS))
+        return NULL;
+    fbi.info.bmiHeader.biHeight = -fbi.info.bmiHeader.biHeight; // иначе будет вверх ногами
+
+    // Выполняем собственно копирование данных
+    if (!GetDIBits(memDC.m_hDC, hBitmap, 0, bmpheight, img->imageData, &fbi.info, DIB_RGB_COLORS))
+        return NULL;
+
+    // Освобождаем память
+    bmp->Detach();
+    bmp->DeleteObject();
+    delete bmp;
+    bmp = NULL;
+
+    memDC.SelectObject(pOldBitmap);
+    memDC.DeleteDC();
+    dc.DeleteDC();
+
+    return img;
+}
+
 #endif
