@@ -12,6 +12,15 @@ using System.Xml;
 
 namespace VideoAnnotationAPP
 {
+    enum appState
+    {
+        NOVID,                            // видео не загружено
+        ISVID_NOTRAJ,                     // видео загружено, но траектория не выбрана
+        ISVID_NOTRAJ_OPCREATE,            // видео загружено, выбрана операция создания траектории
+        ISVID_NOTRAJ_OPCREATE_STRETCH,    // тянем рамку для новой траектории
+        ISVIS_ISTRAJ_OPVIEW               // видео загружено, траектория выбрана, просмотр траектории
+    }
+
     public partial class Form2 : Form
     {
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -30,15 +39,81 @@ namespace VideoAnnotationAPP
         double videoFps;
         double videoDurationMs;
         int ixFrameCurr;        // индекс текущего кадра видео
-        Image frameCurr;          // текущий кадр видео
+        Image frameCurr;        // текущий кадр видео
+        appState appstate;      // состояние приложения
+        int mouseStartX;        // координаты рамки выделения мышью
+        int mouseStartY;
+        int mouseStopX;
+        int mouseStopY;
 
         // Коллекция содержит траектории всех объектов на видео
         TrackList tracks;
+
+        // Метод смены состояния приложения
+        private void enterAppState(appState newstate)
+        {
+            appstate = newstate;
+        }
+
+        // Операция создания новой траектории с началом на текущем кадре
+        private void actionCreateTrack()
+        {
+            // Проверка условий применимости действия
+            switch (appstate)
+            {
+                case appState.NOVID:
+                    throw new Exception("actionCreateTrack: No video loaded!");
+                    break;
+                default:
+                    // ... Дополнительные проверки ...
+                    break;
+            }
+
+            // Изменение пользовательских данных в памяти приложения
+
+            // Отображение изменений в графическом интерфейсе
+
+            // Изменение состояния приложения
+            enterAppState(appState.ISVID_NOTRAJ_OPCREATE);
+        }
+
+        // Метод перерисовывает кадр видео в поле PicturteBox на форме
+        private void redrawPicture()
+        {
+            Graphics g;
+            Point origin = new Point(0, 0);
+            Pen pen;
+            Rectangle rect = new Rectangle();
+
+            switch (appstate)
+            {
+                case appState.NOVID:
+                    break;
+                case appState.ISVID_NOTRAJ_OPCREATE_STRETCH:
+                case appState.ISVIS_ISTRAJ_OPVIEW:
+                    // Отображаем поверх кадра текущую рамку выделения
+                    g = pictureBox1.CreateGraphics();
+                    g.DrawImage(frameCurr, origin);
+                    pen = new Pen(DefaultForeColor);
+                    rect.X = Math.Min(mouseStartX, mouseStopX);
+                    rect.Y = Math.Min(mouseStartY, mouseStopY);
+                    rect.Width = Math.Abs(mouseStopX - mouseStartX) + 1;
+                    rect.Height = Math.Abs(mouseStopY - mouseStartY) + 1;
+                    g.DrawRectangle(pen, rect);
+                    break;
+                default:
+                    // Отображаем кадр видео без рамок выделения
+                    g = pictureBox1.CreateGraphics();
+                    g.DrawImage(frameCurr, origin);
+                    break;
+            }
+        }
 
         public Form2()
         {
             InitializeComponent();
             isVideo = false;
+            appstate = appState.NOVID;
 
             // Инициализируем коллекцию траекторий
             tracks = new TrackList();
@@ -103,6 +178,7 @@ namespace VideoAnnotationAPP
                 txtCurrentFrame.Text = "";
                 txtCurrentPosition.Text = "";
                 isVideo = false;
+                enterAppState(appState.NOVID);
             }
         }
 
@@ -129,6 +205,7 @@ namespace VideoAnnotationAPP
             frameCurr = Image.FromHbitmap(hBitmap);
             videoDurationMs = 1000.0 * videoFramesTotal / videoFps;
             isVideo = true;
+            enterAppState(appState.ISVID_NOTRAJ);
 
             // Отображаем информацию о видеофайле на форме
             pictureBox1.Image = frameCurr;
@@ -160,6 +237,51 @@ namespace VideoAnnotationAPP
         {
             double video_time_ms = trackBar1.Value * videoDurationMs / trackBar1.Maximum;
             GoToPosition(video_time_ms);
+        }
+
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            switch (appstate)
+            {
+                case appState.ISVID_NOTRAJ_OPCREATE:
+                    mouseStartX = e.X;
+                    mouseStartY = e.Y;
+                    enterAppState(appState.ISVID_NOTRAJ_OPCREATE_STRETCH);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            switch (appstate)
+            {
+                case appState.ISVID_NOTRAJ_OPCREATE_STRETCH:
+                    mouseStopX = e.X;
+                    mouseStopY = e.Y;
+                    redrawPicture();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
+        {
+            switch (appstate)
+            {
+                case appState.ISVID_NOTRAJ_OPCREATE_STRETCH:
+                    enterAppState(appState.ISVIS_ISTRAJ_OPVIEW);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void btnCreateTrack_Click(object sender, EventArgs e)
+        {
+            actionCreateTrack();
         }
 
     }

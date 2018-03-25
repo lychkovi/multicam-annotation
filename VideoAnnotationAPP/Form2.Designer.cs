@@ -53,6 +53,7 @@
             this.maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btnCloseVideo = new System.Windows.Forms.Button();
+            this.btnCreateTrack = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -76,6 +77,9 @@
             this.pictureBox1.Size = new System.Drawing.Size(628, 325);
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
+            this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
+            this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);
             // 
             // btnOpenVideo
             // 
@@ -274,11 +278,22 @@
             this.btnCloseVideo.UseVisualStyleBackColor = true;
             this.btnCloseVideo.Click += new System.EventHandler(this.btnCloseVideo_Click);
             // 
+            // btnCreateTrack
+            // 
+            this.btnCreateTrack.Location = new System.Drawing.Point(127, 426);
+            this.btnCreateTrack.Name = "btnCreateTrack";
+            this.btnCreateTrack.Size = new System.Drawing.Size(89, 23);
+            this.btnCreateTrack.TabIndex = 26;
+            this.btnCreateTrack.Text = "Create Track";
+            this.btnCreateTrack.UseVisualStyleBackColor = true;
+            this.btnCreateTrack.Click += new System.EventHandler(this.btnCreateTrack_Click);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(918, 481);
+            this.Controls.Add(this.btnCreateTrack);
             this.Controls.Add(this.btnCloseVideo);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.maskedTextBox1);
@@ -337,5 +352,6 @@
         private System.Windows.Forms.MaskedTextBox maskedTextBox1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btnCloseVideo;
+        private System.Windows.Forms.Button btnCreateTrack;
     }
 }
