@@ -151,7 +151,7 @@ namespace VideoAnnotationAPP
 
     public class TrackList : SerializableDictionary<int, Track>, IXmlSerializable
     {
-        public string videoFilePath;
+        public string videoFilePath;// путь к файлу видеозаписи
 
         protected override string listName
         {
@@ -212,5 +212,12 @@ namespace VideoAnnotationAPP
             writer.WriteEndElement();
         }
         #endregion
+
+        // Метод очищает содержимое экземпляра класса
+        public void Reset()
+        {
+            Clear();
+            videoFilePath = "";
+        }
     }
 }
