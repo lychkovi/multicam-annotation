@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using System.Runtime.InteropServices;       // для DllImport native C++
 using System.Xml;
 
 namespace VideoAnnotationAPP
@@ -23,17 +22,6 @@ namespace VideoAnnotationAPP
 
     public partial class Form2 : Form
     {
-        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int open_video(String filepath, out IntPtr hBitmap, 
-            out int nframes, out double fps);
-
-        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int seek_video(double video_time_ms, out IntPtr hBitmap,
-            out int iframe);
-
-        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int close_video();
-
         bool isVideo;           // признак успешно открытого видеофайла
         int videoFramesTotal;
         double videoFps;
@@ -148,7 +136,7 @@ namespace VideoAnnotationAPP
             IntPtr hBitmap;
             int iframe;
             int errcode;
-            errcode = seek_video(video_time_ms, out hBitmap, out iframe);
+            errcode = OcvWrapper.VideoSeek(video_time_ms, out hBitmap, out iframe);
             if (errcode != 0)
             {
                 MessageBox.Show("Unable to seek position in video!", "Error!",
@@ -169,7 +157,7 @@ namespace VideoAnnotationAPP
         {
             if (isVideo)
             {
-                close_video();
+                OcvWrapper.VideoClose();
                 pictureBox1.Image = null;
                 txtVideoFilePath.Text = "";
                 txtVideoFramesTotal.Text = "";
@@ -191,7 +179,7 @@ namespace VideoAnnotationAPP
             
             // Открываем видеофайл
             IntPtr hBitmap;
-            int errcode = open_video(openVideoDlg.FileName, out hBitmap, 
+            int errcode = OcvWrapper.VideoOpen(openVideoDlg.FileName, out hBitmap, 
                 out videoFramesTotal, out videoFps);
             if (errcode != 0)
             {

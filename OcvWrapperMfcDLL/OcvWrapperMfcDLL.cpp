@@ -77,19 +77,19 @@ int prevFrameNum = 0;       // номер последнего считанного из видео файла кадра
 extern "C"  
 {
     // Пробная функция вычисляет сумму двух чисел
-    __declspec(dllexport) int add(int a, int b) 
+    __declspec(dllexport) int TestAdd(int a, int b) 
     {
         return a+b;
     }
 
     // Пробная функция вычисляет разность двух чисел
-    __declspec(dllexport) int subtract(int a, int b) 
+    __declspec(dllexport) int TestSubtract(int a, int b) 
     {
         return a-b;
     }
 
     // Функция загружает изображение из файла на диске
-    __declspec(dllexport) HRESULT load_image(
+    __declspec(dllexport) HRESULT ImageLoad(
         const char* filepath, /* out */ HBITMAP * hBitmap)
     {
         Mat img = imread(filepath, CV_LOAD_IMAGE_COLOR);
@@ -103,7 +103,7 @@ extern "C"
     }
 
     // Функция сохраняет изображение в файл на диске
-    __declspec(dllexport) HRESULT save_image(
+    __declspec(dllexport) HRESULT ImageSave(
         const char* filepath, HBITMAP hBitmap)
     {
         Mat img;
@@ -117,7 +117,7 @@ extern "C"
     }
 
     // Пробная функция для обработки массива чисел
-    __declspec(dllexport) void __stdcall detect_targets(
+    __declspec(dllexport) void __stdcall TestAddArray(
         double* inputValues, long inputValuesCount, 
         /* out */ double **outputValues, /* out */ long* outputValuesCount)
     {
@@ -139,7 +139,7 @@ extern "C"
 
     // Функция открывает видео файл, считывает из него первый кадр и 
     // возвращает первый кадр, количество кадров и частоту кадров в секунду
-    __declspec(dllexport) HRESULT open_video(
+    __declspec(dllexport) HRESULT VideoOpen(
         const char* filepath, /* out */ HBITMAP * hBitmap, 
         /* out */ int* nframes, /* out */ double* fps)
     {
@@ -169,7 +169,7 @@ extern "C"
     }
 
     // Функция перематывает видео до нужного момента времени (мс)
-    __declspec(dllexport) HRESULT seek_video(double video_time_ms, 
+    __declspec(dllexport) HRESULT VideoSeek(double video_time_ms, 
         /* out */ HBITMAP* hBitmap, /* out */ int* iframe)
     {
         // Перемещаемся в нужную позицию видеофайла
@@ -195,7 +195,7 @@ extern "C"
     }
 
     // Функция закрывает видео файл, ранее открытый функцией open_video()
-    __declspec(dllexport) HRESULT close_video()
+    __declspec(dllexport) HRESULT VideoClose()
     {
         cap.release();
         prevFrame.release();

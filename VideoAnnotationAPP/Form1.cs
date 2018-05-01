@@ -28,33 +28,11 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using System.Runtime.InteropServices;       // для DllImport native C++
-
 
 namespace VideoAnnotationAPP
 {
     public partial class Form1 : Form
     {
-        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int subtract(int a, int b);
-
-        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int add(int a, int b);
-
-        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int load_image(String filepath, out IntPtr hBitmap);
-
-        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int save_image(String filepath, IntPtr hBitmap);
-
-        [DllImport("OcvWrapperMfcDLL.dll")]
-        public static extern void detect_targets(
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] double[] inputValues,
-            int inputValuesCount,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] out double[] outputValues,
-            out int outputValuesCount
-        );
-
         public Form1()
         {
             InitializeComponent();
@@ -64,7 +42,7 @@ namespace VideoAnnotationAPP
         {
             int x = Convert.ToInt32(txtNumber1.Text);
             int y = Convert.ToInt32(txtNumber2.Text);
-            int z = add(x, y);
+            int z = OcvWrapper.TestAdd(x, y);
             MessageBox.Show("Required Answer is " + Convert.ToString(z), "Answer",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -73,7 +51,7 @@ namespace VideoAnnotationAPP
         {
             int x = Convert.ToInt32(txtNumber1.Text);
             int y = Convert.ToInt32(txtNumber2.Text);
-            int z = subtract(x, y);
+            int z = OcvWrapper.TestSubtract(x, y);
             MessageBox.Show("Required Answer is " + Convert.ToString(z), "Answer", 
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -100,7 +78,7 @@ namespace VideoAnnotationAPP
                 inputValues[i] = Double.Parse(lstInputValues.Items[i].ToString());
             }
 
-            detect_targets(inputValues, inputValuesCount, out outputValues, out outputValuesCount);
+            OcvWrapper.TestAddArray(inputValues, inputValuesCount, out outputValues, out outputValuesCount);
             for (int i = 0; i < outputValuesCount; i++)
             {
                 lstOutputValues.Items.Add(outputValues[i].ToString());
@@ -111,7 +89,7 @@ namespace VideoAnnotationAPP
         {
             IntPtr hBitmap;
             String filepath = "..\\Data\\" + txtInputFile.Text;
-            int errcode = load_image(filepath, out hBitmap);
+            int errcode = OcvWrapper.ImageLoad(filepath, out hBitmap);
             if (errcode == 0)
             {
                 pictureBox1.Image = Image.FromHbitmap(hBitmap);
@@ -131,7 +109,7 @@ namespace VideoAnnotationAPP
 
             bmp = new Bitmap(pictureBox1.Image);
             hBitmap = bmp.GetHbitmap();
-            int errcode = save_image(filepath, hBitmap);
+            int errcode = OcvWrapper.ImageSave(filepath, hBitmap);
         }
     }
 }
