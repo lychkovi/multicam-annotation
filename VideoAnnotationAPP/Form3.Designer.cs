@@ -62,10 +62,16 @@
             this.txtMarkupFilePath = new System.Windows.Forms.TextBox();
             this.saveMarkupFileDlg = new System.Windows.Forms.SaveFileDialog();
             this.openMarkupFileDlg = new System.Windows.Forms.OpenFileDialog();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusVideo = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusMarkup = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusMode = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusAction = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.grpVideoNavigator.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picFrameView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbrVideoSlider)).BeginInit();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -324,9 +330,9 @@
             // 
             // tbrVideoSlider
             // 
-            this.tbrVideoSlider.Location = new System.Drawing.Point(253, 491);
+            this.tbrVideoSlider.Location = new System.Drawing.Point(247, 491);
             this.tbrVideoSlider.Name = "tbrVideoSlider";
-            this.tbrVideoSlider.Size = new System.Drawing.Size(709, 45);
+            this.tbrVideoSlider.Size = new System.Drawing.Size(715, 45);
             this.tbrVideoSlider.TabIndex = 7;
             // 
             // lblMarkupFilePath
@@ -356,11 +362,55 @@
             // 
             this.openMarkupFileDlg.FileName = "openFileDialog1";
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusVideo,
+            this.statusMarkup,
+            this.statusMode,
+            this.statusAction});
+            this.statusStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
+            this.statusStrip1.Location = new System.Drawing.Point(0, 543);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1010, 22);
+            this.statusStrip1.TabIndex = 10;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // statusVideo
+            // 
+            this.statusVideo.AutoSize = false;
+            this.statusVideo.Name = "statusVideo";
+            this.statusVideo.Size = new System.Drawing.Size(200, 17);
+            this.statusVideo.Text = "No Video";
+            // 
+            // statusMarkup
+            // 
+            this.statusMarkup.AutoSize = false;
+            this.statusMarkup.Name = "statusMarkup";
+            this.statusMarkup.Size = new System.Drawing.Size(200, 17);
+            this.statusMarkup.Text = "Markup Unsaved";
+            // 
+            // statusMode
+            // 
+            this.statusMode.AutoSize = false;
+            this.statusMode.Name = "statusMode";
+            this.statusMode.Size = new System.Drawing.Size(200, 17);
+            this.statusMode.Text = "Create Trace";
+            // 
+            // statusAction
+            // 
+            this.statusAction.AutoSize = false;
+            this.statusAction.Name = "statusAction";
+            this.statusAction.Size = new System.Drawing.Size(200, 17);
+            this.statusAction.Text = "Enter First Corner";
+            // 
             // Form3
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1010, 546);
+            this.ClientSize = new System.Drawing.Size(1010, 565);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.txtMarkupFilePath);
             this.Controls.Add(this.lblMarkupFilePath);
             this.Controls.Add(this.tbrVideoSlider);
@@ -380,6 +430,8 @@
             this.grpVideoNavigator.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picFrameView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbrVideoSlider)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -421,5 +473,10 @@
         private System.Windows.Forms.ToolStripMenuItem menuMarkupClose;
         private System.Windows.Forms.ToolStripMenuItem menuVideoClose;
         private System.Windows.Forms.ToolStripMenuItem menuQuit;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel statusVideo;
+        private System.Windows.Forms.ToolStripStatusLabel statusMarkup;
+        private System.Windows.Forms.ToolStripStatusLabel statusMode;
+        private System.Windows.Forms.ToolStripStatusLabel statusAction;
     }
 }

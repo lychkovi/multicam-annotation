@@ -22,6 +22,10 @@ namespace VideoAnnotationAPP
             context.Reset();
             markup = new TrackList();
             markup.Reset();
+
+            StatusBarUpdate();
+            VideoNavigatorUpdate();
+            PictureRedraw();
         }
 
         // ******************************************************************
@@ -39,6 +43,9 @@ namespace VideoAnnotationAPP
             context.MarkupFilePath = FilePath;
             context.isMarkupUnsaved = false;
 
+            // Обновляем индикацию на форме
+            txtMarkupFilePath.Text = context.MarkupFilePath;
+            StatusBarUpdate();
             return true;
         }
 
@@ -66,6 +73,86 @@ namespace VideoAnnotationAPP
             }
         }
 
+        // Обновление надписей в строке состояния
+        private void StatusBarUpdate()
+        {
+            if (context.isVideo)
+                statusVideo.Text = "Video Loaded";
+            else
+                statusVideo.Text = "No Video";
+
+            if (context.isMarkupUnsaved)
+                statusMarkup.Text = "Markup Unsaved";
+            else
+                statusMarkup.Text = "";
+
+            switch (context.modemajor)
+            {
+                case EditModeMajor.VideoNone:
+                default:
+                    statusMode.Text = "";
+                    break;
+                case EditModeMajor.VideoView:
+                    statusMode.Text = "View Video";
+                    break;
+                case EditModeMajor.TraceCreate:
+                    statusMode.Text = "Create Trace";
+                    break;
+                case EditModeMajor.TraceAppend:
+                case EditModeMajor.TraceEdit:
+                    if (context.modemajor == EditModeMajor.TraceAppend)
+                        statusMode.Text = "Append Trace";
+                    else
+                        statusMode.Text = "Edit Trace";
+                    switch (context.modedir)
+                    {
+                        case EditModeDir.Forward:
+                            statusMode.Text += " Forward";
+                            break;
+                        case EditModeDir.Backward:
+                            statusMode.Text += " Backward";
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+            }
+
+            switch (context.modeminor)
+            {
+                case EditModeMinor.None:
+                default:
+                    statusAction.Text = "";
+                    break;
+                case EditModeMinor.SpecifyFirstCorner:
+                    statusAction.Text = "Specify First Corner";
+                    break;
+                case EditModeMinor.SpecifySecondCorner:
+                    statusAction.Text = "Specify Second Corner";
+                    break;
+                case EditModeMinor.AddPoint:
+                    statusAction.Text = "Specify Feature Point";
+                    break;
+                case EditModeMinor.SelectPoint:
+                    statusAction.Text = "Select Feature Point";
+                    break;
+            }
+        }
+
+        // Метод перерисовывает изображение кадра frameCurr с нанесенной 
+        // разметкой траекторий. 
+        private void PictureRedraw()
+        {
+            if (context.isVideo)
+            {
+                picFrameView.Image = frameCurr;
+            }
+            else
+            {
+                picFrameView.Image = null;
+            }
+        }
+
         // ******************************************************************
         // Операции, инициируемые пользователем из графического интерфейса
         private bool MarkupSaveAs()
@@ -76,15 +163,7 @@ namespace VideoAnnotationAPP
                 return false;
 
             // Выполняем сериализацию, обновляем состояние контекста
-            bool isSuccess = MarkupSaveToPath(saveMarkupFileDlg.FileName);
-
-            if (isSuccess)
-            {
-                // Обновляем индикацию на форме
-                txtMarkupFilePath.Text = context.MarkupFilePath;
-            }
-
-            return isSuccess;
+            return MarkupSaveToPath(saveMarkupFileDlg.FileName);
         }
 
         private bool MarkupSave()
@@ -130,6 +209,7 @@ namespace VideoAnnotationAPP
 
             // Обновляем состояние индикации на форме
             txtMarkupFilePath.Text = context.MarkupFilePath;
+            StatusBarUpdate();
 
             return true;
         }
@@ -139,7 +219,7 @@ namespace VideoAnnotationAPP
             bool isSuccess;
 
             // При необходимости выполняем сохранение разметки в файл
-            if (context.isMarkupUnsaved)
+            if (context.isMarkupUnsaved || context.isMarkupFile)
             {
                 isSuccess = MarkupClose();
                 if (!isSuccess) return;
@@ -173,6 +253,8 @@ namespace VideoAnnotationAPP
 
             // Обновляем индикацию на форме
             txtMarkupFilePath.Text = context.MarkupFilePath;
+            StatusBarUpdate();
+            statusMarkup.Text = "Markup Loaded";
         }
 
         private void VideoClose()
@@ -193,7 +275,8 @@ namespace VideoAnnotationAPP
 
             // Обновляем индикацию на форме
             VideoNavigatorUpdate();
-            picFrameView.Image = null;
+            StatusBarUpdate();
+            PictureRedraw();
         }
 
         private void VideoOpen()
@@ -237,8 +320,15 @@ namespace VideoAnnotationAPP
 
                 // Обновляем индикацию на форме
                 VideoNavigatorUpdate();
-                picFrameView.Image = frameCurr;
+                StatusBarUpdate();
+                PictureRedraw();
             }
+        }
+
+        // 
+        void VideoMoveTo()
+        {
+
         }
 
         // ******************************************************************
