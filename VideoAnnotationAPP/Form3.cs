@@ -55,11 +55,16 @@ namespace VideoAnnotationAPP
             {
                 txtVideoFilePath.Text = context.VideoFilePath;
                 txtVideoFramesTotal.Text = context.VideoFramesCount.ToString();
-                txtVideoFps.Text = context.VideoFps.ToString();
-                txtVideoDurationMs.Text = context.VideoDurationMs.ToString() + " ms";
+                txtVideoFps.Text = context.VideoFps.ToString("####.##");
+                int videoDurationMsInt = (int) context.VideoDurationMs;
+                txtVideoDurationMs.Text = videoDurationMsInt.ToString() + " ms";
                 double videoPositionMs = context.VideoFrameCurrent * 1000.0 / context.VideoFps;
-                txtVideoPositionMs.Text = videoPositionMs.ToString() + " ms";
+                int videoPositionMsInt = (int) videoPositionMs;
+                txtVideoPositionMs.Text = videoPositionMsInt.ToString() + " ms";
                 txtVideoFrameCurrent.Text = context.VideoFrameCurrent.ToString();
+
+                // Управляем ползунком
+                tbrVideoSlider.Enabled = (context.modemajor == EditModeMajor.VideoView);
             }
             else
             {
@@ -70,6 +75,7 @@ namespace VideoAnnotationAPP
                 txtVideoDurationMs.Text = "";
                 txtVideoPositionMs.Text = "";
                 txtVideoFrameCurrent.Text = "";
+                tbrVideoSlider.Enabled = false;
             }
         }
 
@@ -151,6 +157,49 @@ namespace VideoAnnotationAPP
             {
                 picFrameView.Image = null;
             }
+        }
+
+        // Метод выполняет достраивание или перезаписывание одного узла 
+        // текущей редактируемой траектории в соответствии с режимом
+        // с переходом к следующему кадру видеофайла
+        private void TraceChangeProceed()
+        {
+
+        }
+
+        // Метод перематывает видео к нужному кадру и соответственно
+        // обновляет состояние интерфейса на форме
+        private bool VideoMoveTo(int iframe)
+        {
+            if (!context.isVideo)
+                throw new Exception("No video loaded!");
+
+            if (iframe < 0 || iframe >= context.VideoFramesCount)
+                return false;
+
+            double positionMs = iframe * 
+                context.VideoDurationMs / context.VideoFramesCount;
+
+            // Перематываем видеофайл
+            IntPtr hBitmap;
+            int newframe;
+            int errcode;
+            errcode = OcvWrapper.VideoSeek(positionMs, out hBitmap, out newframe);
+            if (errcode != 0)
+            {
+                MessageBox.Show("Unable to seek position in video!", "Error!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            // Сохраняем информацию о текущей позиции видео в полях класса
+            context.VideoFrameCurrent = newframe - 1;
+            frameCurr = Image.FromHbitmap(hBitmap);
+
+            // Отображаем информацию о текущей позиции видео на форме
+            VideoNavigatorUpdate();
+            PictureRedraw();
+            return true;
         }
 
         // ******************************************************************
@@ -322,6 +371,13 @@ namespace VideoAnnotationAPP
                 VideoNavigatorUpdate();
                 StatusBarUpdate();
                 PictureRedraw();
+                tbrVideoSlider.Minimum = 0;
+                tbrVideoSlider.Maximum = context.VideoFramesCount - 1;
+                int largeChange = context.VideoFramesCount / 20;
+                if (largeChange > 1)
+                    tbrVideoSlider.LargeChange = context.VideoFramesCount / 20;
+                else
+                    tbrVideoSlider.LargeChange = 1;
             }
         }
 
@@ -371,6 +427,74 @@ namespace VideoAnnotationAPP
         private void menuQuit_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void tbrVideoSlider_ValueChanged(object sender, EventArgs e)
+        {
+            if (context.isVideo && context.modemajor == EditModeMajor.VideoView)
+            {
+                // Выполняем переход к указанной позиции видео
+                VideoMoveTo(tbrVideoSlider.Value);
+            }
+        }
+
+        private void btnGoToFrame_Click(object sender, EventArgs e)
+        {
+            int iframe; 
+                
+            if (context.isVideo && context.modemajor == EditModeMajor.VideoView)
+            {
+                // Выполняем переход к указанной позиции видео
+                if (System.Int32.TryParse(txtGoToFrame.Text, out iframe) && 
+                    iframe >= 0 && iframe < context.VideoFramesCount)
+                    tbrVideoSlider.Value = iframe;
+                else
+                    MessageBox.Show("Wrong frame number entered!", "Error!",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnPreviousFrame_Click(object sender, EventArgs e)
+        {
+            if (context.isVideo && context.VideoFrameCurrent >= 1) 
+            switch (context.modemajor)
+            {
+                case EditModeMajor.VideoView:
+                    // Выполняем переход к указанной позиции видео
+                    tbrVideoSlider.Value -= 1;
+                    break;
+                case EditModeMajor.TraceEdit:
+                case EditModeMajor.TraceAppend:
+                    // Выполняем добавление нового узла траектории
+                    if (context.modedir == EditModeDir.Backward)
+                        TraceChangeProceed();
+                    break;
+                default:
+                    // Ничего не делаем
+                    break;
+            }
+        }
+
+        private void btnNextFrame_Click(object sender, EventArgs e)
+        {
+            if (context.isVideo && 
+                context.VideoFrameCurrent < context.VideoFramesCount - 1)
+            switch (context.modemajor)
+            {
+                case EditModeMajor.VideoView:
+                    // Выполняем переход к указанной позиции видео
+                    tbrVideoSlider.Value += 1;
+                    break;
+                case EditModeMajor.TraceEdit:
+                case EditModeMajor.TraceAppend:
+                    // Выполняем добавление нового узла траектории
+                    if (context.modedir == EditModeDir.Forward)
+                        TraceChangeProceed();
+                    break;
+                default:
+                    // Ничего не делаем
+                    break;
+            }
         }
     }
 }

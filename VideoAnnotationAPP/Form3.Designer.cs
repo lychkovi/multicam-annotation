@@ -49,7 +49,7 @@
             this.txtVideoFrameCurrent = new System.Windows.Forms.TextBox();
             this.lblCurrentFrame = new System.Windows.Forms.Label();
             this.txtGoToFrame = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnGoToFrame = new System.Windows.Forms.Button();
             this.txtVideoDurationMs = new System.Windows.Forms.TextBox();
             this.lblVideoDurationMs = new System.Windows.Forms.Label();
             this.txtVideoFps = new System.Windows.Forms.TextBox();
@@ -186,7 +186,7 @@
             this.grpVideoNavigator.Controls.Add(this.txtVideoFrameCurrent);
             this.grpVideoNavigator.Controls.Add(this.lblCurrentFrame);
             this.grpVideoNavigator.Controls.Add(this.txtGoToFrame);
-            this.grpVideoNavigator.Controls.Add(this.button1);
+            this.grpVideoNavigator.Controls.Add(this.btnGoToFrame);
             this.grpVideoNavigator.Controls.Add(this.txtVideoDurationMs);
             this.grpVideoNavigator.Controls.Add(this.lblVideoDurationMs);
             this.grpVideoNavigator.Controls.Add(this.txtVideoFps);
@@ -225,6 +225,7 @@
             this.btnNextFrame.TabIndex = 14;
             this.btnNextFrame.Text = "Next Frame";
             this.btnNextFrame.UseVisualStyleBackColor = true;
+            this.btnNextFrame.Click += new System.EventHandler(this.btnNextFrame_Click);
             // 
             // btnPreviousFrame
             // 
@@ -234,6 +235,7 @@
             this.btnPreviousFrame.TabIndex = 13;
             this.btnPreviousFrame.Text = "Previous Frame";
             this.btnPreviousFrame.UseVisualStyleBackColor = true;
+            this.btnPreviousFrame.Click += new System.EventHandler(this.btnPreviousFrame_Click);
             // 
             // txtVideoFrameCurrent
             // 
@@ -259,14 +261,15 @@
             this.txtGoToFrame.Size = new System.Drawing.Size(79, 20);
             this.txtGoToFrame.TabIndex = 10;
             // 
-            // button1
+            // btnGoToFrame
             // 
-            this.button1.Location = new System.Drawing.Point(9, 130);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 9;
-            this.button1.Text = "GoTo Frame";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnGoToFrame.Location = new System.Drawing.Point(9, 130);
+            this.btnGoToFrame.Name = "btnGoToFrame";
+            this.btnGoToFrame.Size = new System.Drawing.Size(75, 23);
+            this.btnGoToFrame.TabIndex = 9;
+            this.btnGoToFrame.Text = "GoTo Frame";
+            this.btnGoToFrame.UseVisualStyleBackColor = true;
+            this.btnGoToFrame.Click += new System.EventHandler(this.btnGoToFrame_Click);
             // 
             // txtVideoDurationMs
             // 
@@ -330,10 +333,11 @@
             // 
             // tbrVideoSlider
             // 
-            this.tbrVideoSlider.Location = new System.Drawing.Point(247, 491);
+            this.tbrVideoSlider.Location = new System.Drawing.Point(252, 491);
             this.tbrVideoSlider.Name = "tbrVideoSlider";
-            this.tbrVideoSlider.Size = new System.Drawing.Size(715, 45);
+            this.tbrVideoSlider.Size = new System.Drawing.Size(708, 45);
             this.tbrVideoSlider.TabIndex = 7;
+            this.tbrVideoSlider.ValueChanged += new System.EventHandler(this.tbrVideoSlider_ValueChanged);
             // 
             // lblMarkupFilePath
             // 
@@ -456,7 +460,7 @@
         private System.Windows.Forms.TextBox txtVideoFrameCurrent;
         private System.Windows.Forms.Label lblCurrentFrame;
         private System.Windows.Forms.TextBox txtGoToFrame;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnGoToFrame;
         private System.Windows.Forms.GroupBox grpTrace;
         private System.Windows.Forms.PictureBox picFrameView;
         private System.Windows.Forms.TrackBar tbrVideoSlider;
