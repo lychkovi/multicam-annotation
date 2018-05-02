@@ -68,7 +68,9 @@ namespace VideoAnnotationAPP
         public bool isPointSelected;       // выбрана ли характерная точка в кадре
         public int nPointSelected;         // номер выбранной храктерной точки
         public int BoundFirstCornerX;      // координаты 1-го угла рамки выделения
-        public int BoundFirstCornerY;      // координаты 1-го угла рамки выделения
+        public int BoundFirstCornerY;
+        public int BoundSecondCornerX;     // координаты 2-го угла рамки выделения
+        public int BoundSecondCornerY;
 
         public EditModeMajor modemajor;    // главный идентификатор состояния
         public EditModeMinor modeminor;    // вспомогательный идентификатор сост.
@@ -94,6 +96,8 @@ namespace VideoAnnotationAPP
             nPointSelected = -1;
             BoundFirstCornerX = 0;
             BoundFirstCornerY = 0;
+            BoundSecondCornerX = 0;
+            BoundSecondCornerY = 0;
 
             modemajor = EditModeMajor.VideoNone;
             modeminor = EditModeMinor.None;

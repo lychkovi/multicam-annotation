@@ -12,11 +12,11 @@ namespace VideoAnnotationAPP
 
     public class TrackNode : IXmlSerializable
     {
-        int left;
-        int top;
-        int right;
-        int bottom;
-        int iframe;
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+        public int iframe;
 
         #region IXmlSerializable Members
         public System.Xml.Schema.XmlSchema GetSchema()
@@ -83,7 +83,9 @@ namespace VideoAnnotationAPP
 
     public class Track : SerializableDictionary<int, TrackNode>, IXmlSerializable
     {
-        int objType;            // тип движущегося объекта
+        public int objType;            // тип движущегося объекта
+        public int iframeStart;        // индекс начального кадра траектории
+        public int iframeEnd;          // индекс конечного кадра траектории
 
         protected override string listName
         {

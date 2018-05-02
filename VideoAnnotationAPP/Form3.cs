@@ -37,6 +37,7 @@ namespace VideoAnnotationAPP
             XmlTextWriter writer = new XmlTextWriter(
                 FilePath, Encoding.Unicode);
             markup.WriteXml(writer);
+            writer.Close();
 
             // Изменяем состояние контекста графического интерфейса
             context.isMarkupFile = true;
@@ -122,6 +123,9 @@ namespace VideoAnnotationAPP
                             break;
                     }
                     break;
+                case EditModeMajor.TraceView:
+                    statusMode.Text = "View Trace";
+                    break;
             }
 
             switch (context.modeminor)
@@ -145,13 +149,78 @@ namespace VideoAnnotationAPP
             }
         }
 
+        // Метод обновляем информацию на панели свойств текущей траектории
+        private void TraceInfoUpdate()
+        {
+
+        }
+
+        // Метод отрисовывает разметку траекторий поверх текущего кадра
+        private void PictureDrawMarkup(Graphics g)
+        {
+            int iframe = context.VideoFrameCurrent;
+            TrackNode node;
+            Rectangle rect = new Rectangle();
+            Pen pen = new Pen(Color.Green);
+            pen.Width = 2;
+
+            foreach (KeyValuePair<int,Track> pair in markup)
+            {
+                if (pair.Value.iframeStart >= iframe &&
+                    pair.Value.iframeEnd <= iframe)
+                {
+                    if (context.isTraceSelected &&
+                        context.nTraceSelected == pair.Key)
+                        pen.Color = Color.Red;
+                    else
+                        pen.Color = Color.Green;
+
+                    if (pair.Value.TryGetValue(iframe, out node))
+                    {
+                        rect.X = node.left;
+                        rect.Y = node.top;
+                        rect.Width = node.right - node.left + 1;
+                        rect.Height = node.bottom - node.top + 1;
+                        g.DrawRectangle(pen, rect);
+                    }
+                    else
+                    {
+                        throw new Exception("Unable to get track node!");
+                    }
+                }
+            }
+        }
+
         // Метод перерисовывает изображение кадра frameCurr с нанесенной 
         // разметкой траекторий. 
         private void PictureRedraw()
         {
+            Graphics g;
+            Point origin = new Point(0, 0);
+            Pen pen;
+            Rectangle rect = new Rectangle();
+
             if (context.isVideo)
             {
-                picFrameView.Image = frameCurr;
+                // Наносим изображение кадра
+                g = picFrameView.CreateGraphics();
+                g.DrawImage(frameCurr, origin);
+
+                // Наносим разметку траекторий
+                PictureDrawMarkup(g);
+
+                // При вводе новой траектории наносим тянущуюся рамку
+                if (context.modemajor == EditModeMajor.TraceCreate &&
+                    context.modeminor == EditModeMinor.SpecifySecondCorner)
+                {
+                    pen = new Pen(DefaultForeColor);
+                    rect.X = Math.Min(context.BoundFirstCornerX, context.BoundSecondCornerX);
+                    rect.Y = Math.Min(context.BoundFirstCornerY, context.BoundSecondCornerY);
+                    rect.Width = Math.Abs(context.BoundSecondCornerX - context.BoundFirstCornerX) + 1;
+                    rect.Height = Math.Abs(context.BoundSecondCornerY - context.BoundFirstCornerY) + 1;
+                    g.DrawRectangle(pen, rect);
+                }
+
             }
             else
             {
@@ -302,6 +371,7 @@ namespace VideoAnnotationAPP
 
             // Обновляем индикацию на форме
             txtMarkupFilePath.Text = context.MarkupFilePath;
+            PictureRedraw();
             StatusBarUpdate();
             statusMarkup.Text = "Markup Loaded";
         }
@@ -381,10 +451,55 @@ namespace VideoAnnotationAPP
             }
         }
 
-        // 
-        void VideoMoveTo()
+        // Метод инициирует режим создания новой траектории на текущем кадре
+        private void TraceCreateBegin()
         {
+            if (!context.isVideo)
+                return;
 
+            // Обновляем состояние контекста графического интерфейса
+            context.modemajor = EditModeMajor.TraceCreate;
+            context.modeminor = EditModeMinor.SpecifyFirstCorner;
+            context.modedir = EditModeDir.None;
+
+            // Обновляем сообщения в строке состояния
+            StatusBarUpdate();
+        }
+
+        private void TraceCreateEnd()
+        {
+            if (!context.isVideo ||
+                context.modemajor != EditModeMajor.TraceCreate ||
+                context.modeminor != EditModeMinor.SpecifySecondCorner)
+                return;
+
+            // Создаем новую траекторию в списке траекторий
+            int itrack = markup.Count();
+            int iframe = context.VideoFrameCurrent;
+            TrackNode node = new TrackNode();
+            node.left = Math.Min(context.BoundFirstCornerX, context.BoundSecondCornerX);
+            node.right = Math.Max(context.BoundFirstCornerX, context.BoundSecondCornerX);
+            node.top = Math.Min(context.BoundFirstCornerY, context.BoundSecondCornerY);
+            node.bottom = Math.Max(context.BoundFirstCornerY, context.BoundSecondCornerY);
+            Track trace = new Track();
+            trace.objType = 0;
+            trace.iframeStart = iframe;
+            trace.iframeEnd = iframe;
+            trace.Add(iframe, node);
+            markup.Add(itrack, trace);
+
+            // Отмечаем созданную траекторию как текущую выделенную
+            context.isTraceSelected = true;
+            context.nTraceSelected = itrack;
+            context.modemajor = EditModeMajor.TraceView;
+            context.modeminor = EditModeMinor.None;
+            context.modedir = EditModeDir.None;
+            context.isMarkupUnsaved = true;
+
+            // Обновляем индикацию на форме
+            StatusBarUpdate();
+            TraceInfoUpdate();
+            PictureRedraw();
         }
 
         // ******************************************************************
@@ -495,6 +610,88 @@ namespace VideoAnnotationAPP
                     // Ничего не делаем
                     break;
             }
+        }
+
+        // События мыши на поле изображения кадра
+        private void picFrameView_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (!context.isVideo) return;
+
+            switch (context.modemajor)
+            {
+                case EditModeMajor.TraceCreate:
+                    switch (context.modeminor)
+                    {
+                        case EditModeMinor.SpecifyFirstCorner:
+                            context.BoundFirstCornerX = e.X;
+                            context.BoundFirstCornerY = e.Y;
+                            context.modeminor = EditModeMinor.SpecifySecondCorner;
+                            StatusBarUpdate();
+                            break;
+                        case EditModeMinor.SpecifySecondCorner:
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void picFrameView_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!context.isVideo) return;
+
+            switch (context.modemajor)
+            {
+                case EditModeMajor.TraceCreate:
+                    switch (context.modeminor)
+                    {
+                        case EditModeMinor.SpecifySecondCorner:
+                            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                            {
+                                context.BoundSecondCornerX = e.X;
+                                context.BoundSecondCornerY = e.Y;
+                                PictureRedraw();
+                            }
+                            break;
+                        case EditModeMinor.SpecifyFirstCorner:
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void picFrameView_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (!context.isVideo) return;
+
+            switch (context.modemajor)
+            {
+                case EditModeMajor.TraceCreate:
+                    switch (context.modeminor)
+                    {
+                        case EditModeMinor.SpecifySecondCorner:
+                            context.BoundSecondCornerX = e.X;
+                            context.BoundSecondCornerY = e.Y;
+                            TraceCreateEnd();
+                            break;
+                        case EditModeMinor.SpecifyFirstCorner:
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void menuTraceCreate_Click(object sender, EventArgs e)
+        {
+            TraceCreateBegin();
         }
     }
 }

@@ -67,6 +67,8 @@
             this.statusMarkup = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusMode = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusAction = new System.Windows.Forms.ToolStripStatusLabel();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuTraceCreate = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.grpVideoNavigator.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picFrameView)).BeginInit();
@@ -77,7 +79,8 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.editToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1010, 24);
@@ -330,6 +333,9 @@
             this.picFrameView.Size = new System.Drawing.Size(691, 386);
             this.picFrameView.TabIndex = 6;
             this.picFrameView.TabStop = false;
+            this.picFrameView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picFrameView_MouseDown);
+            this.picFrameView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picFrameView_MouseMove);
+            this.picFrameView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.picFrameView_MouseUp);
             // 
             // tbrVideoSlider
             // 
@@ -358,7 +364,6 @@
             // 
             // saveMarkupFileDlg
             // 
-            this.saveMarkupFileDlg.CheckFileExists = true;
             this.saveMarkupFileDlg.DefaultExt = "xml";
             this.saveMarkupFileDlg.Filter = "Markup files (*.xml)|*.xml";
             // 
@@ -408,6 +413,21 @@
             this.statusAction.Name = "statusAction";
             this.statusAction.Size = new System.Drawing.Size(200, 17);
             this.statusAction.Text = "Enter First Corner";
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuTraceCreate});
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem.Text = "Edit";
+            // 
+            // menuTraceCreate
+            // 
+            this.menuTraceCreate.Name = "menuTraceCreate";
+            this.menuTraceCreate.Size = new System.Drawing.Size(152, 22);
+            this.menuTraceCreate.Text = "Trace Create";
+            this.menuTraceCreate.Click += new System.EventHandler(this.menuTraceCreate_Click);
             // 
             // Form3
             // 
@@ -482,5 +502,7 @@
         private System.Windows.Forms.ToolStripStatusLabel statusMarkup;
         private System.Windows.Forms.ToolStripStatusLabel statusMode;
         private System.Windows.Forms.ToolStripStatusLabel statusAction;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem menuTraceCreate;
     }
 }
