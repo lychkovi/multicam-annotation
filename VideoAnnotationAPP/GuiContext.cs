@@ -52,6 +52,7 @@ namespace VideoAnnotationAPP
     struct GuiContext
     {
         public bool isVideo;               // загружен ли видеофайл
+        public int videoHandle;            // идентификатор источника видео OpenCV
         public string VideoFilePath;       // путь к загруженному видеофайлу
         public int VideoFramesCount;       // количество кадров в видеофайле
         public double VideoFps;            // частота кадров видеофайла

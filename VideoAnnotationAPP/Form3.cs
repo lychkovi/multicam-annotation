@@ -65,7 +65,16 @@ namespace VideoAnnotationAPP
                 txtVideoFrameCurrent.Text = context.VideoFrameCurrent.ToString();
 
                 // Управляем ползунком
-                tbrVideoSlider.Enabled = (context.modemajor == EditModeMajor.VideoView);
+                switch (context.modemajor)
+                {
+                    case EditModeMajor.VideoView:
+                    case EditModeMajor.TraceView:
+                        tbrVideoSlider.Enabled = true;
+                        break;
+                    default:
+                        tbrVideoSlider.Enabled = false;
+                        break;
+                }
             }
             else
             {
@@ -253,7 +262,8 @@ namespace VideoAnnotationAPP
             IntPtr hBitmap;
             int newframe;
             int errcode;
-            errcode = OcvWrapper.VideoSeek(positionMs, out hBitmap, out newframe);
+            errcode = OcvWrapper.VideoSeek(context.videoHandle, positionMs, 
+                out hBitmap, out newframe);
             if (errcode != 0)
             {
                 MessageBox.Show("Unable to seek position in video!", "Error!",
@@ -385,7 +395,7 @@ namespace VideoAnnotationAPP
                 throw new Exception("VideoClose(): Unable to close markup!");
 
             // Закрываем объект декодирования видео
-            int errcode = OcvWrapper.VideoClose();
+            int errcode = OcvWrapper.VideoClose(context.videoHandle);
             if (errcode != 0)
                 throw new Exception("VideoClose(): Unable to close video with ffmpeg!");
 
@@ -411,7 +421,8 @@ namespace VideoAnnotationAPP
                 int videoFramesCount;
                 double videoFps;
                 int errcode = OcvWrapper.VideoOpen(openVideoFileDlg.FileName, 
-                    out hBitmap, out videoFramesCount, out videoFps);
+                    out context.videoHandle, out hBitmap, out videoFramesCount, 
+                    out videoFps);
                 if (errcode != 0)
                 {
                     MessageBox.Show("Unable to open input video!", "Error!",
@@ -546,10 +557,16 @@ namespace VideoAnnotationAPP
 
         private void tbrVideoSlider_ValueChanged(object sender, EventArgs e)
         {
-            if (context.isVideo && context.modemajor == EditModeMajor.VideoView)
+            if (context.isVideo)
+            switch (context.modemajor) 
             {
-                // Выполняем переход к указанной позиции видео
-                VideoMoveTo(tbrVideoSlider.Value);
+                case EditModeMajor.VideoView:
+                case EditModeMajor.TraceView:
+                    // Выполняем переход к указанной позиции видео
+                    VideoMoveTo(tbrVideoSlider.Value);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -557,15 +574,21 @@ namespace VideoAnnotationAPP
         {
             int iframe; 
                 
-            if (context.isVideo && context.modemajor == EditModeMajor.VideoView)
+            if (context.isVideo)
+            switch (context.modemajor)
             {
-                // Выполняем переход к указанной позиции видео
-                if (System.Int32.TryParse(txtGoToFrame.Text, out iframe) && 
-                    iframe >= 0 && iframe < context.VideoFramesCount)
-                    tbrVideoSlider.Value = iframe;
-                else
-                    MessageBox.Show("Wrong frame number entered!", "Error!",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                case EditModeMajor.VideoView:
+                case EditModeMajor.TraceView:
+                    // Выполняем переход к указанной позиции видео
+                    if (System.Int32.TryParse(txtGoToFrame.Text, out iframe) &&
+                        iframe >= 0 && iframe < context.VideoFramesCount)
+                        tbrVideoSlider.Value = iframe;
+                    else
+                        MessageBox.Show("Wrong frame number entered!", "Error!",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
+                default:
+                    break;
             }
         }
 

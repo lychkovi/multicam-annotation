@@ -23,6 +23,7 @@ namespace VideoAnnotationAPP
     public partial class Form2 : Form
     {
         bool isVideo;           // признак успешно открытого видеофайла
+        int videoHandle;
         int videoFramesTotal;
         double videoFps;
         double videoDurationMs;
@@ -51,7 +52,7 @@ namespace VideoAnnotationAPP
             {
                 case appState.NOVID:
                     throw new Exception("actionCreateTrack: No video loaded!");
-                    break;
+                    
                 default:
                     // ... Дополнительные проверки ...
                     break;
@@ -101,6 +102,7 @@ namespace VideoAnnotationAPP
         {
             InitializeComponent();
             isVideo = false;
+            videoHandle = -1;
             appstate = appState.NOVID;
 
             // Инициализируем коллекцию траекторий
@@ -136,7 +138,7 @@ namespace VideoAnnotationAPP
             IntPtr hBitmap;
             int iframe;
             int errcode;
-            errcode = OcvWrapper.VideoSeek(video_time_ms, out hBitmap, out iframe);
+            errcode = OcvWrapper.VideoSeek(videoHandle, video_time_ms, out hBitmap, out iframe);
             if (errcode != 0)
             {
                 MessageBox.Show("Unable to seek position in video!", "Error!",
@@ -157,7 +159,7 @@ namespace VideoAnnotationAPP
         {
             if (isVideo)
             {
-                OcvWrapper.VideoClose();
+                OcvWrapper.VideoClose(videoHandle);
                 pictureBox1.Image = null;
                 txtVideoFilePath.Text = "";
                 txtVideoFramesTotal.Text = "";
@@ -179,7 +181,8 @@ namespace VideoAnnotationAPP
             
             // Открываем видеофайл
             IntPtr hBitmap;
-            int errcode = OcvWrapper.VideoOpen(openVideoDlg.FileName, out hBitmap, 
+            int errcode = OcvWrapper.VideoOpen(openVideoDlg.FileName, 
+                out videoHandle, out hBitmap, 
                 out videoFramesTotal, out videoFps);
             if (errcode != 0)
             {

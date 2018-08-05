@@ -68,9 +68,9 @@ BOOL COcvWrapperMfcDLLApp::InitInstance()
 
 // Хранимые данные
 
-VideoCapture cap;           // объект для чтения кадров из видео файла
-Mat prevFrame;              // последний считанный из видео файла кадр
-int prevFrameNum = 0;       // номер последнего считанного из видео файла кадра
+vector<VideoCapture> caps;  // массив объектов для чтения кадров из видео файла
+vector<Mat> prevFrames;      // последний считанный из видео файла кадр
+vector<int> prevFrameNums;   // номер последнего считанного из видео файла кадра
 
 // Экспортируемые функции
 
@@ -140,9 +140,14 @@ extern "C"
     // Функция открывает видео файл, считывает из него первый кадр и 
     // возвращает первый кадр, количество кадров и частоту кадров в секунду
     __declspec(dllexport) HRESULT VideoOpen(
-        const char* filepath, /* out */ HBITMAP * hBitmap, 
-        /* out */ int* nframes, /* out */ double* fps)
+        const char* filepath, 
+        /* out */ int* videoHandleOut, 
+        /* out */ HBITMAP * hBitmap, 
+        /* out */ int* nframes, 
+        /* out */ double* fps)
     {
+        VideoCapture cap;
+
         // Открываем видео файл для чтения
         cap.open(filepath);
         if (!cap.isOpened())
@@ -157,49 +162,60 @@ extern "C"
         if (!copyMatToHbitmap(img, hBitmap))
             return S_FALSE;
 
+        // Обновляем переменные состояния проигрывателя
+        int videoHandle = (int) caps.size();
+        caps.push_back(cap);
+        prevFrames.push_back(img);
+        prevFrameNums.push_back(0);
+
         // Возвращаем параметры видео в вызывающую программу
         *nframes = (long) cap.get(CV_CAP_PROP_FRAME_COUNT);
         *fps = (double) cap.get(CV_CAP_PROP_FPS);
-        
-        // Обновляем переменные состояния проигрывателя
-        img.copyTo(prevFrame);
-        prevFrameNum = 0;
+        *videoHandleOut = videoHandle;
 
         return S_OK;
     }
 
     // Функция перематывает видео до нужного момента времени (мс)
-    __declspec(dllexport) HRESULT VideoSeek(double video_time_ms, 
-        /* out */ HBITMAP* hBitmap, /* out */ int* iframe)
+    __declspec(dllexport) HRESULT VideoSeek(int videoHandle, 
+        double video_time_ms, 
+        /* out */ HBITMAP* hBitmap, 
+        /* out */ int* iframe)
     {
+        if (videoHandle < 0 || videoHandle >= (int)caps.size())
+            return S_FALSE;
+
         // Перемещаемся в нужную позицию видеофайла
-        if (!cap.set(CV_CAP_PROP_POS_MSEC, video_time_ms))
+        if (!caps[videoHandle].set(CV_CAP_PROP_POS_MSEC, video_time_ms))
             return S_FALSE;
 
         // Считываем кадр видео в текущей позиции
         Mat img;
-        cap >> img;
+        caps[videoHandle] >> img;
         if (img.empty())
             return S_FALSE;
 
         // Возвращаем считанный кадр и его номер в приложение
         if (!copyMatToHbitmap(img, hBitmap))
             return S_FALSE;
-        *iframe = cap.get(CV_CAP_PROP_POS_FRAMES);
+        *iframe = (int) caps[videoHandle].get(CV_CAP_PROP_POS_FRAMES);
 
         // Обновляем переменные состояния проигрывателя
-        img.copyTo(prevFrame);
-        prevFrameNum = *iframe;
+        img.copyTo(prevFrames[videoHandle]);
+        prevFrameNums[videoHandle] = *iframe;
 
         return S_OK;
     }
 
     // Функция закрывает видео файл, ранее открытый функцией open_video()
-    __declspec(dllexport) HRESULT VideoClose()
+    __declspec(dllexport) HRESULT VideoClose(int videoHandle)
     {
-        cap.release();
-        prevFrame.release();
-        prevFrameNum = -1;
+        if (videoHandle < 0 || videoHandle >= (int)caps.size())
+            return S_FALSE;
+
+        caps[videoHandle].release();
+        prevFrames[videoHandle].release();
+        prevFrameNums[videoHandle] = -1;
         return S_OK;
     }
 }

@@ -37,14 +37,17 @@ namespace VideoAnnotationAPP
 
         // Функции для работы с видеофайлом
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int VideoOpen(String filepath, out IntPtr hBitmap,
+        public static extern int VideoOpen(String filepath, 
+            out int videoHandle, 
+            out IntPtr hBitmap,
             out int nframes, out double fps);
 
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int VideoSeek(double video_time_ms, out IntPtr hBitmap,
+        public static extern int VideoSeek(int videoHandle, 
+            double video_time_ms, out IntPtr hBitmap,
             out int iframe);
 
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int VideoClose();
+        public static extern int VideoClose(int videoHandle);
     }
 }
