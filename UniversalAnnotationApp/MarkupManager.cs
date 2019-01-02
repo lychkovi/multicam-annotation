@@ -5,27 +5,66 @@ using System.Text;
 
 namespace UniversalAnnotationApp
 {
-    interface IMarkupPublic
+    // Все Public-Методы (Метод регистрации графических элементов управления, 
+    // а также методы обработки событий от элементов управления формы).
+    // Могут вызываться прямо из методов формы пользовательского интерфейса.
+    public interface IMarkup
     {
         void MarkupGuiBind();
     }
 
-    abstract class MarkupManagerBase : CameraManager, IMarkupPublic
+    // Все Protected-методы, которые могут вызываться классами-наследниками и 
+    // Public-методы из соответствующего интерфейса. 
+    abstract class MarkupManagerBase : CameraManager, IMarkup
     {
-        abstract protected void MarkupOpen(string XmlFilePath);
+        // Такие два метода должны быть у всех слоев выше слоя Camera
+        // Слои вызывают эти методы рекурсивно по цепочке
+        abstract public bool MarkupCameraOpen(string RecordingFilePath);
+        abstract public bool MarkupCameraClose(); 
+
+        abstract protected bool MarkupOpen(string MarkupFilePath);
+        abstract protected bool MarkupClose();
+
+        abstract protected bool MarkupIsOpened { get; }
+
         abstract public void MarkupGuiBind();
     }
 
+    // Реализации Public-, Private- методов, а также Private-члены, к которым
+    // не могут обращаться классы-наследники.
     class MarkupManager : MarkupManagerBase
     {
-        override protected void MarkupOpen(string XmlFilePath) 
-        { 
-
+        public override bool MarkupCameraOpen(string RecordingFilePath)
+        {
+            CameraOpen(RecordingFilePath);
+            throw new NotImplementedException();
         }
+
+        public override bool MarkupCameraClose()
+        {
+            CameraClose();
+            throw new NotImplementedException();
+        }
+
+        override protected bool MarkupOpen(string XmlFilePath) 
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override bool MarkupClose()
+        {
+            throw new NotImplementedException();
+        }
+
+        override protected bool MarkupIsOpened
+        {
+            get { return false; }
+        }
+
 
         override public void MarkupGuiBind() 
         { 
-            CameraOpen(""); 
+            CameraOpen("");
         }
     }
 }

@@ -13,6 +13,12 @@ namespace UniversalAnnotationApp
     {
         public Form1()
         {
+            MarkupManager markup = new MarkupManager();
+            IMarkup markupIface = (IMarkup)markup;
+            markupIface.MarkupGuiBind();
+
+            CameraManager camera = new CameraManager();
+
             InitializeComponent();
         }
     }
