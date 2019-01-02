@@ -19,11 +19,11 @@ namespace UniversalAnnotationApp
     {
         // Такие два метода должны быть у всех слоев выше слоя Camera
         // Слои вызывают эти методы рекурсивно по цепочке
-        abstract public bool MarkupCameraOpen(string RecordingFilePath);
-        abstract public bool MarkupCameraClose(); 
+        abstract protected bool MarkupCameraOpen(string RecordingFilePath);
+        abstract protected void MarkupCameraClose(); 
 
         abstract protected bool MarkupOpen(string MarkupFilePath);
-        abstract protected bool MarkupClose();
+        abstract protected void MarkupClose();
 
         abstract protected bool MarkupIsOpened { get; }
 
@@ -34,13 +34,13 @@ namespace UniversalAnnotationApp
     // не могут обращаться классы-наследники.
     class MarkupManager : MarkupManagerBase
     {
-        public override bool MarkupCameraOpen(string RecordingFilePath)
+        protected override bool MarkupCameraOpen(string RecordingFilePath)
         {
             CameraOpen(RecordingFilePath);
             throw new NotImplementedException();
         }
 
-        public override bool MarkupCameraClose()
+        protected override void MarkupCameraClose()
         {
             CameraClose();
             throw new NotImplementedException();
@@ -51,7 +51,7 @@ namespace UniversalAnnotationApp
             throw new NotImplementedException();
         }
 
-        protected override bool MarkupClose()
+        protected override void MarkupClose()
         {
             throw new NotImplementedException();
         }

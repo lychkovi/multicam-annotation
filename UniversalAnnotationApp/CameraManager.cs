@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 
 using System.Runtime.InteropServices;       // для DllImport native C++
+using MarkupData;                           // RecordingInfo
 
 
 namespace UniversalAnnotationApp
@@ -13,8 +14,9 @@ namespace UniversalAnnotationApp
     // Все Protected-методы, которые могут вызываться классами-наследниками
     abstract class CameraManagerBase
     {
+        abstract protected RecordingInfo CameraRecordingInfo { get; }
         abstract protected bool CameraOpen(string RecordingFilePath);
-        abstract protected bool CameraClose();
+        abstract protected void CameraClose();
         abstract protected bool CameraIsOpened { get; }
     }
 
@@ -35,6 +37,17 @@ namespace UniversalAnnotationApp
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int m_VideoClose(int videoHandle);
 
+        private RecordingInfo m_RecordingInfo; // сведения о видеозаписи
+
+        // Свойство для чтения сведения о видеозаписи верхними слоями
+        override protected RecordingInfo CameraRecordingInfo 
+        {
+            get
+            {
+                return m_RecordingInfo;
+            }
+        }
+
         override protected bool CameraOpen(string RecordingFilePath) 
         {
             // Открываем видеофайл
@@ -47,9 +60,9 @@ namespace UniversalAnnotationApp
             return (status == 0);
         }
 
-        override protected bool CameraClose()
+        override protected void CameraClose()
         {
-            return true;
+            
         }
 
         override protected bool CameraIsOpened 
