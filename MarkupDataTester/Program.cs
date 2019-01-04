@@ -1,4 +1,4 @@
-﻿// Программа для тестирования класса MarkupProvider
+﻿// Программа для тестирования классов MarkupProvider
 
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,27 @@ namespace MarkupDataTester
 {
     class Program
     {
+        /* Метод конструирует структуру RecordingInfo для последующей
+         * инициализации объекта markup. */
+        static void RecordingInfoInit(out RecordingInfo rec)
+        {
+            View View;
+            View.ID = 0;
+            View.FileNameAVI = "unknown.avi";
+            View.FrameWidth = 720;
+            View.FrameHeight = 576;
+            View.IsColour = true;
+            View.Comment = "";
+
+            rec.FileNameXML = "unknown.xml";
+            rec.FramesCount = 0;
+            rec.Fps = 25.0;
+            rec.Comment = "";
+            rec.DateTime = DateTime.Now;
+            rec.Views = new List<View>();
+            rec.Views.Add(View);
+        }
+
         /* Вспомогательный метод для вывода в консоль таблицы Categories. */
         static void CategoryPrintAll(MarkupProvider markup)
         {
@@ -44,16 +65,18 @@ namespace MarkupDataTester
         }
 
         /* Метод тестирует просмотр всех категорий в списке. */
-        static void TestCategorySelect()
+        static void TestCategorySelect(RecordingInfo rec)
         {
-            MarkupProvider markup = new MarkupProvider();
+            MarkupProvider markup = new MarkupProviderADO();
+            markup.Init(rec);
             CategoryPrintAll(markup);
         }
 
         /* Метод тестирует функцию добавления новой категории. */
-        static void TestCategoryInsert()
+        static void TestCategoryInsert(RecordingInfo rec)
         {
-            MarkupProvider markup = new MarkupProvider();
+            MarkupProvider markup = new MarkupProviderADO();
+            markup.Init(rec);
             int ID = CategoryInsertOne(markup, "New");
 
             Console.WriteLine("New ID = {0}", ID);
@@ -61,9 +84,10 @@ namespace MarkupDataTester
         }
 
         /* Метод тестирует удаление строки из таблицы категорий. */
-        static void TestCategoryDelete()
+        static void TestCategoryDelete(RecordingInfo rec)
         {
-            MarkupProvider markup = new MarkupProvider();
+            MarkupProvider markup = new MarkupProviderADO();
+            markup.Init(rec);
             CategoryInsertOne(markup, "New1");
             CategoryInsertOne(markup, "New2");
             markup.CategoryDelete(1);
@@ -72,9 +96,10 @@ namespace MarkupDataTester
         }
 
         /* Метод тестирует обновление строки в таблице категорий. */
-        static void TestCategoryUpdate()
+        static void TestCategoryUpdate(RecordingInfo rec)
         {
-            MarkupProvider markup = new MarkupProvider();
+            MarkupProvider markup = new MarkupProviderADO();
+            markup.Init(rec);
             CategoryInsertOne(markup, "New1");
             CategoryInsertOne(markup, "New2");
 
@@ -88,28 +113,72 @@ namespace MarkupDataTester
             CategoryPrintAll(markup);
         }
 
+        /* Метод тестирует сохранение разметки в XML-файл. */
+        static void TestXmlWrite(RecordingInfo rec)
+        {
+            string MarkupFilePath = "markup.xml";
+
+            MarkupProvider markup = new MarkupProviderADO();
+            markup.Init(rec);
+            CategoryInsertOne(markup, "New1");
+            CategoryInsertOne(markup, "New2");
+            CategoryPrintAll(markup);
+            if (markup.Save(MarkupFilePath))
+                Console.WriteLine("Saved markup to " + MarkupFilePath);
+            else
+                Console.WriteLine("Problem while saving markup!");
+        }
+
+        /* Метод тестирует загрузку разметки из XML-файла. */
+        static void TestXmlRead()
+        {
+            string MarkupFilePath = "markup.xml";
+
+            MarkupProvider markup = new MarkupProviderADO();
+            if (markup.Open(MarkupFilePath))
+            {
+                Console.WriteLine("Loaded markup from " + MarkupFilePath);
+                CategoryPrintAll(markup);
+            }
+            else
+            {
+                Console.WriteLine("Propblem while loading markup!");
+            }
+        }
+
         static void Main(string[] args)
         {
+            RecordingInfo rec;
+            RecordingInfoInit(out rec);
+
             Console.WriteLine("1 - Test Category Select;");
             Console.WriteLine("2 - Test Category Insert;");
             Console.WriteLine("3 - Test Category Delete;");
             Console.WriteLine("4 - Test Category Update;");
+            Console.WriteLine("5 - Test saving markup to Xml;");
+            Console.WriteLine("6 - Test loading markup from Xml;");
             Console.Write("Your choise: ");
             ConsoleKeyInfo key = Console.ReadKey();
             Console.WriteLine();
             switch (key.KeyChar)
             {
                 case '1':
-                    TestCategorySelect();
+                    TestCategorySelect(rec);
                     break;
                 case '2':
-                    TestCategoryInsert();
+                    TestCategoryInsert(rec);
                     break;
                 case '3':
-                    TestCategoryDelete();
+                    TestCategoryDelete(rec);
                     break;
                 case '4':
-                    TestCategoryUpdate();
+                    TestCategoryUpdate(rec);
+                    break;
+                case '5':
+                    TestXmlWrite(rec);
+                    break;
+                case '6':
+                    TestXmlRead();
                     break;
                 default:
                     Console.WriteLine("Wrong input!");

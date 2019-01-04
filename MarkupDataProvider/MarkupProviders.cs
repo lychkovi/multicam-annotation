@@ -6,10 +6,10 @@ using System.Data;      // работа с DataSet и др. элементами
 
 namespace MarkupData
 {
-    /* MarkupProvider: Класс реализует представление разметки в памяти
+    /* MarkupProviderADO: Класс реализует представление разметки в памяти
      * с помощью реляционных таблиц класса ADO.NET DataSet и сохранение
      * разметки на диск в файл XML. */
-    public class MarkupProvider: MarkupProviderBase
+    public class MarkupProviderADO: MarkupProvider
     {
         private DataSet m_data;
 
@@ -55,14 +55,7 @@ namespace MarkupData
                 NameColumn, CommentColumn, ColorRedColumn, ColorGreenColumn, 
                 ColorBlueColumn });
             CategoriesTable.PrimaryKey = new DataColumn[] 
-                { CategoriesTable.Columns[0] };
-
-            /* Добавляем в таблицу нулевую категорию Unknown по умолчанию 
-             * для новых объектов. */
-            DataRow DefaultCategory = CategoriesTable.NewRow();
-            DefaultCategory["Name"] = "Unknown";
-            DefaultCategory["Comment"] = "Default category for new tags";
-            CategoriesTable.Rows.Add(DefaultCategory);
+                { CategoriesTable.Columns["ID"] };
 
             /* Сохраняем таблицу в объект DataSet в памяти. */
             m_data.Tables.Add(CategoriesTable);
@@ -93,13 +86,8 @@ namespace MarkupData
             DataTable TagsTable = new DataTable("Tags");
             TagsTable.Columns.AddRange(new DataColumn[] { IdColumn, 
                 categoryIdColumn, CommentColumn });
-            TagsTable.PrimaryKey = new DataColumn[] { TagsTable.Columns[0] };
-
-            /* Добавляем в таблицу нулевую метку Unknown по умолчанию 
-             * для новых траекторий. */
-            DataRow DefaultTag = TagsTable.NewRow();
-            DefaultTag["Comment"] = "Unknown";
-            TagsTable.Rows.Add(DefaultTag);
+            TagsTable.PrimaryKey = new DataColumn[] 
+                { TagsTable.Columns["ID"] };
 
             /* Сохраняем таблицу в объект DataSet в памяти. */
             m_data.Tables.Add(TagsTable);
@@ -140,7 +128,7 @@ namespace MarkupData
                 { FileNameXmlColumn, FramesCountColumn, FpsColumn, 
                     CommentColumn, AuthorColumn, DateTimeColumn });
             RecordingInfoTable.PrimaryKey = new DataColumn[] 
-                { RecordingInfoTable.Columns[0] };
+                { RecordingInfoTable.Columns["FileNameXML"] };
 
             m_data.Tables.Add(RecordingInfoTable);
         }
@@ -184,8 +172,8 @@ namespace MarkupData
             ViewsTable.Columns.AddRange(new DataColumn[] { IdColumn, 
                 FrameWidthColumn, FrameHeightColumn, IsColourColumn, 
                 FileNameAviColumn, CommentColumn });
-            ViewsTable.PrimaryKey = 
-                new DataColumn[] { ViewsTable.Columns[0] };
+            ViewsTable.PrimaryKey =
+                new DataColumn[] { ViewsTable.Columns["ID"] };
 
             m_data.Tables.Add(ViewsTable);
         }
@@ -216,8 +204,8 @@ namespace MarkupData
             DataTable TracesTable = new DataTable("Traces");
             TracesTable.Columns.AddRange(new DataColumn[] { IdColumn, 
                 ViewIdColumn, TagIdColumn, HasBoxColumn });
-            TracesTable.PrimaryKey = 
-                new DataColumn[] { TracesTable.Columns[0] };
+            TracesTable.PrimaryKey =
+                new DataColumn[] { TracesTable.Columns["ID"] };
 
             m_data.Tables.Add(TracesTable);
         }
@@ -341,15 +329,12 @@ namespace MarkupData
             m_data.Relations.Add(dr);
         }
 
-        /* Reset: Удаление всего содержимого разметки и создание схемы 
+        /* CreateSchema: Удаление всего содержимого разметки и создание схемы 
          * всех таблиц с нуля (без заполнения данными), его нужно вызывать 
-         * при закрытии файла разметки. */
-        override public void Reset()
+         * один раз в констукторе класса. */
+        private void m_CreateSchema()
         {
-            // Удаляем всю информацию о разметке из памяти
-            m_data.Clear();
-
-            // Заново создаем все таблицы
+            // Создаем все таблицы
             m_CreateRecordingInfo();
             m_CreateViews();
             m_CreateCategories();
@@ -362,24 +347,74 @@ namespace MarkupData
             m_CreateRelations();
         }
 
-        /* Инициализация таблиц Views и RecInfo, его нужно вызывать при
-         * создании нового файла разметки для заданной видеозаписи. */
-        override public bool Init(RecordingInfo rec)
+        /* InitCategories: Добавляем категорию объектов по умолчанию. */
+        private void m_InitCategories()
         {
-            Reset();
-            return false;
+            /* Добавляем в таблицу нулевую категорию Unknown по умолчанию 
+             * для новых объектов. */
+            DataRow DefaultCategory = m_data.Tables["Categories"].NewRow();
+            DefaultCategory["Name"] = "Unknown";
+            DefaultCategory["Comment"] = "Default category for new tags";
+            m_data.Tables["Categories"].Rows.Add(DefaultCategory);
         }
 
-        /* Save: Сохранение разметки в XML-файл */
-        override public bool Save(string MarkupFilePath)
+        /* InitTags: Добавляем метку объекта по умолчнию. */
+        private void m_InitTags()
         {
-            return false;
+            /* Добавляем в таблицу нулевую метку Unknown по умолчанию 
+             * для новых траекторий. */
+            DataRow DefaultTag = m_data.Tables["Tags"].NewRow();
+            DefaultTag["Comment"] = "Unknown";
+            m_data.Tables["Tags"].Rows.Add(DefaultTag);
         }
 
-        /* Open: Загрузка разметки из XML-файла. */
-        override public bool Open(string MarkupFilePath)
+        /* InitRecordingInfo: Инициализируем таблицу RecordingInfo 
+         * сведениями из переданной структуры. */
+        private void m_InitRecordingInfo(RecordingInfo rec)
         {
-            return false;
+            DataRow Info = m_data.Tables["RecordingInfo"].NewRow();
+            Info["FileNameXML"] = rec.FileNameXML;
+            Info["FramesCount"] = rec.FramesCount;
+            Info["Fps"] = rec.Fps;
+            Info["Comment"] = rec.Comment;
+            Info["DateTime"] = rec.DateTime;
+            m_data.Tables["RecordingInfo"].Rows.Add(Info);
+        }
+
+        /* InitViews: Инициализируем таблицу Views сведениями об отдельных
+         * камерах из структуры описания видеозаписи. */
+        private void m_InitViews(RecordingInfo rec)
+        {
+            //DataRow row;
+            foreach (View item in rec.Views)
+            {
+                DataRow row = m_data.Tables["Views"].NewRow();
+                row["FrameWidth"] = item.FrameWidth;
+                row["FrameHeight"] = item.FrameHeight;
+                row["IsColour"] = item.IsColour;
+                row["FileNameAVI"] = item.FileNameAVI;
+                row["Comment"] = item.Comment;
+                m_data.Tables["Views"].Rows.Add(row);
+            }
+        }
+
+        /* Инициализируются только таблицы Views и RecInfo, метод нужно
+         * вызывать при создании нового XML-файла видеозаписи. */
+        override public void InitPartial(RecordingInfo rec)
+        {
+            m_data.Clear();
+            m_InitRecordingInfo(rec);
+            m_InitViews(rec);
+        }
+
+        /* Инициализация таблиц Views, RecInfo, Categories, Tags, метод
+         * нужно вызывать при создании нового XML-файла разметки для 
+         * заданной видеозаписи. */ 
+        override public void Init(RecordingInfo rec)
+        {
+            InitPartial(rec);
+            m_InitCategories();
+            m_InitTags();
         }
 
         /* Check: Проверка соответствия загруженной разметки параметрам
@@ -466,10 +501,40 @@ namespace MarkupData
             return list;
         }
 
-        public MarkupProvider()
+        // Метод сохранения разметки в XML-файл
+        override public bool Save(string MarkupFilePath)
+        {
+            try
+            {
+                m_data.WriteXml(MarkupFilePath);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        // Метод загрузки разметки из XML-файла
+        override public bool Open(string MarkupFilePath)
+        {
+            try
+            {
+                // Очищаем все таблицы
+                m_data.Clear();
+                m_data.ReadXml(MarkupFilePath);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public MarkupProviderADO()
         {
             m_data = new DataSet();
-            Reset();
+            m_CreateSchema();
         }
     }
 }

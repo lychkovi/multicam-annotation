@@ -35,7 +35,8 @@ namespace UniversalAnnotationApp
         abstract protected bool TraceIsTraceSelected { get; } 
             // траектория выбрана?
         abstract protected int TraceTraceSelectedID { get; } // её индекс
-        abstract protected bool TraceIsStateCreate { get; } 
+        abstract protected bool TraceIsStateCreate { get; }
+        abstract protected bool TraceIsStateCreateMarker { get; }
             // инициировали создание
         abstract protected bool TraceIsStateCreateStretch { get; }
             // мышкой указали первый угол рамки, тянем второй
@@ -57,8 +58,8 @@ namespace UniversalAnnotationApp
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
-        abstract public bool TraceCameraOpen(string RecordingFilePath);
-        abstract public void TraceCameraClose();
+        abstract protected bool TraceCameraOpen(string RecordingFilePath);
+        abstract protected void TraceCameraClose();
         abstract protected bool TraceMarkupOpen(string MarkupFilePath);
         abstract protected void TraceMarkupClose();
 
@@ -72,7 +73,7 @@ namespace UniversalAnnotationApp
         abstract protected void TraceUnSelect(); // отменить выбор траект.
 
         // Создание траектории
-        abstract protected void TraceCreateBegin(); // инициировать создание
+        abstract protected void TraceCreateBegin(bool isMarker); // инициировать создание
         abstract protected void TraceCreateProceed(); // 1ый угол рамки ввели
         abstract protected void TraceCreateEnd(int TraceID);
             /* Завершитиь создание траектории, индекс созданной траектории
@@ -99,6 +100,7 @@ namespace UniversalAnnotationApp
         private bool m_IsTraceSelected; // траектория выбрана?
         private int m_TraceSelectedID;  // индекс выбранной траектории
         private bool m_IsStateCreate;   // инициировали создание
+        private bool m_IsStateCreateMarker; // создание маркера
         private bool m_IsStateCreateStretch; // указали первый угол рамки
         private bool m_IsStateUpdate; // инициировали изменение
         private int m_UpdateStepDir;  // шаг приращения кадра
@@ -118,6 +120,7 @@ namespace UniversalAnnotationApp
             // Создание траектории
             m_IsStateCreate = false;
             m_IsStateCreateStretch = false;
+            m_IsStateCreateMarker = false;
 
             // Редактирование траектории
             m_IsStateUpdate = false;
@@ -194,6 +197,14 @@ namespace UniversalAnnotationApp
             }
         }
 
+        override protected bool TraceIsStateCreateMarker
+        {
+            get
+            {
+                return m_IsStateCreateMarker;
+            }
+        }
+
         override protected bool TraceIsStateCreateStretch
         { // мышкой указали первый угол рамки, тянем второй
             get
@@ -246,7 +257,7 @@ namespace UniversalAnnotationApp
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
-        override public bool TraceCameraOpen(string RecordingFilePath)
+        override protected bool TraceCameraOpen(string RecordingFilePath)
         {
             if (MarkupCameraOpen(RecordingFilePath))
             {
@@ -259,7 +270,7 @@ namespace UniversalAnnotationApp
                 return false;
         }
 
-        override public void TraceCameraClose()
+        override protected void TraceCameraClose()
         {
             MarkupCameraClose();
             m_ResetState();
@@ -319,7 +330,7 @@ namespace UniversalAnnotationApp
         }
 
         // Создание траектории
-        override protected void TraceCreateBegin()
+        override protected void TraceCreateBegin(bool isMarker)
         { // инициировать создание
             if (m_IsStateUpdate)
                 TraceOnUpdateEnd(); // останавливаем редактирование
@@ -328,6 +339,7 @@ namespace UniversalAnnotationApp
 
             m_IsStateCreate = true;
             m_IsStateCreateStretch = false;
+            m_IsStateCreateMarker = isMarker;
         }
 
         override protected void TraceCreateProceed()

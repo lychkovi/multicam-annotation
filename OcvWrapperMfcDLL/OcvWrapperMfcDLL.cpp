@@ -180,7 +180,7 @@ extern "C"
     __declspec(dllexport) HRESULT VideoSeek(int videoHandle, 
         double video_time_ms, 
         /* out */ HBITMAP* hBitmap, 
-        /* out */ int* iframe)
+        /* out */ int* iframe) // нумерация iframe начинается с 1
     {
         if (videoHandle < 0 || videoHandle >= (int)caps.size())
             return S_FALSE;
@@ -203,6 +203,21 @@ extern "C"
         // Обновляем переменные состояния проигрывателя
         img.copyTo(prevFrames[videoHandle]);
         prevFrameNums[videoHandle] = *iframe;
+
+        return S_OK;
+    }
+
+    // Функция запроса сведений о видеофайле
+    __declspec(dllexport) HRESULT VideoGetInfo(int videoHandle,
+        /* out */ int* nframes, 
+        /* out */ double* fps)
+    {
+        if (videoHandle < 0 || videoHandle >= (int)caps.size())
+            return S_FALSE;
+
+        // Возвращаем параметры видео в вызывающую программу
+        *nframes = (long) caps[videoHandle].get(CV_CAP_PROP_FRAME_COUNT);
+        *fps = (double) caps[videoHandle].get(CV_CAP_PROP_FPS);
 
         return S_OK;
     }

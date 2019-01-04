@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{25D2503A-45B6-42B0-B5F0-F450F1B24F99}</ProjectGuid>
+    <ProjectGuid>{3369E241-DB8A-48DC-B67D-A9032690B8E1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UniversalAnnotationApp</RootNamespace>
-    <AssemblyName>UniversalAnnotationApp</AssemblyName>
+    <RootNamespace>CameraDataTester</RootNamespace>
+    <AssemblyName>CameraDataTester</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -46,18 +46,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CameraManager.cs" />
-    <Compile Include="DisplayManager.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="MarkupManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TraceManager.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -70,7 +66,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -85,10 +80,6 @@
     <ProjectReference Include="..\CameraData\CameraData.csproj">
       <Project>{12CF7313-6D58-4061-A1D7-1A6E41E007D3}</Project>
       <Name>CameraData</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MarkupDataProvider\MarkupData.csproj">
-      <Project>{CAFF6E5E-EB0F-42A4-8957-DA60A3A8FDC6}</Project>
-      <Name>MarkupData</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

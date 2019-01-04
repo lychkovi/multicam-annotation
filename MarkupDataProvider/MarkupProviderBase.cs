@@ -79,10 +79,16 @@ namespace MarkupData
     }
 
     /* Базовый класс для реализации поставщика данных разметки видео. */
-    abstract public class MarkupProviderBase
+    abstract public class MarkupProvider
     {
-        abstract public void Reset(); // создание схемы всех таблиц
-        abstract public bool Init(RecordingInfo rec); // --> Views и RecInfo
+        abstract public void InitPartial(RecordingInfo rec);
+            //--> Инициализируются только таблицы Views и RecInfo
+            // содержимым структуры rec:
+            // необходимо для создания XML-файла видеозаписи.
+        abstract public void Init(RecordingInfo rec);
+            //--> Кроме таблиц Views и RecInfo также инициализируются
+            // таблицы Categories и Tags тэгами по умолчанию:
+            // необходимо при создании нового XML-файла разметки.
         abstract public bool Save(string MarkupFilePath);
         abstract public bool Open(string MarkupFilePath);
         abstract public bool Check(RecordingInfo rec);//<--> Views и RecInfo

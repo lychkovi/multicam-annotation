@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using MarkupData;                   // классы MarkupProvider
+
+
 namespace UniversalAnnotationApp
 {
     // Все Public-Методы (Метод регистрации графических элементов управления, 
@@ -34,6 +37,8 @@ namespace UniversalAnnotationApp
     // не могут обращаться классы-наследники.
     class MarkupManager : MarkupManagerBase
     {
+        private MarkupProvider m_markup;    // поставщик данных
+
         protected override bool MarkupCameraOpen(string RecordingFilePath)
         {
             CameraOpen(RecordingFilePath);
@@ -65,6 +70,12 @@ namespace UniversalAnnotationApp
         override public void MarkupGuiBind() 
         { 
             CameraOpen("");
+        }
+
+        // Конструктор класса по умолчанию
+        public MarkupManager()
+        {
+            m_markup = new MarkupProviderADO();
         }
     }
 }
