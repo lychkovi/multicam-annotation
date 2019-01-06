@@ -46,6 +46,10 @@
             this.dlgRecordingOpen = new System.Windows.Forms.OpenFileDialog();
             this.dlgMarkupSave = new System.Windows.Forms.SaveFileDialog();
             this.dlgMarkupOpen = new System.Windows.Forms.OpenFileDialog();
+            this.lblRecordingFile = new System.Windows.Forms.Label();
+            this.lblMarkupFile = new System.Windows.Forms.Label();
+            this.txtRecordingFile = new System.Windows.Forms.TextBox();
+            this.txtMarkupFile = new System.Windows.Forms.TextBox();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -100,24 +104,28 @@
             this.menuMarkupOpen.Name = "menuMarkupOpen";
             this.menuMarkupOpen.Size = new System.Drawing.Size(158, 22);
             this.menuMarkupOpen.Text = "Markup Open";
+            this.menuMarkupOpen.Click += new System.EventHandler(this.menuMarkupOpen_Click);
             // 
             // menuMarkupSave
             // 
             this.menuMarkupSave.Name = "menuMarkupSave";
             this.menuMarkupSave.Size = new System.Drawing.Size(158, 22);
             this.menuMarkupSave.Text = "Markup Save";
+            this.menuMarkupSave.Click += new System.EventHandler(this.menuMarkupSave_Click);
             // 
             // menuMarkupSaveAd
             // 
             this.menuMarkupSaveAd.Name = "menuMarkupSaveAd";
             this.menuMarkupSaveAd.Size = new System.Drawing.Size(158, 22);
             this.menuMarkupSaveAd.Text = "Markup Save As";
+            this.menuMarkupSaveAd.Click += new System.EventHandler(this.menuMarkupSaveAd_Click);
             // 
             // menuMarkupClose
             // 
             this.menuMarkupClose.Name = "menuMarkupClose";
             this.menuMarkupClose.Size = new System.Drawing.Size(158, 22);
             this.menuMarkupClose.Text = "Markup Close";
+            this.menuMarkupClose.Click += new System.EventHandler(this.menuMarkupClose_Click);
             // 
             // statusStrip
             // 
@@ -178,11 +186,49 @@
             this.dlgMarkupOpen.FileName = "openFileDialog1";
             this.dlgMarkupOpen.Filter = "XML files|*.xml";
             // 
+            // lblRecordingFile
+            // 
+            this.lblRecordingFile.AutoSize = true;
+            this.lblRecordingFile.Location = new System.Drawing.Point(12, 31);
+            this.lblRecordingFile.Name = "lblRecordingFile";
+            this.lblRecordingFile.Size = new System.Drawing.Size(75, 13);
+            this.lblRecordingFile.TabIndex = 2;
+            this.lblRecordingFile.Text = "Recording File";
+            // 
+            // lblMarkupFile
+            // 
+            this.lblMarkupFile.AutoSize = true;
+            this.lblMarkupFile.Location = new System.Drawing.Point(12, 57);
+            this.lblMarkupFile.Name = "lblMarkupFile";
+            this.lblMarkupFile.Size = new System.Drawing.Size(62, 13);
+            this.lblMarkupFile.TabIndex = 3;
+            this.lblMarkupFile.Text = "Markup File";
+            // 
+            // txtRecordingFile
+            // 
+            this.txtRecordingFile.Location = new System.Drawing.Point(93, 28);
+            this.txtRecordingFile.Name = "txtRecordingFile";
+            this.txtRecordingFile.ReadOnly = true;
+            this.txtRecordingFile.Size = new System.Drawing.Size(640, 20);
+            this.txtRecordingFile.TabIndex = 4;
+            // 
+            // txtMarkupFile
+            // 
+            this.txtMarkupFile.Location = new System.Drawing.Point(93, 54);
+            this.txtMarkupFile.Name = "txtMarkupFile";
+            this.txtMarkupFile.ReadOnly = true;
+            this.txtMarkupFile.Size = new System.Drawing.Size(640, 20);
+            this.txtMarkupFile.TabIndex = 5;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(745, 485);
+            this.Controls.Add(this.txtMarkupFile);
+            this.Controls.Add(this.txtRecordingFile);
+            this.Controls.Add(this.lblMarkupFile);
+            this.Controls.Add(this.lblRecordingFile);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuStrip);
             this.MainMenuStrip = this.menuStrip;
@@ -218,6 +264,10 @@
         private System.Windows.Forms.OpenFileDialog dlgRecordingOpen;
         private System.Windows.Forms.SaveFileDialog dlgMarkupSave;
         private System.Windows.Forms.OpenFileDialog dlgMarkupOpen;
+        private System.Windows.Forms.Label lblRecordingFile;
+        private System.Windows.Forms.Label lblMarkupFile;
+        private System.Windows.Forms.TextBox txtRecordingFile;
+        private System.Windows.Forms.TextBox txtMarkupFile;
     }
 }
 

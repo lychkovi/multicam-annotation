@@ -37,33 +37,62 @@ namespace UniversalAnnotationApp
             string[] ViewFilePaths, string Comment);
     }
 
-    class CameraManager : CameraManagerBase
+    /* Класс обеспечивает доступ к флагам состояния слоя только через 
+     * бизнес-логику обновления графического интерфейса. */
+    class CameraManagerState
     {
-        private CameraProvider m_cam;   // поставщик видео-данных
-        private bool m_IsOpened;        // признак открытой видеозаписи
-        private RecordingInfo m_RecordingInfo; // открытая видеозапись
-        private List<int> m_VideoHandles;   // номера открытых видеофайлов
-        private CameraManagerControls m_Controls;  // элементы управления формы
+        private bool m_IsOpened;            // признак открытия видеозаписи
+        private CameraManagerControls m_Controls;
 
-        // Обновить состояние элементов управления на форме
         private void m_ControlsUpdate()
         {
             if (m_Controls.statusVideo != null)
             {
                 if (m_IsOpened)
+                {
                     m_Controls.statusVideo.Text = "Video Opened";
+                }
                 else
-                    m_Controls.statusVideo.Text = "No Video Opened";
+                {
+                    m_Controls.statusVideo.Text = "No Video";
+                }
             }
         }
+
+        public void GuiBind(CameraManagerControls controls)
+        {
+            m_Controls = controls;
+            m_ControlsUpdate();
+        }
+
+        public bool IsOpened
+        {
+            get { return m_IsOpened; }
+
+            set
+            {
+                m_IsOpened = value;
+                m_ControlsUpdate();
+            }
+        }
+
+        public CameraManagerState()
+        {
+            m_IsOpened = false;
+        }
+    }
+
+    class CameraManager : CameraManagerBase
+    {
+        private CameraProvider m_cam;   // поставщик видео-данных
+        private CameraManagerState m_state;    // признак открытой видеозаписи
+        private RecordingInfo m_RecordingInfo; // открытая видеозапись
+        private List<int> m_VideoHandles;   // номера открытых видеофайлов
 
         // Свойство для чтения сведения о видеозаписи верхними слоями
         override protected RecordingInfo CameraRecordingInfo 
         {
-            get
-            {
-                return m_RecordingInfo;
-            }
+            get { return m_RecordingInfo; }
         }
 
         override protected bool CameraOpen(RecordingInfo rec) 
@@ -75,7 +104,7 @@ namespace UniversalAnnotationApp
             double Fps;
 
             // При необходимости закрываем текущю
-            if (m_IsOpened)
+            if (m_state.IsOpened)
                 CameraClose();
 
             if (rec.Views.Count == 0)
@@ -106,22 +135,23 @@ namespace UniversalAnnotationApp
 
             // Сохраняем информацию о видеозаписи
             m_RecordingInfo = rec;
-            m_IsOpened = true;
-            m_ControlsUpdate();
+            m_state.IsOpened = true;
             return true;
         }
 
         override protected void CameraClose()
         {
-            for (int i = 0; i < m_VideoHandles.Count; i++)
-                m_cam.Close(m_VideoHandles[i]);
-            m_IsOpened = false;
-            m_ControlsUpdate();
+            if (m_state.IsOpened)
+            {
+                for (int i = 0; i < m_VideoHandles.Count; i++)
+                    m_cam.Close(m_VideoHandles[i]);
+                m_state.IsOpened = false;
+            }
         }
 
         override protected bool CameraIsOpened 
         {
-            get { return m_IsOpened; }
+            get { return m_state.IsOpened; }
         }
 
         /* Метод принимает на вход список путей к файлам видео отдельных
@@ -186,15 +216,14 @@ namespace UniversalAnnotationApp
         // Подключение элементов управления формы
         override public void CameraGuiBind(CameraManagerControls controls)
         {
-            m_Controls = controls;
-            m_ControlsUpdate();
+            m_state.GuiBind(controls);
         }
 
         /* Конструкутор класса по умолчанию. */
         public CameraManager()
         {
             m_cam = new CameraProviderVideo();
-            m_IsOpened = false;
+            m_state = new CameraManagerState();
             m_VideoHandles = new List<int>();
         }
     }

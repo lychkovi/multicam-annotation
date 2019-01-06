@@ -412,6 +412,10 @@ namespace MarkupData
          * заданной видеозаписи. */ 
         override public void Init(RecordingInfo rec)
         {
+            // Это нужно, чтобы сбросить счетчики инкрементирования индексов
+            m_data.Reset();
+            m_CreateSchema();
+
             InitHeader(rec);
             m_InitCategories();
             m_InitTags();

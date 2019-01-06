@@ -24,11 +24,17 @@ namespace UniversalAnnotationApp
             cameraControls.statusVideo = statusVideo;
             engine.CameraGuiBind(cameraControls);
 
+            MarkupManagerControls markupControls;
+            markupControls.statusMarkup = statusMarkup;
+            engine.MarkupGuiBind(markupControls);
+
             FileManagerControls fileControls;
             fileControls.dlgMarkupOpen = dlgMarkupOpen;
             fileControls.dlgMarkupSave = dlgMarkupSave;
             fileControls.dlgRecordingOpen = dlgRecordingOpen;
             fileControls.dlgRecordingSave = dlgRecordingSave;
+            fileControls.txtRecordingFile = txtRecordingFile;
+            fileControls.txtMarkupFile = txtMarkupFile;
             engine.FileGuiBind(fileControls);
         }
 
@@ -53,6 +59,26 @@ namespace UniversalAnnotationApp
         private void menuRecordingClose_Click(object sender, EventArgs e)
         {
             engine.FileOnRecordingClose();
+        }
+
+        private void menuMarkupOpen_Click(object sender, EventArgs e)
+        {
+            engine.FileOnMarkupOpen();
+        }
+
+        private void menuMarkupSave_Click(object sender, EventArgs e)
+        {
+            engine.FileOnMarkupSave();
+        }
+
+        private void menuMarkupSaveAd_Click(object sender, EventArgs e)
+        {
+            engine.FileOnMarkupSaveAs();
+        }
+
+        private void menuMarkupClose_Click(object sender, EventArgs e)
+        {
+            engine.FileOnMarkupClose();
         }
     }
 }
