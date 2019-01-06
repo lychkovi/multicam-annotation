@@ -400,7 +400,7 @@ namespace MarkupData
 
         /* Инициализируются только таблицы Views и RecInfo, метод нужно
          * вызывать при создании нового XML-файла видеозаписи. */
-        override public void InitPartial(RecordingInfo rec)
+        override public void InitHeader(RecordingInfo rec)
         {
             m_data.Clear();
             m_InitRecordingInfo(rec);
@@ -412,7 +412,7 @@ namespace MarkupData
          * заданной видеозаписи. */ 
         override public void Init(RecordingInfo rec)
         {
-            InitPartial(rec);
+            InitHeader(rec);
             m_InitCategories();
             m_InitTags();
         }

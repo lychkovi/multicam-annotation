@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using MarkupData;
+
+
 namespace UniversalAnnotationApp
 {
     public interface ITrace
@@ -58,7 +61,7 @@ namespace UniversalAnnotationApp
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
-        abstract protected bool TraceCameraOpen(string RecordingFilePath);
+        abstract protected bool TraceCameraOpen(RecordingInfo rec);
         abstract protected void TraceCameraClose();
         abstract protected bool TraceMarkupOpen(string MarkupFilePath);
         abstract protected void TraceMarkupClose();
@@ -257,9 +260,9 @@ namespace UniversalAnnotationApp
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
-        override protected bool TraceCameraOpen(string RecordingFilePath)
+        override protected bool TraceCameraOpen(RecordingInfo rec)
         {
-            if (MarkupCameraOpen(RecordingFilePath))
+            if (MarkupCameraOpen(rec))
             {
                 m_ResetState();
                 m_FrameID = 0;

@@ -28,45 +28,102 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.statusVideo = new System.Windows.Forms.ToolStripStatusLabel();
-            this.statusMarkup = new System.Windows.Forms.ToolStripStatusLabel();
-            this.statusMode = new System.Windows.Forms.ToolStripStatusLabel();
-            this.statusAction = new System.Windows.Forms.ToolStripStatusLabel();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuCameraOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuRecordingOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.menuCameraClose = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMarkupOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMarkupSave = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMarkupSaveAd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMarkupClose = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuStrip1.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.statusVideo = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusMarkup = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusMode = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusAction = new System.Windows.Forms.ToolStripStatusLabel();
+            this.menuRecordingCreate = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuRecordingClose = new System.Windows.Forms.ToolStripMenuItem();
+            this.dlgRecordingSave = new System.Windows.Forms.SaveFileDialog();
+            this.dlgRecordingOpen = new System.Windows.Forms.OpenFileDialog();
+            this.dlgMarkupSave = new System.Windows.Forms.SaveFileDialog();
+            this.dlgMarkupOpen = new System.Windows.Forms.OpenFileDialog();
+            this.menuStrip.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
-            // menuStrip1
+            // menuStrip
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(745, 24);
-            this.menuStrip1.TabIndex = 0;
-            this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(745, 24);
+            this.menuStrip.TabIndex = 0;
+            this.menuStrip.Text = "menuStrip";
             // 
-            // statusStrip1
+            // fileToolStripMenuItem
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuRecordingOpen,
+            this.menuCameraClose,
+            this.menuRecordingCreate,
+            this.menuRecordingClose,
+            this.menuMarkupOpen,
+            this.menuMarkupSave,
+            this.menuMarkupSaveAd,
+            this.menuMarkupClose});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // menuRecordingOpen
+            // 
+            this.menuRecordingOpen.Name = "menuRecordingOpen";
+            this.menuRecordingOpen.Size = new System.Drawing.Size(158, 22);
+            this.menuRecordingOpen.Text = "Recording Open";
+            // 
+            // menuCameraClose
+            // 
+            this.menuCameraClose.Name = "menuCameraClose";
+            this.menuCameraClose.Size = new System.Drawing.Size(152, 22);
+            this.menuCameraClose.Text = "Camera Close";
+            // 
+            // menuMarkupOpen
+            // 
+            this.menuMarkupOpen.Name = "menuMarkupOpen";
+            this.menuMarkupOpen.Size = new System.Drawing.Size(158, 22);
+            this.menuMarkupOpen.Text = "Markup Open";
+            // 
+            // menuMarkupSave
+            // 
+            this.menuMarkupSave.Name = "menuMarkupSave";
+            this.menuMarkupSave.Size = new System.Drawing.Size(158, 22);
+            this.menuMarkupSave.Text = "Markup Save";
+            // 
+            // menuMarkupSaveAd
+            // 
+            this.menuMarkupSaveAd.Name = "menuMarkupSaveAd";
+            this.menuMarkupSaveAd.Size = new System.Drawing.Size(158, 22);
+            this.menuMarkupSaveAd.Text = "Markup Save As";
+            // 
+            // menuMarkupClose
+            // 
+            this.menuMarkupClose.Name = "menuMarkupClose";
+            this.menuMarkupClose.Size = new System.Drawing.Size(158, 22);
+            this.menuMarkupClose.Text = "Markup Close";
+            // 
+            // statusStrip
+            // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusVideo,
             this.statusMarkup,
             this.statusMode,
             this.statusAction});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 463);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(745, 22);
-            this.statusStrip1.TabIndex = 1;
-            this.statusStrip1.Text = "statusStrip1";
+            this.statusStrip.Location = new System.Drawing.Point(0, 463);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(745, 22);
+            this.statusStrip.TabIndex = 1;
+            this.statusStrip.Text = "statusStrip";
             // 
             // statusVideo
             // 
@@ -96,69 +153,51 @@
             this.statusAction.Size = new System.Drawing.Size(109, 17);
             this.statusAction.Text = "Enter First Corner";
             // 
-            // fileToolStripMenuItem
+            // menuRecordingCreate
             // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuCameraOpen,
-            this.menuCameraClose,
-            this.menuMarkupOpen,
-            this.menuMarkupSave,
-            this.menuMarkupSaveAd,
-            this.menuMarkupClose});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
-            this.fileToolStripMenuItem.Text = "File";
+            this.menuRecordingCreate.Name = "menuRecordingCreate";
+            this.menuRecordingCreate.Size = new System.Drawing.Size(158, 22);
+            this.menuRecordingCreate.Text = "Recording Create";
+            this.menuRecordingCreate.Click += new System.EventHandler(this.menuRecordingCreate_Click);
             // 
-            // menuCameraOpen
+            // menuRecordingClose
             // 
-            this.menuCameraOpen.Name = "menuCameraOpen";
-            this.menuCameraOpen.Size = new System.Drawing.Size(152, 22);
-            this.menuCameraOpen.Text = "Camera Open";
+            this.menuRecordingClose.Name = "menuRecordingClose";
+            this.menuRecordingClose.Size = new System.Drawing.Size(158, 22);
+            this.menuRecordingClose.Text = "Recording Close";
             // 
-            // menuCameraClose
+            // dlgRecordingSave
             // 
-            this.menuCameraClose.Name = "menuCameraClose";
-            this.menuCameraClose.Size = new System.Drawing.Size(152, 22);
-            this.menuCameraClose.Text = "Camera Close";
+            this.dlgRecordingSave.Filter = "XML files|*.xml";
             // 
-            // menuMarkupOpen
+            // dlgRecordingOpen
             // 
-            this.menuMarkupOpen.Name = "menuMarkupOpen";
-            this.menuMarkupOpen.Size = new System.Drawing.Size(152, 22);
-            this.menuMarkupOpen.Text = "Markup Open";
+            this.dlgRecordingOpen.FileName = "openFileDialog1";
+            this.dlgRecordingOpen.Filter = "XML files|*.xml";
             // 
-            // menuMarkupSave
+            // dlgMarkupSave
             // 
-            this.menuMarkupSave.Name = "menuMarkupSave";
-            this.menuMarkupSave.Size = new System.Drawing.Size(152, 22);
-            this.menuMarkupSave.Text = "Markup Save";
+            this.dlgMarkupSave.Filter = "XML files|*.xml";
             // 
-            // menuMarkupSaveAd
+            // dlgMarkupOpen
             // 
-            this.menuMarkupSaveAd.Name = "menuMarkupSaveAd";
-            this.menuMarkupSaveAd.Size = new System.Drawing.Size(152, 22);
-            this.menuMarkupSaveAd.Text = "Markup Save As";
-            // 
-            // menuMarkupClose
-            // 
-            this.menuMarkupClose.Name = "menuMarkupClose";
-            this.menuMarkupClose.Size = new System.Drawing.Size(152, 22);
-            this.menuMarkupClose.Text = "Markup Close";
+            this.dlgMarkupOpen.FileName = "openFileDialog1";
+            this.dlgMarkupOpen.Filter = "XML files|*.xml";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(745, 485);
-            this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
+            this.Controls.Add(this.statusStrip);
+            this.Controls.Add(this.menuStrip);
+            this.MainMenuStrip = this.menuStrip;
             this.Name = "Form1";
             this.Text = "Form1";
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
+            this.menuStrip.ResumeLayout(false);
+            this.menuStrip.PerformLayout();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -166,12 +205,12 @@
 
         #endregion
 
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.MenuStrip menuStrip;
+        private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel statusVideo;
         private System.Windows.Forms.ToolStripStatusLabel statusMarkup;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem menuCameraOpen;
+        private System.Windows.Forms.ToolStripMenuItem menuRecordingOpen;
         private System.Windows.Forms.ToolStripMenuItem menuCameraClose;
         private System.Windows.Forms.ToolStripMenuItem menuMarkupOpen;
         private System.Windows.Forms.ToolStripMenuItem menuMarkupSave;
@@ -179,6 +218,12 @@
         private System.Windows.Forms.ToolStripMenuItem menuMarkupClose;
         private System.Windows.Forms.ToolStripStatusLabel statusMode;
         private System.Windows.Forms.ToolStripStatusLabel statusAction;
+        private System.Windows.Forms.ToolStripMenuItem menuRecordingCreate;
+        private System.Windows.Forms.ToolStripMenuItem menuRecordingClose;
+        private System.Windows.Forms.SaveFileDialog dlgRecordingSave;
+        private System.Windows.Forms.OpenFileDialog dlgRecordingOpen;
+        private System.Windows.Forms.SaveFileDialog dlgMarkupSave;
+        private System.Windows.Forms.OpenFileDialog dlgMarkupOpen;
     }
 }
 

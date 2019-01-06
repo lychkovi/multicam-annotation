@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using MarkupData;
+
+
 namespace UniversalAnnotationApp
 {
     public interface IDisplay
@@ -21,7 +24,7 @@ namespace UniversalAnnotationApp
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
-        abstract protected bool DisplayCameraOpen(string RecordingFilePath);
+        abstract protected bool DisplayCameraOpen(RecordingInfo rec);
         abstract protected void DisplayCameraClose();
         abstract protected bool DisplayMarkupOpen(string MarkupFilePath);
         abstract protected void DisplayMarkupClose();
@@ -89,9 +92,9 @@ namespace UniversalAnnotationApp
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
-        override protected bool DisplayCameraOpen(string RecordingFilePath)
+        override protected bool DisplayCameraOpen(RecordingInfo rec)
         {
-            if (TraceCameraOpen(RecordingFilePath))
+            if (TraceCameraOpen(rec))
             {
                 m_Init();
                 return true;

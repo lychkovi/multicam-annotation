@@ -25,6 +25,16 @@ namespace MarkupData
         public DateTime DateTime;   // дата и время создания видеозаписи
         public string Comment;      // Комментарий к видеозаписи
         public List<View> Views;    // сведения о записях отдельных камер
+
+        public RecordingInfo(string myComment)// конструктор по умолчанию
+        {
+            FileNameXML = "";
+            FramesCount = 0;
+            Fps = 25.0;
+            DateTime = DateTime.Now;
+            Comment = myComment;
+            Views = new List<View>();
+        }
     }
 
     /* Category: Категория движущихся объектов. */
@@ -81,7 +91,7 @@ namespace MarkupData
     /* Базовый класс для реализации поставщика данных разметки видео. */
     abstract public class MarkupProvider
     {
-        abstract public void InitPartial(RecordingInfo rec);
+        abstract public void InitHeader(RecordingInfo rec);
             //--> Инициализируются только таблицы Views и RecInfo
             // содержимым структуры rec:
             // необходимо для создания XML-файла видеозаписи.

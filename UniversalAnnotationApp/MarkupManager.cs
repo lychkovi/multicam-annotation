@@ -22,13 +22,14 @@ namespace UniversalAnnotationApp
     {
         // Такие два метода должны быть у всех слоев выше слоя Camera
         // Слои вызывают эти методы рекурсивно по цепочке
-        abstract protected bool MarkupCameraOpen(string RecordingFilePath);
-        abstract protected void MarkupCameraClose(); 
+        abstract protected bool MarkupCameraOpen(RecordingInfo rec);
+        abstract protected void MarkupCameraClose();
 
         abstract protected bool MarkupOpen(string MarkupFilePath);
         abstract protected void MarkupClose();
 
         abstract protected bool MarkupIsOpened { get; }
+        abstract protected bool MarkupIsSaved { get; }
 
         abstract public void MarkupGuiBind();
     }
@@ -38,38 +39,51 @@ namespace UniversalAnnotationApp
     class MarkupManager : MarkupManagerBase
     {
         private MarkupProvider m_markup;    // поставщик данных
+        private bool m_IsOpened;            // признак открытия файла
+        private bool m_IsSaved;             // признак сохранения изменений
 
-        protected override bool MarkupCameraOpen(string RecordingFilePath)
+        override protected bool MarkupCameraOpen(RecordingInfo rec)
         {
-            CameraOpen(RecordingFilePath);
+            CameraOpen(rec);
             throw new NotImplementedException();
         }
 
-        protected override void MarkupCameraClose()
+        override protected void MarkupCameraClose()
         {
             CameraClose();
             throw new NotImplementedException();
         }
 
-        override protected bool MarkupOpen(string XmlFilePath) 
+        override protected bool MarkupOpen(string MarkupFilePath) 
         {
             throw new NotImplementedException();
         }
 
-        protected override void MarkupClose()
+        override protected void MarkupClose()
         {
             throw new NotImplementedException();
         }
 
         override protected bool MarkupIsOpened
         {
-            get { return false; }
+            get 
+            { 
+                return m_IsOpened; 
+            }
+        }
+
+        override protected bool MarkupIsSaved
+        {
+            get
+            {
+                return m_IsSaved; 
+            }
         }
 
 
         override public void MarkupGuiBind() 
         { 
-            CameraOpen("");
+            
         }
 
         // Конструктор класса по умолчанию
