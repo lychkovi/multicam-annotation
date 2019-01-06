@@ -101,7 +101,8 @@ namespace MarkupData
             // необходимо при создании нового XML-файла разметки.
         abstract public bool Save(string MarkupFilePath);
         abstract public bool Open(string MarkupFilePath);
-        abstract public bool Check(RecordingInfo rec);//<--> Views и RecInfo
+        abstract public RecordingInfo GetHeader();
+        abstract public bool CheckHeader(RecordingInfo rec);//<--> Views и RecInfo
 
         abstract public int CategoryInsert(Category category);
         abstract public void CategoryUpdate(Category category);

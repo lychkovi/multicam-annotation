@@ -61,7 +61,7 @@ namespace UniversalAnnotationApp
                     // TODO: Запрашиваем нужный кадр от слоя Camera и 
                     // буферизуем во внутренних полях Display
 
-                    if (m_FrameID != TraceFrameID)
+                    if (false /*m_FrameID != TraceFrameID*/)
                         throw new NotSupportedException("Bad buffering!");
                 }
 

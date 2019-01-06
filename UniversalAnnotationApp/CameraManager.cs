@@ -7,6 +7,7 @@ using System.Text;
 
 using System.Drawing;                       // Объект Image
 using System.IO;                            // время создания файла
+using System.Windows.Forms;                 // Элементы ToolStrip
 
 using CameraData;                           // CameraProvider
 using MarkupData;                           // структура RecordingInfo
@@ -14,9 +15,20 @@ using MarkupData;                           // структура RecordingInfo
 
 namespace UniversalAnnotationApp
 {
+    public struct CameraManagerControls
+    {
+        public ToolStripStatusLabel statusVideo;
+    }
+
+    public interface ICamera
+    {
+        void CameraGuiBind(CameraManagerControls controls);
+    }
     // Все Protected-методы, которые могут вызываться классами-наследниками
     abstract class CameraManagerBase
     {
+        abstract public void CameraGuiBind(CameraManagerControls controls);
+
         abstract protected RecordingInfo CameraRecordingInfo { get; }
         abstract protected bool CameraOpen(RecordingInfo rec);
         abstract protected void CameraClose();
@@ -30,6 +42,20 @@ namespace UniversalAnnotationApp
         private CameraProvider m_cam;   // поставщик видео-данных
         private bool m_IsOpened;        // признак открытой видеозаписи
         private RecordingInfo m_RecordingInfo; // открытая видеозапись
+        private List<int> m_VideoHandles;   // номера открытых видеофайлов
+        private CameraManagerControls m_Controls;  // элементы управления формы
+
+        // Обновить состояние элементов управления на форме
+        private void m_ControlsUpdate()
+        {
+            if (m_Controls.statusVideo != null)
+            {
+                if (m_IsOpened)
+                    m_Controls.statusVideo.Text = "Video Opened";
+                else
+                    m_Controls.statusVideo.Text = "No Video Opened";
+            }
+        }
 
         // Свойство для чтения сведения о видеозаписи верхними слоями
         override protected RecordingInfo CameraRecordingInfo 
@@ -42,20 +68,55 @@ namespace UniversalAnnotationApp
 
         override protected bool CameraOpen(RecordingInfo rec) 
         {
-            // Открываем видеофайл
+            // По очереди открываем все файлы, определяем их параметры
+            int VideoHandle;
             Image InitialFrame;
             int FramesCount;
             double Fps;
-            int videoHandle;
 
-            bool status = m_cam.Open("", out videoHandle, out InitialFrame, 
-                out FramesCount, out Fps);
-            return status;
+            // При необходимости закрываем текущю
+            if (m_IsOpened)
+                CameraClose();
+
+            if (rec.Views.Count == 0)
+                throw new Exception("Recording file must contain views!");
+
+            for (int i = 0; i < rec.Views.Count; i++)
+            {
+                if (!m_cam.Open(rec.Views[i].FileNameAVI, out VideoHandle,
+                    out InitialFrame, out FramesCount, out Fps))
+                {
+                    throw new Exception(string.Format(
+                        "Unable to open {0}-th video!", i + 1));
+                }
+                if (FramesCount != rec.FramesCount)
+                {
+                    throw new Exception("Wrong Frames Count!");
+                }
+                if (Fps != rec.Fps)
+                {
+                    throw new Exception("Wrong FPS value!");
+                }
+                if (rec.Views[i].FrameWidth != InitialFrame.Width)
+                {
+                    throw new Exception("Wrong video frame size!");
+                }
+                m_VideoHandles.Add(VideoHandle);
+            }
+
+            // Сохраняем информацию о видеозаписи
+            m_RecordingInfo = rec;
+            m_IsOpened = true;
+            m_ControlsUpdate();
+            return true;
         }
 
         override protected void CameraClose()
         {
-            
+            for (int i = 0; i < m_VideoHandles.Count; i++)
+                m_cam.Close(m_VideoHandles[i]);
+            m_IsOpened = false;
+            m_ControlsUpdate();
         }
 
         override protected bool CameraIsOpened 
@@ -73,7 +134,7 @@ namespace UniversalAnnotationApp
         {
             int nViews = ViewFilePaths.Length;
             if (nViews < 1)
-                throw new NotSupportedException("You must specify views!");
+                throw new Exception("You must specify views!");
             
             RecordingInfo rec = new RecordingInfo("");
             rec.Comment = Comment;
@@ -88,7 +149,7 @@ namespace UniversalAnnotationApp
                 if (!m_cam.Open(ViewFilePaths[i], out VideoHandle,
                     out InitialFrame, out FramesCount, out Fps))
                 {
-                    throw new NotSupportedException(string.Format(
+                    throw new Exception(string.Format(
                         "Unable to open {0}-th video!", i + 1));
                 }
                 if (i == 0)
@@ -98,13 +159,13 @@ namespace UniversalAnnotationApp
                 }
                 else if (FramesCount != rec.FramesCount)
                 {
-                    throw new NotSupportedException("FramesCount differs!");
+                    throw new Exception("FramesCount differs!");
                 }
                 else if (Fps != rec.Fps)
                 {
-                    throw new NotSupportedException("FPS value differs!");
+                    throw new Exception("FPS value differs!");
                 }
-                View view = new View();
+                MarkupData.View view = new MarkupData.View();
                 view.ID = i;
                 view.Comment = string.Format("camera {0}", i);
                 view.FileNameAVI = ViewFilePaths[i];
@@ -122,12 +183,19 @@ namespace UniversalAnnotationApp
             return rec;
         }
 
+        // Подключение элементов управления формы
+        override public void CameraGuiBind(CameraManagerControls controls)
+        {
+            m_Controls = controls;
+            m_ControlsUpdate();
+        }
+
         /* Конструкутор класса по умолчанию. */
         public CameraManager()
         {
             m_cam = new CameraProviderVideo();
+            m_IsOpened = false;
+            m_VideoHandles = new List<int>();
         }
     }
-
-    
 }

@@ -44,14 +44,12 @@ namespace UniversalAnnotationApp
 
         override protected bool MarkupCameraOpen(RecordingInfo rec)
         {
-            CameraOpen(rec);
-            throw new NotImplementedException();
+            return CameraOpen(rec);
         }
 
         override protected void MarkupCameraClose()
         {
             CameraClose();
-            throw new NotImplementedException();
         }
 
         override protected bool MarkupOpen(string MarkupFilePath) 

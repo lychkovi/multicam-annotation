@@ -20,6 +20,10 @@ namespace UniversalAnnotationApp
             engine = new FileManager();
 
             // Регистрируем элементы управления в отдельных слоях
+            CameraManagerControls cameraControls;
+            cameraControls.statusVideo = statusVideo;
+            engine.CameraGuiBind(cameraControls);
+
             FileManagerControls fileControls;
             fileControls.dlgMarkupOpen = dlgMarkupOpen;
             fileControls.dlgMarkupSave = dlgMarkupSave;
@@ -28,9 +32,27 @@ namespace UniversalAnnotationApp
             engine.FileGuiBind(fileControls);
         }
 
+        // Событие вызывается непосредственно перед закрытием формы, может 
+        // отменить закрытие.
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!engine.FileOnFormClosing())
+                e.Cancel = true;
+        }
+
         private void menuRecordingCreate_Click(object sender, EventArgs e)
         {
             engine.FileOnRecordingCreate();
+        }
+
+        private void menuRecordingOpen_Click(object sender, EventArgs e)
+        {
+            engine.FileOnRecordingOpen();
+        }
+
+        private void menuRecordingClose_Click(object sender, EventArgs e)
+        {
+            engine.FileOnRecordingClose();
         }
     }
 }

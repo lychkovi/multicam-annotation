@@ -417,11 +417,56 @@ namespace MarkupData
             m_InitTags();
         }
 
-        /* Check: Проверка соответствия загруженной разметки параметрам
-         * файла видеозаписи. */
-        override public bool Check(RecordingInfo rec)
+        /* GetHeader: Метод возвращает структуру RecordingInfo, содержащую
+         * таблицы RecordingInfo и Views данных. */
+        override public RecordingInfo GetHeader()
         {
-            return false;
+            RecordingInfo rec = new RecordingInfo("");
+            if (m_data.Tables["RecordingInfo"].Rows.Count == 0)
+                throw new Exception("XML file was not opened!");
+
+            DataRow info = m_data.Tables["RecordingInfo"].Rows[0];
+            rec.FileNameXML = (string) info["FileNameXML"];
+            rec.FramesCount = (int) info["FramesCount"];
+            rec.Fps = (double) info["Fps"];
+            rec.DateTime = (DateTime) info["DateTime"];
+            rec.Comment = (string) info["Comment"];
+            
+            DataRow[] rows = m_data.Tables["Views"].Select();
+            for (int i = 0; i < rows.Length; i++)
+            {
+                View item = new View();
+                DataRow row = rows[i];
+                item.ID = (int)row["ID"];
+                item.FileNameAVI = (string)row["FileNameAVI"];
+                item.FrameWidth = (int)row["FrameWidth"];
+                item.FrameHeight = (int)row["FrameHeight"];
+                item.IsColour = (bool)row["IsColour"];
+                item.Comment = (string)row["Comment"];
+                rec.Views.Add(item);
+            }
+
+            return rec;
+        }
+
+        /* CheckHeader: Проверка соответствия загруженной разметки параметрам
+         * файла видеозаписи, представленной структуруой rec. */
+        override public bool CheckHeader(RecordingInfo rec)
+        {
+            RecordingInfo header = GetHeader();
+
+            bool isOK = true;
+            isOK = isOK && (header.FramesCount == rec.FramesCount);
+            isOK = isOK && (header.Fps == rec.Fps);
+            isOK = isOK && (header.Views.Count == rec.Views.Count);
+            for (int i = 0; i < header.Views.Count; i++)
+            {
+                isOK = isOK && (header.Views[i].FrameWidth ==
+                    rec.Views[i].FrameWidth);
+                isOK = isOK && (header.Views[i].FrameHeight ==
+                    rec.Views[i].FrameHeight);
+            }
+            return isOK;
         }
 
         /* Блок методов для работы с таблицей категорий объектов. */

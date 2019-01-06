@@ -162,7 +162,7 @@ namespace UniversalAnnotationApp
                             xml.Save(m_Controls.dlgRecordingSave.FileName);
                         }
                     }
-                    catch (NotSupportedException e)
+                    catch (Exception e)
                     {
                         MessageBox.Show(e.Message, "ERROR!", 
                             MessageBoxButtons.OK);
@@ -177,12 +177,44 @@ namespace UniversalAnnotationApp
 
         override public void FileOnRecordingOpen()
         {
+            // Запрашиваем путь к XML-файлу видеозаписи
+            DialogResult result = m_Controls.dlgRecordingOpen.ShowDialog();
+            if (result != DialogResult.OK)
+                return;
 
+            // Если видеозапись открыта, её сначала нужно закрыть
+            if (CameraIsOpened)
+                FileOnRecordingClose();
+
+            // Затем открываем новую видеозапись
+            //try
+            //{
+                MarkupProvider xml = new MarkupProviderADO();
+                if (!xml.Open(m_Controls.dlgRecordingOpen.FileName))
+                {
+                    MessageBox.Show("Unable to open video recording XML!",
+                        "ERROR!", MessageBoxButtons.OK);
+                    return;
+                }
+                RecordingInfo rec = xml.GetHeader();
+
+                if (!DisplayCameraOpen(rec))
+                {
+                    MessageBox.Show("Unable to open video recording!",
+                        "ERROR!", MessageBoxButtons.OK);
+                    return;
+                }
+            //}
+            //catch (Exception e)
+            //{
+            //    MessageBox.Show(e.Message, "ERROR!", MessageBoxButtons.OK);
+            //}
         }
 
         override public void FileOnRecordingClose()
         {
-
+            if (CameraIsOpened)
+                DisplayCameraClose();
         }
     }
 }
