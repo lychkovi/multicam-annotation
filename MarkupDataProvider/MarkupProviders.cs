@@ -403,6 +403,11 @@ namespace MarkupData
         override public void InitHeader(RecordingInfo rec)
         {
             m_data.Clear();
+
+            // Это нужно, чтобы сбросить счетчики инкрементирования индексов
+            m_data.Reset();
+            m_CreateSchema();
+
             m_InitRecordingInfo(rec);
             m_InitViews(rec);
         }
@@ -412,10 +417,6 @@ namespace MarkupData
          * заданной видеозаписи. */ 
         override public void Init(RecordingInfo rec)
         {
-            // Это нужно, чтобы сбросить счетчики инкрементирования индексов
-            m_data.Reset();
-            m_CreateSchema();
-
             InitHeader(rec);
             m_InitCategories();
             m_InitTags();
