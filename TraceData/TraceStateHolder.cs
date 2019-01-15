@@ -1,28 +1,72 @@
-﻿// DLL-бибилотека пользовательского элемента управления DisplayControl
+﻿// Проект представляет интерфейс класса для хранения переменных состояния
+// слоя Trace, который должен реализовать элемент управления DisplayControl
+// для автоматической перерисовки элемента управления при изменении состояния
+// слоя Trace. Также проект содержит релизацию класса-контейнера переменных 
+// состояния по умолчанию, реализующего данный интерфейс на случай отсутствия
+// элемента управления DisplayControl. 
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using TraceData;            // Интерфейс ITraceStateHolder
 
 
-namespace DisplayControlWpf
+namespace TraceData
 {
-    /// <summary>
-    /// Логика взаимодействия для UserControl1.xaml
-    /// </summary>
-    public partial class DisplayControl : UserControl, ITraceStateHolder
+    public interface ITraceStateHolder
+    {
+        void StateReset();
+
+        bool IsTraceSelected
+        { // траектория выбрана?
+            get; 
+            set;
+        }
+
+        int TraceSelectedID
+        { // индекс выбранной траектории
+            get;
+            set;
+        }
+
+        bool IsStateCreate
+        { // инициировали создание
+            get;
+            set;
+        }
+
+        bool IsStateCreateMarker
+        {
+            get;
+            set;
+        }
+
+        bool IsStateCreateStretch
+        { // мышкой указали первый угол рамки, тянем второй
+            get;
+            set;
+        }
+
+        bool IsStateUpdate
+        { // инициировали изменение
+            get;
+            set;
+        }
+
+        bool IsStateUpdateStretch
+        { // мышкой указали первый угол рамки, тянем второй
+            get;
+            set;
+        }
+
+        bool IsStateUpdateAppend
+        { // признак изменения траектории в режиме Append
+            get;
+            set;
+        }
+    }
+
+    public class TraceStateHolderDummy : ITraceStateHolder
     {
         private bool m_IsTraceSelected; // траектория выбрана?
         private int m_TraceSelectedID;  // индекс выбранной траектории
@@ -33,13 +77,6 @@ namespace DisplayControlWpf
         private bool m_IsStateUpdateStretch; // указали первый угол рамки
         private bool m_IsStateUpdateAppend; // признак изменения траектории
 
-        public DisplayControl()
-        {
-            InitializeComponent();
-            StateReset();
-        }
-
-        // Реализация методов интерфейса ITraceStateHolder
         public void StateReset()
         {
             // Выбор траектории
@@ -80,7 +117,7 @@ namespace DisplayControlWpf
         public bool IsStateCreate
         { // инициировали создание
             get { return m_IsStateCreate; }
-
+            
             set
             {
                 m_IsStateCreate = value;
@@ -90,7 +127,7 @@ namespace DisplayControlWpf
         public bool IsStateCreateMarker
         {
             get { return m_IsStateCreateMarker; }
-
+      
             set
             {
                 m_IsStateCreateMarker = value;
@@ -130,11 +167,16 @@ namespace DisplayControlWpf
         public bool IsStateUpdateAppend
         { // признак изменения траектории в режиме Append
             get { return m_IsStateUpdateAppend; }
-
+            
             set
             {
                 m_IsStateUpdateAppend = value;
             }
+        }
+
+        public TraceStateHolderDummy()
+        {
+            StateReset();
         }
     }
 }

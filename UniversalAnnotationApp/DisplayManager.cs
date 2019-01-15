@@ -8,19 +8,25 @@ using System.Linq;
 using System.Text;
 
 using MarkupData;
+using TraceData;            // TraceStateHolderDummy
 
 
 namespace UniversalAnnotationApp
 {
+    public struct DisplayManagerControls
+    {
+        public DisplayControlWpf.DisplayControl wpfDisplayCtrl;
+    }
+
     public interface IDisplay
     {
-        void DisplayGuiBind();
+        void DisplayGuiBind(DisplayManagerControls controls);
     }
 
     abstract class DisplayManagerBase : TraceManager, IDisplay
     {
         // Метод привязки элементов управления форму к объекту DisplayManager
-        abstract public void DisplayGuiBind();
+        abstract public void DisplayGuiBind(DisplayManagerControls controls);
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
@@ -35,8 +41,10 @@ namespace UniversalAnnotationApp
 
     class DisplayManager: DisplayManagerBase
     {
+        private DisplayManagerControls m_gui;
         private bool m_IsDisplay;   // признак инициализированного дисплея
         private int m_FrameID;      // номер текущего буферизованного кадра
+        //private TraceStateHolderDummy dummy; // временный объект (для отладки)
 
         // инициализация полей вывода изображений
         private void m_Init()
@@ -133,9 +141,15 @@ namespace UniversalAnnotationApp
         }
 
         // Метод привязки элементов управления форму к объекту DisplayManager
-        override public void DisplayGuiBind()
+        override public void DisplayGuiBind(DisplayManagerControls controls)
         {
+            m_gui = controls;
+            TraceStateHolderBind(m_gui.wpfDisplayCtrl);
+        }
 
+        public DisplayManager()
+        {
+            //dummy = new TraceStateHolderDummy();
         }
     }
 }

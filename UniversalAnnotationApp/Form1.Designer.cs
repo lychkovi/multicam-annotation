@@ -50,6 +50,7 @@
             this.lblMarkupFile = new System.Windows.Forms.Label();
             this.txtRecordingFile = new System.Windows.Forms.TextBox();
             this.txtMarkupFile = new System.Windows.Forms.TextBox();
+            this.pnlDisplay = new System.Windows.Forms.Panel();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -220,11 +221,19 @@
             this.txtMarkupFile.Size = new System.Drawing.Size(640, 20);
             this.txtMarkupFile.TabIndex = 5;
             // 
+            // pnlDisplay
+            // 
+            this.pnlDisplay.Location = new System.Drawing.Point(93, 141);
+            this.pnlDisplay.Name = "pnlDisplay";
+            this.pnlDisplay.Size = new System.Drawing.Size(279, 216);
+            this.pnlDisplay.TabIndex = 6;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(745, 485);
+            this.Controls.Add(this.pnlDisplay);
             this.Controls.Add(this.txtMarkupFile);
             this.Controls.Add(this.txtRecordingFile);
             this.Controls.Add(this.lblMarkupFile);
@@ -268,6 +277,7 @@
         private System.Windows.Forms.Label lblMarkupFile;
         private System.Windows.Forms.TextBox txtRecordingFile;
         private System.Windows.Forms.TextBox txtMarkupFile;
+        private System.Windows.Forms.Panel pnlDisplay;
     }
 }
 

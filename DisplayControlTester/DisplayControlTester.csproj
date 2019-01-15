@@ -86,6 +86,10 @@
       <Project>{10209F0D-3887-4809-9F08-86653D0E5B1C}</Project>
       <Name>DisplayControlWpf</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TraceData\TraceData.csproj">
+      <Project>{875A609B-6531-4D1A-9C95-F5A7A0E51E80}</Project>
+      <Name>TraceData</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

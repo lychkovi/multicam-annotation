@@ -34,8 +34,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +47,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraManager.cs" />
@@ -96,9 +101,17 @@
       <Project>{12CF7313-6D58-4061-A1D7-1A6E41E007D3}</Project>
       <Name>CameraData</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DisplayControlWpf\DisplayControlWpf.csproj">
+      <Project>{10209F0D-3887-4809-9F08-86653D0E5B1C}</Project>
+      <Name>DisplayControlWpf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MarkupDataProvider\MarkupData.csproj">
       <Project>{CAFF6E5E-EB0F-42A4-8957-DA60A3A8FDC6}</Project>
       <Name>MarkupData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TraceData\TraceData.csproj">
+      <Project>{875A609B-6531-4D1A-9C95-F5A7A0E51E80}</Project>
+      <Name>TraceData</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
