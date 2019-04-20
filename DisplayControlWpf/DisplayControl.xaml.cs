@@ -136,5 +136,24 @@ namespace DisplayControlWpf
                 m_IsStateUpdateAppend = value;
             }
         }
+
+        // Метод обновляет размеры дочерних элементов в случае изменения 
+        // размеров самого элемента управления NewWidth и NewHeight.
+        public void OnResize(double NewWidth, double NewHeight)
+        {
+            canvasControl.Width = NewWidth;
+            canvasControl.Height = NewHeight - 44.0;
+
+            rectangleClip.Width = NewWidth;
+            rectangleClip.Height = NewHeight;
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.HeightChanged || e.WidthChanged)
+            {
+                OnResize(e.NewSize.Width, e.NewSize.Height);
+            }
+        }
     }
 }

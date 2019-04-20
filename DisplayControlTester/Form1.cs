@@ -35,6 +35,7 @@ namespace DisplayControlTester
             wpfAddressCtrl = new DisplayControlWpf.DisplayControl();
             wpfAddressCtrl.InitializeComponent();
             ctrlHost.Child = wpfAddressCtrl;
+            wpfAddressCtrl.OnResize(panel1.Width, panel1.Height);
         }
     }
 }

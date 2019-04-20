@@ -92,5 +92,21 @@ namespace DisplayControlWpf
             selectCanvForImg.CropImage +=
                 new RoutedEventHandler(selectCanvForImg_CropImage);
         }
+
+        // Метод обновляет размеры дочерних элементов в случае изменения 
+        // размеров самого элемента управления NewWidth и NewHeight.
+        public void OnResize(double NewWidth, double NewHeight)
+        {
+            svForImg.Width = NewWidth;
+            svForImg.Height = NewHeight - 52.0;
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.HeightChanged || e.WidthChanged)
+            {
+                OnResize(e.NewSize.Width, e.NewSize.Height);
+            }
+        }
     }
 }

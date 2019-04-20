@@ -4,10 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="350" xmlns:my="clr-namespace:DisplayControlWpf">
+             d:DesignHeight="400" d:DesignWidth="350" xmlns:my="clr-namespace:DisplayControlWpf" SizeChanged="UserControl_SizeChanged">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="400*" />
+            <RowDefinition Height="0*" />
+        </Grid.RowDefinitions>
         <Label Content="URA" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="label1" VerticalAlignment="Top" />
-        <my:UserCanvasControl HorizontalAlignment="Left" Margin="0,44,0,0" x:Name="canvasControl11" VerticalAlignment="Top" ClipToBounds="False" Height="299" />
-        <Rectangle HorizontalAlignment="Left" Name="rectangle1" Stroke="Black" Width="350" />
+        <my:UserCanvasControl HorizontalAlignment="Left" x:Name="canvasControl" VerticalAlignment="Top" ClipToBounds="False" Height="356" Margin="0,44,0,0" />
+        <Rectangle HorizontalAlignment="Left" Name="rectangleClip" Stroke="Black" Width="350" />
     </Grid>
 </UserControl>
