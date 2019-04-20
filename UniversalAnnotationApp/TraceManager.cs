@@ -374,6 +374,7 @@ namespace UniversalAnnotationApp
 
         public TraceManager()
         {
+            m_state = new TraceStateHolderDummy();
             m_ResetState(); // Переход в начальное состояние
             m_FrameID = -1;
         }

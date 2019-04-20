@@ -35,8 +35,8 @@ namespace DisplayWpf
             img = new System.Windows.Controls.Image();
             img.Source = bmpSource;
             //if there was a Zoom Factor applied
-            img.RenderTransform = new ScaleTransform (0.8, 0.8, 0, 0);
-                    //(zoomFactor, zoomFactor, 0.5, 0.5);
+            //img.RenderTransform = new ScaleTransform (0.8, 0.8, 0, 0);
+            img.RenderTransform = new ScaleTransform(zoomFactor, zoomFactor, 0, 0);
             //Size imgRenderSize = new Size();
             //imgRenderSize.Width = 100;
             //imgRenderSize.Height = 100;
@@ -59,12 +59,12 @@ namespace DisplayWpf
 
             // Вариант 1. Если нужно отмасштабированное изображение 
             // (но без контроля выхода выеления за пределы изображения):
-            vbForImg.Child = selectCanvForImg;
-            vbForImg.Stretch = Stretch.Uniform;
+            //vbForImg.Child = selectCanvForImg;
+            //vbForImg.Stretch = Stretch.Uniform;
 
             // Вариант 2. Если нужно изображение в оригинальных размерах 
             // (с прокруткой)
-            //svForImg.Content = selectCanvForImg;
+            svForImg.Content = selectCanvForImg;
 
             //createSelectionCanvasMenu();
         }

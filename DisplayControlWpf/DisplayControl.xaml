@@ -7,7 +7,5 @@
              d:DesignHeight="300" d:DesignWidth="500">
     <Grid>
         <Label Content="URA!!!!!" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="label1" VerticalAlignment="Top" />
-        <Grid Height="148" HorizontalAlignment="Left" Margin="0,101,0,0" Name="grid1" VerticalAlignment="Top" Width="200" />
-        <Image Height="181" HorizontalAlignment="Left" Margin="239,80,0,0" Name="image1" Stretch="Fill" VerticalAlignment="Top" Width="233" />
     </Grid>
 </UserControl>
