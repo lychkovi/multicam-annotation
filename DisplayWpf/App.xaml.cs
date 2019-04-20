@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace DisplayWpf
+namespace DisplayControlWpf
 {
     /// <summary>
     /// Логика взаимодействия для App.xaml

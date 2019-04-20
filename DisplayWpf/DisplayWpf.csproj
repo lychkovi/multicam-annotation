@@ -8,7 +8,7 @@
     <ProjectGuid>{B7D0A711-2C5B-4852-8687-CE312393B4B6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DisplayWpf</RootNamespace>
+    <RootNamespace>DisplayControlWpf</RootNamespace>
     <AssemblyName>DisplayWpf</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>

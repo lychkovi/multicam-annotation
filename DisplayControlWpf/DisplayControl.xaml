@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500">
+             d:DesignHeight="400" d:DesignWidth="350" xmlns:my="clr-namespace:DisplayControlWpf">
     <Grid>
-        <Label Content="URA!!!!!" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="label1" VerticalAlignment="Top" />
+        <Label Content="URA" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="label1" VerticalAlignment="Top" />
+        <my:UserCanvasControl HorizontalAlignment="Left" Margin="0,44,0,0" x:Name="canvasControl11" VerticalAlignment="Top" ClipToBounds="False" Height="299" />
+        <Rectangle HorizontalAlignment="Left" Name="rectangle1" Stroke="Black" Width="350" />
     </Grid>
 </UserControl>

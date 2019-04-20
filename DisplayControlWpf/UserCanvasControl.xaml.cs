@@ -17,7 +17,7 @@ namespace DisplayControlWpf
     /// <summary>
     /// Логика взаимодействия для UserControl1.xaml
     /// </summary>
-    public partial class CanvasControl1 : UserControl
+    public partial class UserCanvasControl : UserControl
     {
         private string ImgUrl = "D:\\Igorek\\Disser\\YanaNewNew\\MyVideoAnno\\Debug\\Koala.jpg";
         private BitmapImage bmpSource = null;
@@ -84,7 +84,7 @@ namespace DisplayControlWpf
             //createDragCanvas();
         }
 
-        public CanvasControl1()
+        public UserCanvasControl()
         {
             InitializeComponent();
 
