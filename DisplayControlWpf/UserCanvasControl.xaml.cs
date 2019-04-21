@@ -14,6 +14,15 @@ using System.Windows.Shapes;
 
 namespace DisplayControlWpf
 {
+    // Перечисление задает все типы событий, которые может вырабатывать
+    // пользовательский элемент управления
+    public enum EventTypeID
+    {
+        rubberCreated,
+        rubberSelected,
+        rubberModified
+    }
+
     /// <summary>
     /// Логика взаимодействия для UserControl1.xaml
     /// </summary>
@@ -24,7 +33,23 @@ namespace DisplayControlWpf
         private SelectionCanvas selectCanvForImg = null;
         private System.Windows.Controls.Image img = null;
         private double zoomFactor = 1.0;
-        Shape rubberBand = null;
+
+        // Обработка события от элемента управления
+        private Shape rubberBand = null;
+        private int controlID;     // идентификатор элемента в массиве
+        public delegate void eventCallback(
+            int getControlID, EventTypeID eventID, 
+            System.Drawing.Rectangle bounds);
+        eventCallback eventCallbackFcn = null;
+
+        // Регистрация обработчика события
+        public void setEventCallback(
+            int setControlID, eventCallback callbackFcn)
+        {
+            controlID = setControlID;
+            eventCallbackFcn = callbackFcn;
+        }
+        //    int setControlID, EventTypeID eventID, Shape rubberBand);
 
         /// <span class="code-SummaryComment"><summary></span>
         /// Creates the Image source for the current canvas
@@ -82,6 +107,18 @@ namespace DisplayControlWpf
         {
             rubberBand = (Shape)selectCanvForImg.Children[1];
             //createDragCanvas();
+
+            // Вызываем внешний обработчик события
+            if (eventCallbackFcn != null)
+            {
+                System.Drawing.Rectangle bounds = new System.Drawing.Rectangle();
+                bounds.X = (int) Canvas.GetLeft(rubberBand);
+                bounds.Y = (int) Canvas.GetTop(rubberBand);
+                bounds.Width = (int)rubberBand.Width;
+                bounds.Height = (int)rubberBand.Height;
+                eventCallbackFcn(
+                    controlID, EventTypeID.rubberCreated, bounds);
+            }
         }
 
         public UserCanvasControl()

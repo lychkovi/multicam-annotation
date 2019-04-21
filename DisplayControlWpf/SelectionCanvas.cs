@@ -25,7 +25,11 @@ namespace DisplayControlWpf
         private Point mouseLeftDownPoint;
         private Style cropperStyle;
         public Shape rubberBand = null;
-        public readonly RoutedEvent CropImageEvent;
+        public readonly static RoutedEvent CropImageEvent = 
+            EventManager.RegisterRoutedEvent(
+            "CropImage", RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler), typeof(SelectionCanvas));
+        private static bool eventRegistered = false;
         #endregion
 
         #region Events
@@ -34,8 +38,8 @@ namespace DisplayControlWpf
         /// <span class="code-SummaryComment"></summary></span>
         public event RoutedEventHandler CropImage
         {
-            add { AddHandler(this.CropImageEvent, value); }
-            remove { RemoveHandler(this.CropImageEvent, value); }
+            add { AddHandler(CropImageEvent, value); }
+            remove { RemoveHandler(CropImageEvent, value); }
         }
         #endregion
 
@@ -46,9 +50,13 @@ namespace DisplayControlWpf
         /// <span class="code-SummaryComment"></summary></span>
         public SelectionCanvas()
         {
-            this.CropImageEvent = EventManager.RegisterRoutedEvent
-        ("CropImage", RoutingStrategy.Bubble,
-        typeof(RoutedEventHandler), typeof(SelectionCanvas));
+            if (!eventRegistered)
+            {
+                //CropImageEvent = EventManager.RegisterRoutedEvent(
+                //    "CropImage", RoutingStrategy.Bubble,
+                //    typeof(RoutedEventHandler), typeof(SelectionCanvas));
+                eventRegistered = true;
+            }
         }
         #endregion
 
@@ -86,7 +94,7 @@ namespace DisplayControlWpf
             {
                 this.ReleaseMouseCapture();
 
-                RaiseEvent(new RoutedEventArgs(this.CropImageEvent, this));
+                RaiseEvent(new RoutedEventArgs(CropImageEvent, this));
             }
         }
 
