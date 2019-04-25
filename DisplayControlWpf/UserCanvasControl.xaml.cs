@@ -79,7 +79,6 @@ namespace DisplayControlWpf
             selectCanvForImg.Width = bmpSource.Width* zoomFactor;
             selectCanvForImg.Height = bmpSource.Height* zoomFactor;
             selectCanvForImg.Children.Clear();
-            selectCanvForImg.rubberBand = null;
             selectCanvForImg.Children.Add(img);
 
             // Вариант 1. Если нужно отмасштабированное изображение 
@@ -102,8 +101,7 @@ namespace DisplayControlWpf
         /// which can then be used to drag the crop area around
         /// within a Canvas
         /// </summary>
-        private void selectCanvForImg_CropImage
-                (object sender, RoutedEventArgs e)
+        private void selectCanvForImg_CropImage(object sender, CanvasEventArgs e)
         {
             rubberBand = (Shape)selectCanvForImg.Children[1];
             //createDragCanvas();
@@ -111,13 +109,8 @@ namespace DisplayControlWpf
             // Вызываем внешний обработчик события
             if (eventCallbackFcn != null)
             {
-                System.Drawing.Rectangle bounds = new System.Drawing.Rectangle();
-                bounds.X = (int) Canvas.GetLeft(rubberBand);
-                bounds.Y = (int) Canvas.GetTop(rubberBand);
-                bounds.Width = (int)rubberBand.Width;
-                bounds.Height = (int)rubberBand.Height;
                 eventCallbackFcn(
-                    controlID, EventTypeID.rubberCreated, bounds);
+                    controlID, EventTypeID.rubberCreated, e.clip);
             }
         }
 
@@ -126,8 +119,8 @@ namespace DisplayControlWpf
             InitializeComponent();
 
             createSelectionCanvas();
-            selectCanvForImg.CropImage +=
-                new RoutedEventHandler(selectCanvForImg_CropImage);
+            selectCanvForImg.RunEvent +=
+                new SelectionCanvas.CanvasEventHandler(selectCanvForImg_CropImage);
         }
 
         // Метод обновляет размеры дочерних элементов в случае изменения 

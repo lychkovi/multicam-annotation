@@ -14,6 +14,26 @@ using System.Windows.Shapes;
 
 namespace DisplayControlWpf
 {
+    public enum CanvasEventID
+    {
+        PointSelected,      // указали точку
+        MarbleCreated,      // создали новую рамку
+        MarbleUpdated,      // изменили рамку
+        PointLost           // за пределы рамки нажали
+    }
+
+    public class CanvasEventArgs : EventArgs
+    {
+        public readonly CanvasEventID msg;
+        public System.Drawing.Rectangle clip;
+
+        public CanvasEventArgs(CanvasEventID message)
+        {
+            msg = message;
+            clip = new System.Drawing.Rectangle();
+        }
+    }
+
     /// <span class="code-SummaryComment"><summary></span>
     /// Provides a Canvas where a rectangle will be drawn
     /// that matches the selection area that the user drew
@@ -24,23 +44,16 @@ namespace DisplayControlWpf
         #region Instance fields
         private Point mouseLeftDownPoint;
         private Style cropperStyle;
-        public Shape rubberBand = null;
-        public readonly static RoutedEvent CropImageEvent = 
-            EventManager.RegisterRoutedEvent(
-            "CropImage", RoutingStrategy.Bubble,
-            typeof(RoutedEventHandler), typeof(SelectionCanvas));
-        private static bool eventRegistered = false;
+        private Shape rubberBand = null;
+        public delegate void CanvasEventHandler(
+            object sender, CanvasEventArgs e);
+        public event CanvasEventHandler RunEvent;
         #endregion
 
         #region Events
         /// <span class="code-SummaryComment"><summary></span>
         /// Raised when the user has drawn a selection area
         /// <span class="code-SummaryComment"></summary></span>
-        public event RoutedEventHandler CropImage
-        {
-            add { AddHandler(CropImageEvent, value); }
-            remove { RemoveHandler(CropImageEvent, value); }
-        }
         #endregion
 
         #region Ctor
@@ -50,13 +63,7 @@ namespace DisplayControlWpf
         /// <span class="code-SummaryComment"></summary></span>
         public SelectionCanvas()
         {
-            if (!eventRegistered)
-            {
-                //CropImageEvent = EventManager.RegisterRoutedEvent(
-                //    "CropImage", RoutingStrategy.Bubble,
-                //    typeof(RoutedEventHandler), typeof(SelectionCanvas));
-                eventRegistered = true;
-            }
+
         }
         #endregion
 
@@ -93,8 +100,13 @@ namespace DisplayControlWpf
             if (this.IsMouseCaptured && rubberBand != null)
             {
                 this.ReleaseMouseCapture();
-
-                RaiseEvent(new RoutedEventArgs(CropImageEvent, this));
+                CanvasEventArgs args = 
+                    new CanvasEventArgs(CanvasEventID.MarbleCreated);
+                args.clip.X = (int)Canvas.GetLeft(rubberBand);
+                args.clip.Y = (int)Canvas.GetTop(rubberBand);
+                args.clip.Width = (int)rubberBand.Width;
+                args.clip.Height = (int)rubberBand.Height;
+                RunEvent(this, args);
             }
         }
 
