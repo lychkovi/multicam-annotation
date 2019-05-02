@@ -223,9 +223,9 @@
             // 
             // pnlDisplay
             // 
-            this.pnlDisplay.Location = new System.Drawing.Point(93, 141);
+            this.pnlDisplay.Location = new System.Drawing.Point(163, 80);
             this.pnlDisplay.Name = "pnlDisplay";
-            this.pnlDisplay.Size = new System.Drawing.Size(279, 216);
+            this.pnlDisplay.Size = new System.Drawing.Size(398, 380);
             this.pnlDisplay.TabIndex = 6;
             // 
             // Form1

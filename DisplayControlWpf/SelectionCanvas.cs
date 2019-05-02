@@ -88,8 +88,8 @@ namespace DisplayControlWpf
             rubberBand = new Rectangle();
             //if (cropperStyle != null)
             //    rubberBand.Style = cropperStyle;
-            //rubberBand.Style = new Style(typeof(Shape)); //, Style.BasedOn); // Style.BasedOn;// DefaultStyleKey;
-            //rubberBand.Style.
+            //rubberBand.Style = new Style(typeof(Shape)); //, Style.BasedOn); 
+            // Style.BasedOn;// DefaultStyleKey;
             rubberBand.Stroke = new SolidColorBrush(Colors.Black);
             rubberBand.StrokeThickness = 2;
             //rubberBand.Fill = new SolidColorBrush(Colors.Black);
@@ -142,7 +142,8 @@ namespace DisplayControlWpf
 
         /// <span class="code-SummaryComment"><summary></span>
         /// Creates a child control
-        /// <span class="code-SummaryComment"><see cref="System.Windows.Shapes.Rectangle">Rectangle</see></span>
+        /// <span class="code-SummaryComment"><see cref="System.Windows.Shapes.Rectangle">
+        /// Rectangle</see></span>
         /// and adds it to this controls children collection
         /// at the co-ordinates the user
         /// drew with the mouse

@@ -18,7 +18,7 @@ namespace UniversalAnnotationApp
     public partial class Form1 : Form
     {
         private ElementHost ctrlHost;
-        private DisplayControlWpf.DisplayControl wpfDisplayCtrl;
+        private DisplayControlWin.DisplayControl DisplayCtrl;
         private FileManager engine;
 
         public Form1()
@@ -26,12 +26,9 @@ namespace UniversalAnnotationApp
             InitializeComponent();
 
             // Добавляем элемент управления DisplayControlWpf
-            ctrlHost = new ElementHost();
-            ctrlHost.Dock = DockStyle.Fill;
-            pnlDisplay.Controls.Add(ctrlHost);
-            wpfDisplayCtrl = new DisplayControlWpf.DisplayControl();
-            wpfDisplayCtrl.InitializeComponent();
-            ctrlHost.Child = wpfDisplayCtrl;
+            DisplayCtrl = new DisplayControlWin.DisplayControl();
+            DisplayCtrl.Dock = DockStyle.Fill;
+            pnlDisplay.Controls.Add(DisplayCtrl);
 
             // Создаем объект бизнес-логики приложения
             engine = new FileManager();
@@ -46,7 +43,7 @@ namespace UniversalAnnotationApp
             engine.MarkupGuiBind(markupControls);
 
             DisplayManagerControls displayControls;
-            displayControls.wpfDisplayCtrl = wpfDisplayCtrl;
+            displayControls.DisplayCtrl = DisplayCtrl;
             engine.DisplayGuiBind(displayControls);
 
             FileManagerControls fileControls;

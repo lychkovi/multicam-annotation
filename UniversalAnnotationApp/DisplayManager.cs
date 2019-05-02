@@ -15,7 +15,7 @@ namespace UniversalAnnotationApp
 {
     public struct DisplayManagerControls
     {
-        public DisplayControlWpf.DisplayControl wpfDisplayCtrl;
+        public DisplayControlWin.DisplayControl DisplayCtrl;
     }
 
     public interface IDisplay
@@ -144,7 +144,6 @@ namespace UniversalAnnotationApp
         override public void DisplayGuiBind(DisplayManagerControls controls)
         {
             m_gui = controls;
-            TraceStateHolderBind(m_gui.wpfDisplayCtrl);
         }
 
         public DisplayManager()

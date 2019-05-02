@@ -101,6 +101,10 @@
       <Project>{12CF7313-6D58-4061-A1D7-1A6E41E007D3}</Project>
       <Name>CameraData</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DisplayControlWin\DisplayControlWin.csproj">
+      <Project>{C3A915C4-943E-4ED8-B8F2-FC38B726C3A0}</Project>
+      <Name>DisplayControlWin</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DisplayControlWpf\DisplayControlWpf.csproj">
       <Project>{10209F0D-3887-4809-9F08-86653D0E5B1C}</Project>
       <Name>DisplayControlWpf</Name>

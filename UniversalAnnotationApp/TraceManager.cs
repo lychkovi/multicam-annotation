@@ -81,7 +81,6 @@ namespace UniversalAnnotationApp
         abstract public void TraceOnUpdateEnd(); // завершить изм. траектории
 
         abstract public void TraceGuiBind();
-        abstract public void TraceStateHolderBind(ITraceStateHolder state);
     }
 
 
@@ -365,11 +364,6 @@ namespace UniversalAnnotationApp
         override public void TraceGuiBind()
         {
 
-        }
-
-        override public void TraceStateHolderBind(ITraceStateHolder state)
-        {
-            m_state = state;
         }
 
         public TraceManager()
