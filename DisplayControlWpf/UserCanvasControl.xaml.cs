@@ -16,11 +16,14 @@ namespace DisplayControlWpf
 {
     // Перечисление задает все типы событий, которые может вырабатывать
     // пользовательский элемент управления
-    public enum EventTypeID
+    public enum DisplayEventID
     {
-        rubberCreated,
-        rubberSelected,
-        rubberModified
+        PointSelected,      // указали точку
+        RubberCreated,      // создали новую рамку
+        RubberUpdated,      // изменили рамку
+        PointLost,          // за пределы рамки нажали
+        ZoomChanged,        // изменение режима зуммирования
+        ViewChanged         // изменение вида для отображения
     }
 
     /// <summary>
@@ -28,17 +31,12 @@ namespace DisplayControlWpf
     /// </summary>
     public partial class UserCanvasControl : UserControl
     {
-        private string ImgUrl = "D:\\Igorek\\Disser\\YanaNewNew\\MyVideoAnno\\Debug\\Koala.jpg";
-        private BitmapImage bmpSource = null;
-        private SelectionCanvas selectCanvForImg = null;
-        private System.Windows.Controls.Image img = null;
-        private double zoomFactor = 1.0;
+        private SelectionCanvas selectCanvForImg;
 
         // Обработка события от элемента управления
-        private Shape rubberBand = null;
         private int controlID;     // идентификатор элемента в массиве
         public delegate void eventCallback(
-            int getControlID, EventTypeID eventID, 
+            int getControlID, DisplayEventID eventID, 
             System.Drawing.Rectangle bounds);
         eventCallback eventCallbackFcn = null;
 
@@ -49,24 +47,6 @@ namespace DisplayControlWpf
             controlID = setControlID;
             eventCallbackFcn = callbackFcn;
         }
-        //    int setControlID, EventTypeID eventID, Shape rubberBand);
-
-        /// <span class="code-SummaryComment"><summary></span>
-        /// Creates the Image source for the current canvas
-        /// <span class="code-SummaryComment"></summary></span>
-        private void createImageSource()
-        {
-            bmpSource = new BitmapImage(new Uri(ImgUrl));
-            img = new System.Windows.Controls.Image();
-            img.Source = bmpSource;
-            //if there was a Zoom Factor applied
-            //img.RenderTransform = new ScaleTransform (0.8, 0.8, 0, 0);
-            img.RenderTransform = new ScaleTransform(zoomFactor, zoomFactor, 0, 0);
-            //Size imgRenderSize = new Size();
-            //imgRenderSize.Width = 100;
-            //imgRenderSize.Height = 100;
-            //img.RenderSize = imgRenderSize;
-        }
 
         /// <span class="code-SummaryComment"><summary></span>
         /// creates the selection canvas, where user can draw
@@ -74,12 +54,7 @@ namespace DisplayControlWpf
         /// <span class="code-SummaryComment"></summary></span>
         public void createSelectionCanvas()
         {
-            createImageSource();
             selectCanvForImg = new SelectionCanvas();
-            selectCanvForImg.Width = bmpSource.Width* zoomFactor;
-            selectCanvForImg.Height = bmpSource.Height* zoomFactor;
-            selectCanvForImg.Children.Clear();
-            selectCanvForImg.Children.Add(img);
 
             // Вариант 1. Если нужно отмасштабированное изображение 
             // (но без контроля выхода выеления за пределы изображения):
@@ -103,20 +78,21 @@ namespace DisplayControlWpf
         /// </summary>
         private void selectCanvForImg_CropImage(object sender, CanvasEventArgs e)
         {
-            rubberBand = (Shape)selectCanvForImg.Children[1];
+            //rubberBand = (Shape)selectCanvForImg.Children[1];
             //createDragCanvas();
 
             // Вызываем внешний обработчик события
             if (eventCallbackFcn != null)
             {
                 eventCallbackFcn(
-                    controlID, EventTypeID.rubberCreated, e.clip);
+                    controlID, DisplayEventID.RubberCreated, e.clip);
             }
         }
 
         public UserCanvasControl()
         {
             InitializeComponent();
+
 
             createSelectionCanvas();
             selectCanvForImg.RunEvent +=

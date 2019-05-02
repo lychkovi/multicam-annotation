@@ -14,11 +14,20 @@ using System.Windows.Shapes;
 
 namespace DisplayControlWpf
 {
+    // Перечень поддерживаемых режимов 
+    public enum CanvasModeID
+    {
+        Idle,               // неактивный режим
+        PointSelect,        // ожидаем ввод координат точки
+        RubberCreate,       // ожидаем ввод координат рамки
+        RubberUpdate        // ожидаем изменение координат рамки
+    }
+
     public enum CanvasEventID
     {
         PointSelected,      // указали точку
-        MarbleCreated,      // создали новую рамку
-        MarbleUpdated,      // изменили рамку
+        RubberCreated,      // создали новую рамку
+        RubberUpdated,      // изменили рамку
         PointLost           // за пределы рамки нажали
     }
 
@@ -44,7 +53,10 @@ namespace DisplayControlWpf
         #region Instance fields
         private Point mouseLeftDownPoint;
         private Style cropperStyle;
-        private Shape rubberBand = null;
+        private string ImgUrl = "D:\\Igorek\\Disser\\YanaNewNew\\MyVideoAnno\\Debug\\Koala.jpg";
+        private System.Windows.Media.Imaging.BitmapImage imgSource;
+        private System.Windows.Controls.Image img;
+        private Shape rubberBand;
         public delegate void CanvasEventHandler(
             object sender, CanvasEventArgs e);
         public event CanvasEventHandler RunEvent;
@@ -63,7 +75,25 @@ namespace DisplayControlWpf
         /// <span class="code-SummaryComment"></summary></span>
         public SelectionCanvas()
         {
+            // Создаем элемент просмотра изображения
+            imgSource = new BitmapImage(new Uri(ImgUrl));
+            img = new System.Windows.Controls.Image();
+            img.Source = imgSource;
+            img.RenderTransform = new ScaleTransform(1.0, 1.0, 0, 0);
+            this.Width = imgSource.Width;
+            this.Height = imgSource.Height;
+            this.Children.Add(img);
 
+            // Создаем элемент прямоугольную рамку
+            rubberBand = new Rectangle();
+            //if (cropperStyle != null)
+            //    rubberBand.Style = cropperStyle;
+            //rubberBand.Style = new Style(typeof(Shape)); //, Style.BasedOn); // Style.BasedOn;// DefaultStyleKey;
+            //rubberBand.Style.
+            rubberBand.Stroke = new SolidColorBrush(Colors.Black);
+            rubberBand.StrokeThickness = 2;
+            //rubberBand.Fill = new SolidColorBrush(Colors.Black);
+            this.Children.Add(rubberBand);
         }
         #endregion
 
@@ -101,7 +131,7 @@ namespace DisplayControlWpf
             {
                 this.ReleaseMouseCapture();
                 CanvasEventArgs args = 
-                    new CanvasEventArgs(CanvasEventID.MarbleCreated);
+                    new CanvasEventArgs(CanvasEventID.RubberCreated);
                 args.clip.X = (int)Canvas.GetLeft(rubberBand);
                 args.clip.Y = (int)Canvas.GetTop(rubberBand);
                 args.clip.Width = (int)rubberBand.Width;
@@ -125,22 +155,8 @@ namespace DisplayControlWpf
             {
                 Point currentPoint = e.GetPosition(this);
 
-                if (rubberBand == null)
-                {
-                    rubberBand = new Rectangle();
-                    //if (cropperStyle != null)
-                    //    rubberBand.Style = cropperStyle;
-                    //rubberBand.Style = new Style(typeof(Shape)); //, Style.BasedOn); // Style.BasedOn;// DefaultStyleKey;
-                    //rubberBand.Style.
-                    rubberBand.Stroke = new SolidColorBrush(Colors.Black);
-                    rubberBand.StrokeThickness = 2;
-                    //rubberBand.Fill = new SolidColorBrush(Colors.Black);
-                    this.Children.Add(rubberBand);
-                }
-
                 double width = Math.Abs(mouseLeftDownPoint.X - currentPoint.X);
-                double height =
-            Math.Abs(mouseLeftDownPoint.Y - currentPoint.Y);
+                double height = Math.Abs(mouseLeftDownPoint.Y - currentPoint.Y);
                 double left = Math.Min(mouseLeftDownPoint.X, currentPoint.X);
                 double top = Math.Min(mouseLeftDownPoint.Y, currentPoint.Y);
 

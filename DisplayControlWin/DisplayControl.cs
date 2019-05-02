@@ -23,7 +23,7 @@ namespace DisplayControlWin
             // Массив элементов управления WPF для отображения видов
 
         private void canvasCallbackFcn(
-            int getControlID, EventTypeID eventID, System.Drawing.Rectangle bounds)
+            int getControlID, DisplayEventID eventID, System.Drawing.Rectangle bounds)
         { 
             string messageText = 
                 "X = " + bounds.X.ToString() + 
