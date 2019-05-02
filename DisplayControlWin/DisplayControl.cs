@@ -19,18 +19,18 @@ namespace DisplayControlWin
     public partial class DisplayControl : UserControl
     {
         private List<Panel> viewPanels;  // массив панелей отображения видов
-        private List<UserCanvasControl> viewCanvases;  
-            // Массив элементов управления WPF для отображения видов
+        private List<UserCanvasControl> viewCanvases;
+        // Массив элементов управления WPF для отображения видов
 
         private void canvasCallbackFcn(
             int getControlID, DisplayEventID eventID, System.Drawing.Rectangle bounds)
-        { 
-            string messageText = 
-                "X = " + bounds.X.ToString() + 
+        {
+            string messageText =
+                "X = " + bounds.X.ToString() +
                 "; Y = " + bounds.Y.ToString() +
-                "; W = " + bounds.Width.ToString() + 
+                "; W = " + bounds.Width.ToString() +
                 "; H = " + bounds.Height.ToString();
-            MessageBox.Show(messageText, 
+            MessageBox.Show(messageText,
                 "Canvas " + getControlID.ToString() + " raised an event!");
         }
 
@@ -53,7 +53,7 @@ namespace DisplayControlWin
                 ElementHost ctrlHost = new ElementHost();
                 ctrlHost.Dock = DockStyle.Fill;
                 panel.Controls.Add(ctrlHost);
-                DisplayControlWpf.UserCanvasControl wpfControl = 
+                DisplayControlWpf.UserCanvasControl wpfControl =
                     new DisplayControlWpf.UserCanvasControl();
                 wpfControl.InitializeComponent();
                 ctrlHost.Child = wpfControl;
@@ -61,6 +61,52 @@ namespace DisplayControlWin
                 viewCanvases.Add(wpfControl);
                 icontrol++;
             }
+        }
+
+        // Метод возвращает количество полей для вывода изображений
+        public int GetViewersCount()
+        {
+            return viewCanvases.Count;
+        }
+
+        // Метод возвращает фактические размеры поля вывода изображения на форме
+        public void GetViewerClientSize(int nviewer, out int width, out int height)
+        {
+            width = 0;
+            height = 0;
+        }
+
+        // Метод задаёт содержание выпадающего списка для выбора конкретного 
+        // вида для визуализации на отдельном поле вывода изображения, а также
+        // индекс активного элемента списка
+        public void SetViewerListOfViews(
+            int nviewer, List<string> viewCaptions, int currViewIndex)
+        {
+            viewCanvases[nviewer].SetListOfViews(viewCaptions, currViewIndex);
+        }
+
+        // Метод задаёт содержание выпадающего списка для выбора конкретного 
+        // зума при визуализации на отдельном поле вывода изображения
+        public void SetViewerListOfZooms(
+            int nviewer, List<string> zoomCaptions, int currZoomIndex)
+        {
+            viewCanvases[nviewer].SetListOfZooms(zoomCaptions, currZoomIndex);
+        }
+
+        // Метод задаёт изображение для отдельного поля вывода
+        public void SetViewerImage(int nviewer, System.Drawing.Image newImage)
+        {
+            viewCanvases[nviewer].SetImage(newImage);
+        }
+
+        // Метод задаём режим взаимодействия с мышкой для всех полей вывода
+        // изображения, а также рамку выделения (при необходимости)
+        public void SetViewersMode(
+            CanvasModeID mode, 
+            System.Drawing.Rectangle clip = new System.Drawing.Rectangle())
+        {
+            for (int i = 0; i < viewCanvases.Count; i++)
+                viewCanvases[i].SetMode(mode, clip);
         }
     }
 }

@@ -6,6 +6,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="350" SizeChanged="UserControl_SizeChanged">
     <Grid>
-        <ScrollViewer Height="248" HorizontalAlignment="Left" Margin="0,52,0,0" Name="svForImg" VerticalAlignment="Top" Width="350" IsManipulationEnabled="False" PanningMode="Both" CanContentScroll="True" HorizontalScrollBarVisibility="Visible" ClipToBounds="False" />
+        <ScrollViewer Height="257" HorizontalAlignment="Left" Margin="0,43,0,0" Name="svForImg" VerticalAlignment="Top" Width="350" IsManipulationEnabled="False" PanningMode="Both" CanContentScroll="True" HorizontalScrollBarVisibility="Visible" ClipToBounds="False" />
+        <ComboBox Height="23" HorizontalAlignment="Left" Margin="47,11,0,0" Name="cmbView" VerticalAlignment="Top" Width="139" />
+        <Label Content="View" Height="28" HorizontalAlignment="Left" Margin="5,10,0,0" Name="lblView" VerticalAlignment="Top" />
+        <Label Content="Zoom" Height="28" HorizontalAlignment="Right" Margin="0,10,106,0" Name="lblZoom" VerticalAlignment="Top" />
+        <ComboBox Height="23" HorizontalAlignment="Right" Margin="0,11,16,0" Name="cmbZoom" VerticalAlignment="Top" Width="80" />
     </Grid>
 </UserControl>

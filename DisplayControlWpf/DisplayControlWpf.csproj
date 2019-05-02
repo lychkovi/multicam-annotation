@@ -84,6 +84,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CameraData\CameraData.csproj">
+      <Project>{12CF7313-6D58-4061-A1D7-1A6E41E007D3}</Project>
+      <Name>CameraData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TraceData\TraceData.csproj">
       <Project>{875A609B-6531-4D1A-9C95-F5A7A0E51E80}</Project>
       <Name>TraceData</Name>

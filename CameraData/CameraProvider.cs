@@ -23,6 +23,10 @@ namespace CameraData
     /* Класс, реализующий чтение кадров из видеофайлов. */
     public class CameraProviderVideo: CameraProvider
     {
+        [DllImport("gdi32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool DeleteObject(IntPtr value);
+
         // Функции для работы с видеофайлом
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int VideoOpen(String filepath,
@@ -62,6 +66,7 @@ namespace CameraData
             {
                 // Преобразуем кадр в нужный формат
                 InitialFrame = Image.FromHbitmap(hBitmap);
+                DeleteObject(hBitmap);
                 return true;
             }
         }
@@ -100,12 +105,18 @@ namespace CameraData
 
             // Преобразуем кадр к нужному формату и возвращаем
             FrameOut = Image.FromHbitmap(hBitmap);
+            DeleteObject(hBitmap);
             return FrameOut;
         }
 
         override public void Close(int VideoHandle)
         {
             VideoClose(VideoHandle);
+        }
+
+        public static void ReleaseBitmap(IntPtr bitmap)
+        {
+            DeleteObject(bitmap);
         }
     }
 }

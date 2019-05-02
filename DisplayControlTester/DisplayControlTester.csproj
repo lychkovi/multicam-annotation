@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -82,6 +82,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CameraData\CameraData.csproj">
+      <Project>{12CF7313-6D58-4061-A1D7-1A6E41E007D3}</Project>
+      <Name>CameraData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DisplayControlWin\DisplayControlWin.csproj">
       <Project>{C3A915C4-943E-4ED8-B8F2-FC38B726C3A0}</Project>
       <Name>DisplayControlWin</Name>

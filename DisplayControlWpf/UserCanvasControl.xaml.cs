@@ -31,7 +31,7 @@ namespace DisplayControlWpf
     /// </summary>
     public partial class UserCanvasControl : UserControl
     {
-        private SelectionCanvas selectCanvForImg;
+        private SelectionCanvas canvas;
 
         // Обработка события от элемента управления
         private int controlID;     // идентификатор элемента в массиве
@@ -54,7 +54,7 @@ namespace DisplayControlWpf
         /// <span class="code-SummaryComment"></summary></span>
         public void createSelectionCanvas()
         {
-            selectCanvForImg = new SelectionCanvas();
+            canvas = new SelectionCanvas();
 
             // Вариант 1. Если нужно отмасштабированное изображение 
             // (но без контроля выхода выеления за пределы изображения):
@@ -63,7 +63,7 @@ namespace DisplayControlWpf
 
             // Вариант 2. Если нужно изображение в оригинальных размерах 
             // (с прокруткой)
-            svForImg.Content = selectCanvForImg;
+            svForImg.Content = canvas;
 
             //createSelectionCanvasMenu();
         }
@@ -76,7 +76,7 @@ namespace DisplayControlWpf
         /// which can then be used to drag the crop area around
         /// within a Canvas
         /// </summary>
-        private void selectCanvForImg_CropImage(object sender, CanvasEventArgs e)
+        private void OnCanvasEvent(object sender, CanvasEventArgs e)
         {
             //rubberBand = (Shape)selectCanvForImg.Children[1];
             //createDragCanvas();
@@ -92,11 +92,56 @@ namespace DisplayControlWpf
         public UserCanvasControl()
         {
             InitializeComponent();
-
-
             createSelectionCanvas();
-            selectCanvForImg.RunEvent +=
-                new SelectionCanvas.CanvasEventHandler(selectCanvForImg_CropImage);
+            canvas.RunEvent +=
+                new SelectionCanvas.CanvasEventHandler(OnCanvasEvent);
+            SetMode(CanvasModeID.Disabled);
+        }
+
+        // Метод возвращает фактические размеры поля вывода изображения на форме
+        public void GetClientSize(out int width, out int height)
+        {
+            width = 0;
+            height = 0;
+        }
+
+        // Метод задаёт содержание выпадающего списка для выбора конкретного 
+        // вида для визуализации на отдельном поле вывода изображения, а также
+        // индекс активного элемента списка
+        public void SetListOfViews(List<string> viewCaptions, int currViewIndex)
+        {
+            cmbView.Items.Clear();
+            for (int i = 0; i < viewCaptions.Count; i++)
+                cmbView.Items.Add(viewCaptions[i]);
+            cmbView.SelectedIndex = currViewIndex;
+        }
+
+        // Метод задаёт содержание выпадающего списка для выбора конкретного 
+        // зума при визуализации на отдельном поле вывода изображения
+        public void SetListOfZooms(List<string> zoomCaptions, int currZoomIndex)
+        {
+            cmbZoom.Items.Clear();
+            for (int i = 0; i < zoomCaptions.Count; i++)
+                cmbZoom.Items.Add(zoomCaptions[i]);
+            cmbZoom.SelectedIndex = currZoomIndex;
+        }
+
+        // Метод задаёт изображение для отдельного поля вывода
+        public void SetImage(System.Drawing.Image newImage)
+        {
+            canvas.SetImage(newImage);
+        }
+
+        // Метод задаём режим взаимодействия с мышкой для всех полей вывода
+        // изображения, а также рамку выделения (при необходимости)
+        public void SetMode(CanvasModeID mode,
+            System.Drawing.Rectangle clip = new System.Drawing.Rectangle())
+        {
+            if (mode == CanvasModeID.Disabled)
+                this.IsEnabled = false;
+            else
+                this.IsEnabled = true;
+            canvas.SetMode(mode, clip);
         }
 
         // Метод обновляет размеры дочерних элементов в случае изменения 

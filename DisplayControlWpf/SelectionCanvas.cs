@@ -12,12 +12,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using CameraData;           // DeleteObject() для освобождения Bitmap
+
+
 namespace DisplayControlWpf
 {
     // Перечень поддерживаемых режимов 
     public enum CanvasModeID
     {
-        Idle,               // неактивный режим
+        Disabled,           // изображение отсутствует
+        Idle,               // события мыши не обрабатываются
         PointSelect,        // ожидаем ввод координат точки
         RubberCreate,       // ожидаем ввод координат рамки
         RubberUpdate        // ожидаем изменение координат рамки
@@ -51,10 +55,11 @@ namespace DisplayControlWpf
     public partial class SelectionCanvas : Canvas
     {
         #region Instance fields
+        private CanvasModeID m_mode;
         private Point mouseLeftDownPoint;
-        private Style cropperStyle;
-        private string ImgUrl = "D:\\Igorek\\Disser\\YanaNewNew\\MyVideoAnno\\Debug\\Koala.jpg";
-        private System.Windows.Media.Imaging.BitmapImage imgSource;
+        //private string ImgUrl = "D:\\Igorek\\Disser\\YanaNewNew\\MyVideoAnno\\Debug\\Koala.jpg";
+        //private System.Windows.Media.Imaging.BitmapImage imgSource;
+        private System.Windows.Media.ImageSource imgSource;
         private System.Windows.Controls.Image img;
         private Shape rubberBand;
         public delegate void CanvasEventHandler(
@@ -76,12 +81,12 @@ namespace DisplayControlWpf
         public SelectionCanvas()
         {
             // Создаем элемент просмотра изображения
-            imgSource = new BitmapImage(new Uri(ImgUrl));
+            //imgSource = new BitmapImage(new Uri(ImgUrl));
             img = new System.Windows.Controls.Image();
-            img.Source = imgSource;
-            img.RenderTransform = new ScaleTransform(1.0, 1.0, 0, 0);
-            this.Width = imgSource.Width;
-            this.Height = imgSource.Height;
+            //img.Source = imgSource;
+            //img.RenderTransform = new ScaleTransform(1.0, 1.0, 0, 0);
+            //this.Width = imgSource.Width;
+            //this.Height = imgSource.Height;
             this.Children.Add(img);
 
             // Создаем элемент прямоугольную рамку
@@ -94,15 +99,13 @@ namespace DisplayControlWpf
             rubberBand.StrokeThickness = 2;
             //rubberBand.Fill = new SolidColorBrush(Colors.Black);
             this.Children.Add(rubberBand);
+
+            // Переводим поле вывода в неактивный режим
+            SetMode(CanvasModeID.Disabled);
         }
         #endregion
 
         #region Public Properties
-        public Style CropperStyle
-        {
-            get { return cropperStyle; }
-            set { cropperStyle = value; }
-        }
         #endregion
 
         #region Overrides
@@ -169,5 +172,75 @@ namespace DisplayControlWpf
             }
         }
         #endregion
+
+        // Метод преобразует изображение к объекту, пригодному для отображения
+        // в среде Windows Presentation Forms. 
+        public static BitmapSource GetImageStream(System.Drawing.Image myImage)
+        {
+            var bitmap = new System.Drawing.Bitmap(myImage);
+            IntPtr bmpPt = bitmap.GetHbitmap();
+            BitmapSource bitmapSource =
+                System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                    bmpPt,
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+
+            //freeze bitmapSource and clear memory to avoid memory leaks
+            bitmapSource.Freeze();
+            CameraProviderVideo.ReleaseBitmap(bmpPt);
+
+            return bitmapSource;
+        }
+
+        // Метод возвращает фактические размеры поля вывода изображения на форме
+        public void GetClientSize(out int width, out int height)
+        {
+            width = 0;
+            height = 0;
+        }
+
+        // Метод задаёт содержание выпадающего списка для выбора конкретного 
+        // вида для визуализации на отдельном поле вывода изображения, а также
+        // индекс активного элемента списка
+        public void SetListOfViews(List<string> viewCaptions, int currViewIndex)
+        {
+
+        }
+
+        // Метод задаёт содержание выпадающего списка для выбора конкретного 
+        // зума при визуализации на отдельном поле вывода изображения
+        public void SetListOfZooms(List<string> zoomCaptions, int currZoomIndex)
+        {
+
+        }
+
+        // Метод задаёт изображение для отдельного поля вывода
+        public void SetImage(System.Drawing.Image newImage)
+        {
+            imgSource = GetImageStream(newImage);
+            img.Source = imgSource;
+            img.RenderTransform = new ScaleTransform(1.0, 1.0, 0, 0);
+            this.Width = imgSource.Width;
+            this.Height = imgSource.Height;
+        }
+
+        // Метод задаём режим взаимодействия с мышкой для всех полей вывода
+        // изображения, а также рамку выделения (при необходимости)
+        public void SetMode(CanvasModeID mode, 
+            System.Drawing.Rectangle clip = new System.Drawing.Rectangle())
+        {
+            if (mode == CanvasModeID.Disabled)
+            {
+                rubberBand.Visibility = System.Windows.Visibility.Hidden;
+                img.Visibility = System.Windows.Visibility.Hidden;
+            }
+            else if (m_mode == CanvasModeID.Disabled)
+            {
+                rubberBand.Visibility = System.Windows.Visibility.Visible;
+                img.Visibility = System.Windows.Visibility.Visible;
+            }
+            m_mode = mode;
+        }
     }
 }
