@@ -99,6 +99,23 @@ namespace DisplayControlWin
             viewCanvases[nviewer].SetImage(newImage);
         }
 
+        // Метод удаляет изображение из отдельного поля вывода и переводит его
+        // в неактивный режим
+        public void DelViewerImage(int nviewer)
+        {
+            viewCanvases[nviewer].DelImage();
+        }
+
+        // Метод задаём режим взаимодействия с мышкой для одного поля вывода
+        // изображения, а также рамку выделения (при необходимости)
+        public void SetViewerMode(
+            int nviewer, 
+            CanvasModeID mode,
+            System.Drawing.Rectangle clip = new System.Drawing.Rectangle())
+        {
+            viewCanvases[nviewer].SetMode(mode, clip);
+        }
+
         // Метод задаём режим взаимодействия с мышкой для всех полей вывода
         // изображения, а также рамку выделения (при необходимости)
         public void SetViewersMode(

@@ -10,13 +10,14 @@ using System.Text;
 using System.Windows.Forms;
 
 using DisplayControlWin;
+using DisplayControlWpf;
 using CameraData;
 
 namespace DisplayControlTester
 {
     public partial class Form2 : Form
     {
-        private DisplayControlWin.DisplayControl control;
+        private DisplayControl control;
         private CameraProvider cam;
         private bool isVideoOpened;
         private int VideoHandle;
@@ -25,7 +26,10 @@ namespace DisplayControlTester
         private void ControlsReset()
         {
             isVideoOpened = false;
-            control.SetViewersMode(DisplayControlWpf.CanvasModeID.Disabled);
+            control.DelViewerImage(0);
+            control.DelViewerImage(1);
+            control.DelViewerImage(2);
+            control.DelViewerImage(3);
         }
 
         public Form2()
@@ -33,7 +37,7 @@ namespace DisplayControlTester
             InitializeComponent();
 
             // Создаем интерактивный элемент отображения видео
-            control = new DisplayControlWin.DisplayControl();
+            control = new DisplayControl();
             control.Dock = DockStyle.Fill;
             panel1.Controls.Add(control);
 
@@ -80,17 +84,20 @@ namespace DisplayControlTester
             }
 
             // 4. Инициализируем элементы отображения кадров
-            control.SetViewerImage(0, InitialFrame);
-            control.SetViewerImage(1, InitialFrame);
-            control.SetViewerImage(2, InitialFrame);
-            control.SetViewerImage(3, InitialFrame);
-            control.SetViewersMode(DisplayControlWpf.CanvasModeID.Idle);
             List<string> viewCaptions = new List<string>();
             viewCaptions.Add("View1");
             control.SetViewerListOfViews(0, viewCaptions, 0);
             List<string> zoomCaptions = new List<string>();
             zoomCaptions.Add("1x");
             control.SetViewerListOfZooms(0, zoomCaptions, 0);
+            control.SetViewerImage(0, InitialFrame);
+            control.SetViewerImage(1, InitialFrame);
+            control.SetViewerImage(2, InitialFrame);
+            control.SetViewerImage(3, InitialFrame);
+            control.SetViewerMode(0, CanvasModeID.RubberUpdate, 
+                new Rectangle(20, 20, 40, 40));
+            control.SetViewerMode(1, CanvasModeID.RubberCreate);
+            control.SetViewerMode(2, CanvasModeID.PointSelect);
             isVideoOpened = true;
         }
 

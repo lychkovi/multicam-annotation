@@ -130,6 +130,15 @@ namespace DisplayControlWpf
         public void SetImage(System.Drawing.Image newImage)
         {
             canvas.SetImage(newImage);
+            this.IsEnabled = true;
+        }
+
+        // Метод удаляет изображение из поля вывода и переводит его
+        // в неактивный режим
+        public void DelImage()
+        {
+            canvas.DelImage();
+            this.IsEnabled = false;
         }
 
         // Метод задаём режим взаимодействия с мышкой для всех полей вывода
