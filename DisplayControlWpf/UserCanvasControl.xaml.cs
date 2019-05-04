@@ -103,20 +103,24 @@ namespace DisplayControlWpf
         // индекс активного элемента списка
         public void SetListOfViews(List<string> viewCaptions, int currViewIndex)
         {
+            cmbView.SelectionChanged -= cmbView_SelectionChanged;
             cmbView.Items.Clear();
             for (int i = 0; i < viewCaptions.Count; i++)
                 cmbView.Items.Add(viewCaptions[i]);
             cmbView.SelectedIndex = currViewIndex;
+            cmbView.SelectionChanged += cmbView_SelectionChanged;
         }
 
         // Метод задаёт содержание выпадающего списка для выбора конкретного 
         // зума при визуализации на отдельном поле вывода изображения
         public void SetListOfZooms(List<string> zoomCaptions, int currZoomIndex)
         {
+            cmbZoom.SelectionChanged -= cmbZoom_SelectionChanged;
             cmbZoom.Items.Clear();
             for (int i = 0; i < zoomCaptions.Count; i++)
                 cmbZoom.Items.Add(zoomCaptions[i]);
             cmbZoom.SelectedIndex = currZoomIndex;
+            cmbZoom.SelectionChanged += cmbZoom_SelectionChanged;
         }
 
         // Метод задаёт изображение для отдельного поля вывода
@@ -165,21 +169,27 @@ namespace DisplayControlWpf
         private void cmbView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Изменился текущий выбранный для отображения вид
-            DisplayControlEventArgs args = new DisplayControlEventArgs(
-                DisplayControlEventID.ViewChanged);
-            args.controlID = m_controlID;
-            args.cmbItemID = cmbView.SelectedIndex;
-            RunEvent(this, args);
+            if (cmbView.SelectedIndex != -1 && cmbZoom.SelectedIndex != -1)
+            {
+                DisplayControlEventArgs args = new DisplayControlEventArgs(
+                    DisplayControlEventID.ViewChanged);
+                args.controlID = m_controlID;
+                args.cmbItemID = cmbView.SelectedIndex;
+                RunEvent(this, args);
+            }
         }
 
         private void cmbZoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Изменился текущий выбранный зум для отображения
-            DisplayControlEventArgs args = new DisplayControlEventArgs(
-                DisplayControlEventID.ZoomChanged);
-            args.controlID = m_controlID;
-            args.cmbItemID = cmbZoom.SelectedIndex;
-            RunEvent(this, args);
+            if (cmbView.SelectedIndex != -1 && cmbZoom.SelectedIndex != -1)
+            {
+                DisplayControlEventArgs args = new DisplayControlEventArgs(
+                    DisplayControlEventID.ZoomChanged);
+                args.controlID = m_controlID;
+                args.cmbItemID = cmbZoom.SelectedIndex;
+                RunEvent(this, args);
+            }
         }
     }
 
