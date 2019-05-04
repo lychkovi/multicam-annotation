@@ -14,18 +14,6 @@ using System.Windows.Shapes;
 
 namespace DisplayControlWpf
 {
-    // Перечисление задает все типы событий, которые может вырабатывать
-    // пользовательский элемент управления
-    public enum DisplayEventID
-    {
-        PointSelected,      // указали точку
-        RubberCreated,      // создали новую рамку
-        RubberUpdated,      // изменили рамку
-        PointLost,          // за пределы рамки нажали
-        ZoomChanged,        // изменение режима зуммирования
-        ViewChanged         // изменение вида для отображения
-    }
-
     /// <summary>
     /// Логика взаимодействия для UserControl1.xaml
     /// </summary>
@@ -34,19 +22,10 @@ namespace DisplayControlWpf
         private SelectionCanvas canvas;
 
         // Обработка события от элемента управления
-        private int controlID;     // идентификатор элемента в массиве
-        public delegate void eventCallback(
-            int getControlID, DisplayEventID eventID, 
-            System.Drawing.Rectangle bounds);
-        eventCallback eventCallbackFcn = null;
-
-        // Регистрация обработчика события
-        public void setEventCallback(
-            int setControlID, eventCallback callbackFcn)
-        {
-            controlID = setControlID;
-            eventCallbackFcn = callbackFcn;
-        }
+        private int m_controlID;     // идентификатор элемента в массиве
+        public delegate void controlEventHandler(
+            object sender, DisplayControlEventArgs args);
+        public event controlEventHandler RunEvent;
 
         /// <span class="code-SummaryComment"><summary></span>
         /// creates the selection canvas, where user can draw
@@ -57,12 +36,13 @@ namespace DisplayControlWpf
             canvas = new SelectionCanvas();
 
             // Вариант 1. Если нужно отмасштабированное изображение 
-            // (но без контроля выхода выеления за пределы изображения):
+            // (но без контроля выхода выделения за пределы изображения),
+            // используем ViewBox:
             //vbForImg.Child = selectCanvForImg;
             //vbForImg.Stretch = Stretch.Uniform;
 
             // Вариант 2. Если нужно изображение в оригинальных размерах 
-            // (с прокруткой)
+            // (с прокруткой), используем ScrollViewer:
             svForImg.Content = canvas;
 
             //createSelectionCanvasMenu();
@@ -78,20 +58,34 @@ namespace DisplayControlWpf
         /// </summary>
         private void OnCanvasEvent(object sender, CanvasEventArgs e)
         {
-            //rubberBand = (Shape)selectCanvForImg.Children[1];
-            //createDragCanvas();
-
             // Вызываем внешний обработчик события
-            if (eventCallbackFcn != null)
+            DisplayControlEventID eventID;
+            switch (e.msg)
             {
-                eventCallbackFcn(
-                    controlID, DisplayEventID.RubberCreated, e.clip);
+                case CanvasEventID.PointLost:
+                default:
+                    eventID = DisplayControlEventID.PointLost;
+                    break;
+                case CanvasEventID.PointSelected:
+                    eventID = DisplayControlEventID.PointSelected;
+                    break;
+                case CanvasEventID.RubberCreated:
+                    eventID = DisplayControlEventID.RubberCreated;
+                    break;
+                case CanvasEventID.RubberUpdated:
+                    eventID = DisplayControlEventID.RubberUpdated;
+                    break;
             }
+            DisplayControlEventArgs args = new DisplayControlEventArgs(eventID);
+            args.controlID = m_controlID;
+            args.clip = e.clip;
+            RunEvent(this, args);
         }
 
-        public UserCanvasControl()
+        public UserCanvasControl(int controlID)
         {
             InitializeComponent();
+            m_controlID = controlID;
             createSelectionCanvas();
             canvas.RunEvent +=
                 new SelectionCanvas.CanvasEventHandler(OnCanvasEvent);
@@ -101,8 +95,7 @@ namespace DisplayControlWpf
         // Метод возвращает фактические размеры поля вывода изображения на форме
         public void GetClientSize(out int width, out int height)
         {
-            width = 0;
-            height = 0;
+            canvas.GetClientSize(out width, out height);
         }
 
         // Метод задаёт содержание выпадающего списка для выбора конкретного 
@@ -167,6 +160,56 @@ namespace DisplayControlWpf
             {
                 OnResize(e.NewSize.Width, e.NewSize.Height);
             }
+        }
+
+        private void cmbView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Изменился текущий выбранный для отображения вид
+            DisplayControlEventArgs args = new DisplayControlEventArgs(
+                DisplayControlEventID.ViewChanged);
+            args.controlID = m_controlID;
+            args.cmbItemID = cmbView.SelectedIndex;
+            RunEvent(this, args);
+        }
+
+        private void cmbZoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Изменился текущий выбранный зум для отображения
+            DisplayControlEventArgs args = new DisplayControlEventArgs(
+                DisplayControlEventID.ZoomChanged);
+            args.controlID = m_controlID;
+            args.cmbItemID = cmbZoom.SelectedIndex;
+            RunEvent(this, args);
+        }
+    }
+
+    // Перечисление задает типы событий, которые может вырабатывать
+    // пользовательский элемент управления при изменении состояния
+    // выпадающих списков
+    public enum DisplayControlEventID
+    {
+        PointSelected,      // указали точку
+        RubberCreated,      // создали новую рамку
+        RubberUpdated,      // изменили рамку
+        PointLost,          // за пределы рамки нажали
+        ZoomChanged,        // изменение режима зуммирования
+        ViewChanged         // изменение вида для отображения
+    }
+
+    // Параметры события выпадающего списка
+    public class DisplayControlEventArgs
+    {
+        public readonly DisplayControlEventID msg;
+        public int controlID;  // идентификатор элемента управления
+        public System.Drawing.Rectangle clip;
+        public int cmbItemID;  // индекс элемента выпадающего списка
+
+        public DisplayControlEventArgs(DisplayControlEventID message)
+        {
+            msg = message;
+            controlID = -1;
+            clip = new System.Drawing.Rectangle();
+            cmbItemID = -1;
         }
     }
 }

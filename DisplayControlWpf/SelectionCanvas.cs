@@ -206,7 +206,7 @@ namespace DisplayControlWpf
         }
 
         // Переинициализация рамки выделения в текущих границах
-        public void Normalize()
+        public void ReInit()
         {
             System.Drawing.Rectangle clip = GetClientRect();
             Init(clip, m_bounds);
@@ -504,7 +504,7 @@ namespace DisplayControlWpf
                         {
                             args = new CanvasEventArgs(CanvasEventID.RubberUpdated);
                             args.clip = rubber.GetClientRect();
-                            rubber.Normalize(); // Фиксируем изменения рамки
+                            rubber.ReInit(); // Фиксируем изменения рамки
                         }
                         else
                         {
