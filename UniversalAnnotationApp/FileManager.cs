@@ -109,7 +109,7 @@ namespace UniversalAnnotationApp
         void FileOnMarkupClose();
     }
 
-    abstract class FileManagerBase : DisplayManager, IFile
+    abstract class FileManagerBase : TraceManager, IFile
     {
         abstract public void FileGuiBind(FileManagerControls controls);
         abstract public bool FileOnFormClosing(); // при выходе из приложения
@@ -143,7 +143,7 @@ namespace UniversalAnnotationApp
 
         override protected bool FileCameraOpen(RecordingInfo rec)
         {
-            return DisplayCameraOpen(rec);
+            return TraceCameraOpen(rec);
         }
 
         override protected void FileCameraClose()
@@ -156,7 +156,7 @@ namespace UniversalAnnotationApp
                         return;
                 }
 
-                DisplayCameraClose();
+                TraceCameraClose();
             }
         }
 
@@ -165,7 +165,7 @@ namespace UniversalAnnotationApp
             if (MarkupIsOpened)
                 if (!FileMarkupClose()) return false;
 
-            return DisplayMarkupOpen(MarkupFilePath);
+            return TraceMarkupOpen(MarkupFilePath);
         }
 
         override protected bool FileMarkupClose()
@@ -190,7 +190,7 @@ namespace UniversalAnnotationApp
                         return false;
                 }
             }
-            DisplayMarkupClose();
+            TraceMarkupClose();
             return true;
         }
 

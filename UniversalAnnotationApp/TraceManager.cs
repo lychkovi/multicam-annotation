@@ -30,7 +30,7 @@ namespace UniversalAnnotationApp
     // Типы указателей на функции обратного вызова верхних слоев приложения
     public delegate void DisplayRefreshCallback();
 
-    abstract class TraceManagerBase : MarkupManager, ITrace
+    abstract class TraceManagerBase : DisplayManager, ITrace
     {
         // Сведения о состоянии объекта TraceManager для верхних слоев
         // приложения. 
@@ -165,7 +165,7 @@ namespace UniversalAnnotationApp
         // Слои вызывают эти методы рекурсивно по цепочке
         override protected bool TraceCameraOpen(RecordingInfo rec)
         {
-            if (MarkupCameraOpen(rec))
+            if (DisplayCameraOpen(rec))
             {
                 m_ResetState();
                 m_FrameID = 0;
@@ -178,7 +178,7 @@ namespace UniversalAnnotationApp
 
         override protected void TraceCameraClose()
         {
-            MarkupCameraClose();
+            DisplayCameraClose();
             m_ResetState();
             m_FrameID = -1;
             /* TODO: Деинициализировать ползунок. */
@@ -186,7 +186,7 @@ namespace UniversalAnnotationApp
 
         override protected bool TraceMarkupOpen(string MarkupFilePath)
         {
-            if (MarkupOpen(MarkupFilePath))
+            if (DisplayMarkupOpen(MarkupFilePath))
             {
                 m_ResetState();
                 return true;
@@ -197,7 +197,7 @@ namespace UniversalAnnotationApp
 
         override protected void TraceMarkupClose()
         {
-            MarkupClose();
+            DisplayMarkupClose();
             m_ResetState();
         }
 

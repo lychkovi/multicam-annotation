@@ -23,7 +23,7 @@ namespace UniversalAnnotationApp
         void DisplayGuiBind(DisplayManagerControls controls);
     }
 
-    abstract class DisplayManagerBase : TraceManager, IDisplay
+    abstract class DisplayManagerBase : MarkupManager, IDisplay
     {
         // Метод привязки элементов управления форму к объекту DisplayManager
         abstract public void DisplayGuiBind(DisplayManagerControls controls);
@@ -42,9 +42,8 @@ namespace UniversalAnnotationApp
     class DisplayManager: DisplayManagerBase
     {
         private DisplayManagerControls m_gui;
-        private bool m_IsDisplay;   // признак инициализированного дисплея
-        private int m_FrameID;      // номер текущего буферизованного кадра
-        //private TraceStateHolderDummy dummy; // временный объект (для отладки)
+        private bool m_IsOpened;   // признак инициализированного дисплея
+        private int m_BufferedFrameID;      // номер текущего буферизованного кадра
 
         // инициализация полей вывода изображений
         private void m_Init()
@@ -52,8 +51,8 @@ namespace UniversalAnnotationApp
             // TODO: 1. Создание всех полей для вывода изображений,
             // регистрация обработчиков мыши для этих полей
 
-            m_FrameID = -1;         // кадр еще не буферизован
-            m_IsDisplay = true;
+            m_BufferedFrameID = -1;         // кадр еще не буферизован
+            m_IsOpened = true;
 
             // 2. Перерисовка изображений
             m_Refresh();
@@ -62,9 +61,9 @@ namespace UniversalAnnotationApp
         // отрисовка изображений на форме
         private void m_Refresh()
         {
-            if (m_IsDisplay)
+            if (m_IsOpened)
             {
-                if (m_FrameID != TraceFrameID)
+                if (m_BufferedFrameID != -1)
                 {
                     // TODO: Запрашиваем нужный кадр от слоя Camera и 
                     // буферизуем во внутренних полях Display
@@ -94,15 +93,15 @@ namespace UniversalAnnotationApp
         {
             // TODO: 1. Удаляем все поля для вывода изображений
 
-            m_FrameID = -1;
-            m_IsDisplay = false;
+            m_BufferedFrameID = -1;
+            m_IsOpened = false;
         }
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
         override protected bool DisplayCameraOpen(RecordingInfo rec)
         {
-            if (TraceCameraOpen(rec))
+            if (MarkupCameraOpen(rec))
             {
                 m_Init();
                 return true;
@@ -113,13 +112,13 @@ namespace UniversalAnnotationApp
 
         override protected void DisplayCameraClose()
         {
-            TraceCameraClose();
+            MarkupCameraClose();
             m_Clear();
         }
 
         override protected bool DisplayMarkupOpen(string MarkupFilePath)
         {
-            if (TraceMarkupOpen(MarkupFilePath))
+            if (MarkupOpen(MarkupFilePath))
             {
                 m_Refresh();
                 return true;
@@ -130,7 +129,7 @@ namespace UniversalAnnotationApp
 
         override protected void DisplayMarkupClose()
         {
-            TraceMarkupClose();
+            MarkupClose();
             m_Refresh();
         }
 
