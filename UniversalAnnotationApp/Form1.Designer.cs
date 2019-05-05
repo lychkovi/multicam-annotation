@@ -51,8 +51,21 @@
             this.txtRecordingFile = new System.Windows.Forms.TextBox();
             this.txtMarkupFile = new System.Windows.Forms.TextBox();
             this.pnlDisplay = new System.Windows.Forms.Panel();
+            this.pnlFilesOpened = new System.Windows.Forms.Panel();
+            this.pnlTools = new System.Windows.Forms.Panel();
+            this.grpNavigation = new System.Windows.Forms.GroupBox();
+            this.grpTracking = new System.Windows.Forms.GroupBox();
+            this.pnlAttributes = new System.Windows.Forms.Panel();
+            this.grpAttributes = new System.Windows.Forms.GroupBox();
+            this.pnlTimeLine = new System.Windows.Forms.Panel();
+            this.tbrTimeLine = new System.Windows.Forms.TrackBar();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
+            this.pnlFilesOpened.SuspendLayout();
+            this.pnlTools.SuspendLayout();
+            this.pnlAttributes.SuspendLayout();
+            this.pnlTimeLine.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbrTimeLine)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip
@@ -61,7 +74,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(745, 24);
+            this.menuStrip.Size = new System.Drawing.Size(746, 24);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip";
             // 
@@ -137,7 +150,7 @@
             this.statusAction});
             this.statusStrip.Location = new System.Drawing.Point(0, 463);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(745, 22);
+            this.statusStrip.Size = new System.Drawing.Size(746, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip";
             // 
@@ -190,7 +203,7 @@
             // lblRecordingFile
             // 
             this.lblRecordingFile.AutoSize = true;
-            this.lblRecordingFile.Location = new System.Drawing.Point(12, 31);
+            this.lblRecordingFile.Location = new System.Drawing.Point(12, 15);
             this.lblRecordingFile.Name = "lblRecordingFile";
             this.lblRecordingFile.Size = new System.Drawing.Size(75, 13);
             this.lblRecordingFile.TabIndex = 2;
@@ -199,7 +212,7 @@
             // lblMarkupFile
             // 
             this.lblMarkupFile.AutoSize = true;
-            this.lblMarkupFile.Location = new System.Drawing.Point(12, 57);
+            this.lblMarkupFile.Location = new System.Drawing.Point(12, 41);
             this.lblMarkupFile.Name = "lblMarkupFile";
             this.lblMarkupFile.Size = new System.Drawing.Size(62, 13);
             this.lblMarkupFile.TabIndex = 3;
@@ -207,7 +220,7 @@
             // 
             // txtRecordingFile
             // 
-            this.txtRecordingFile.Location = new System.Drawing.Point(93, 28);
+            this.txtRecordingFile.Location = new System.Drawing.Point(93, 12);
             this.txtRecordingFile.Name = "txtRecordingFile";
             this.txtRecordingFile.ReadOnly = true;
             this.txtRecordingFile.Size = new System.Drawing.Size(640, 20);
@@ -215,7 +228,7 @@
             // 
             // txtMarkupFile
             // 
-            this.txtMarkupFile.Location = new System.Drawing.Point(93, 54);
+            this.txtMarkupFile.Location = new System.Drawing.Point(93, 38);
             this.txtMarkupFile.Name = "txtMarkupFile";
             this.txtMarkupFile.ReadOnly = true;
             this.txtMarkupFile.Size = new System.Drawing.Size(640, 20);
@@ -223,24 +236,100 @@
             // 
             // pnlDisplay
             // 
-            this.pnlDisplay.Location = new System.Drawing.Point(163, 80);
+            this.pnlDisplay.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlDisplay.Location = new System.Drawing.Point(154, 94);
             this.pnlDisplay.Name = "pnlDisplay";
-            this.pnlDisplay.Size = new System.Drawing.Size(398, 380);
+            this.pnlDisplay.Size = new System.Drawing.Size(438, 320);
             this.pnlDisplay.TabIndex = 6;
+            // 
+            // pnlFilesOpened
+            // 
+            this.pnlFilesOpened.Controls.Add(this.lblRecordingFile);
+            this.pnlFilesOpened.Controls.Add(this.lblMarkupFile);
+            this.pnlFilesOpened.Controls.Add(this.txtMarkupFile);
+            this.pnlFilesOpened.Controls.Add(this.txtRecordingFile);
+            this.pnlFilesOpened.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlFilesOpened.Location = new System.Drawing.Point(0, 24);
+            this.pnlFilesOpened.Name = "pnlFilesOpened";
+            this.pnlFilesOpened.Size = new System.Drawing.Size(746, 70);
+            this.pnlFilesOpened.TabIndex = 7;
+            // 
+            // pnlTools
+            // 
+            this.pnlTools.Controls.Add(this.grpTracking);
+            this.pnlTools.Controls.Add(this.grpNavigation);
+            this.pnlTools.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnlTools.Location = new System.Drawing.Point(0, 94);
+            this.pnlTools.Name = "pnlTools";
+            this.pnlTools.Size = new System.Drawing.Size(154, 369);
+            this.pnlTools.TabIndex = 8;
+            // 
+            // grpNavigation
+            // 
+            this.grpNavigation.Location = new System.Drawing.Point(4, 7);
+            this.grpNavigation.Name = "grpNavigation";
+            this.grpNavigation.Size = new System.Drawing.Size(147, 127);
+            this.grpNavigation.TabIndex = 0;
+            this.grpNavigation.TabStop = false;
+            this.grpNavigation.Text = "Navigation";
+            // 
+            // grpTracking
+            // 
+            this.grpTracking.Location = new System.Drawing.Point(4, 140);
+            this.grpTracking.Name = "grpTracking";
+            this.grpTracking.Size = new System.Drawing.Size(147, 226);
+            this.grpTracking.TabIndex = 1;
+            this.grpTracking.TabStop = false;
+            this.grpTracking.Text = "Tracking";
+            // 
+            // pnlAttributes
+            // 
+            this.pnlAttributes.Controls.Add(this.grpAttributes);
+            this.pnlAttributes.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pnlAttributes.Location = new System.Drawing.Point(592, 94);
+            this.pnlAttributes.Name = "pnlAttributes";
+            this.pnlAttributes.Size = new System.Drawing.Size(154, 369);
+            this.pnlAttributes.TabIndex = 9;
+            // 
+            // grpAttributes
+            // 
+            this.grpAttributes.Location = new System.Drawing.Point(4, 4);
+            this.grpAttributes.Name = "grpAttributes";
+            this.grpAttributes.Size = new System.Drawing.Size(147, 362);
+            this.grpAttributes.TabIndex = 0;
+            this.grpAttributes.TabStop = false;
+            this.grpAttributes.Text = "Attributes";
+            // 
+            // pnlTimeLine
+            // 
+            this.pnlTimeLine.Controls.Add(this.tbrTimeLine);
+            this.pnlTimeLine.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlTimeLine.Location = new System.Drawing.Point(154, 414);
+            this.pnlTimeLine.Name = "pnlTimeLine";
+            this.pnlTimeLine.Size = new System.Drawing.Size(438, 49);
+            this.pnlTimeLine.TabIndex = 10;
+            // 
+            // tbrTimeLine
+            // 
+            this.tbrTimeLine.Location = new System.Drawing.Point(3, 4);
+            this.tbrTimeLine.Name = "tbrTimeLine";
+            this.tbrTimeLine.Size = new System.Drawing.Size(428, 42);
+            this.tbrTimeLine.TabIndex = 0;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(745, 485);
+            this.ClientSize = new System.Drawing.Size(746, 485);
             this.Controls.Add(this.pnlDisplay);
-            this.Controls.Add(this.txtMarkupFile);
-            this.Controls.Add(this.txtRecordingFile);
-            this.Controls.Add(this.lblMarkupFile);
-            this.Controls.Add(this.lblRecordingFile);
+            this.Controls.Add(this.pnlTimeLine);
+            this.Controls.Add(this.pnlAttributes);
+            this.Controls.Add(this.pnlTools);
+            this.Controls.Add(this.pnlFilesOpened);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuStrip);
             this.MainMenuStrip = this.menuStrip;
+            this.MinimumSize = new System.Drawing.Size(754, 512);
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -248,6 +337,13 @@
             this.menuStrip.PerformLayout();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
+            this.pnlFilesOpened.ResumeLayout(false);
+            this.pnlFilesOpened.PerformLayout();
+            this.pnlTools.ResumeLayout(false);
+            this.pnlAttributes.ResumeLayout(false);
+            this.pnlTimeLine.ResumeLayout(false);
+            this.pnlTimeLine.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbrTimeLine)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -278,6 +374,14 @@
         private System.Windows.Forms.TextBox txtRecordingFile;
         private System.Windows.Forms.TextBox txtMarkupFile;
         private System.Windows.Forms.Panel pnlDisplay;
+        private System.Windows.Forms.Panel pnlFilesOpened;
+        private System.Windows.Forms.Panel pnlTools;
+        private System.Windows.Forms.GroupBox grpTracking;
+        private System.Windows.Forms.GroupBox grpNavigation;
+        private System.Windows.Forms.Panel pnlAttributes;
+        private System.Windows.Forms.GroupBox grpAttributes;
+        private System.Windows.Forms.Panel pnlTimeLine;
+        private System.Windows.Forms.TrackBar tbrTimeLine;
     }
 }
 
