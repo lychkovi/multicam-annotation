@@ -35,6 +35,8 @@ namespace UniversalAnnotationApp
         abstract protected bool CameraIsOpened { get; }
         abstract protected RecordingInfo CameraCreate(
             string[] ViewFilePaths, string Comment);
+        abstract protected void CameraLoadFrame(
+            int FrameID, out List<Image> viewImages);
     }
 
     /* Класс обеспечивает доступ к флагам состояния слоя только через 
@@ -146,12 +148,28 @@ namespace UniversalAnnotationApp
                 for (int i = 0; i < m_VideoHandles.Count; i++)
                     m_cam.Close(m_VideoHandles[i]);
                 m_state.IsOpened = false;
+                m_VideoHandles.Clear();
             }
         }
 
         override protected bool CameraIsOpened 
         {
             get { return m_state.IsOpened; }
+        }
+
+        // Метод возвращает изображения всех видов указанного кадра
+        override protected void CameraLoadFrame(
+            int FrameID, out List<Image> viewImages)
+        {
+            viewImages = new List<Image>();
+            if (m_state.IsOpened)
+            {
+                for (int i = 0; i < m_RecordingInfo.Views.Count; i++)
+                {
+                    Image image = m_cam.GetFrame(m_VideoHandles[i], FrameID);
+                    viewImages.Add(image);
+                }
+            }
         }
 
         /* Метод принимает на вход список путей к файлам видео отдельных
