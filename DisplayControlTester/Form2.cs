@@ -32,61 +32,66 @@ namespace DisplayControlTester
             control.DelViewerImage(3);
         }
 
-        // Обработчик события от пользовательского элемента управления
-        private void OnDisplayControlEvent(
-            object sender, DisplayControlEventArgs e)
+        // Обработчик события от полей вывода разметки
+        private void OnDisplayCanvasEvent(
+            object sender, DisplayCanvasEventArgs e)
         {
             string eventName;
-            switch (e.msg)
+            switch (e.eventID)
             {
-                case DisplayControlEventID.PointLost:
+                case DisplayCanvasEventID.FocusPointed:
                 default:
-                    eventName = "Point Lost";
+                    eventName = "Focus Pointed";
                     break;
-                case DisplayControlEventID.PointSelected:
-                    eventName = "Point Selected";
+                case DisplayCanvasEventID.NodeCreated:
+                    if (e.hasBox)
+                        eventName = "Box Created";
+                    else
+                        eventName = "Marker Created";
                     break;
-                case DisplayControlEventID.RubberCreated:
-                    eventName = "Rubber Created";
-                    break;
-                case DisplayControlEventID.RubberUpdated:
-                    eventName = "Rubber Updated";
-                    break;
-                case DisplayControlEventID.ViewChanged:
-                    eventName = "View Changed";
-                    break;
-                case DisplayControlEventID.ZoomChanged:
-                    eventName = "Zoom Changed";
+                case DisplayCanvasEventID.NodeUpdated:
+                    if (e.hasBox)
+                        eventName = "Box Updated";
+                    else
+                        eventName = "Marker Updated";
                     break;
             }
-            string eventArgs;
-            switch (e.msg)
+            string eventArgs =
+                "X = " + e.clip.X.ToString() +
+                "; Y = " + e.clip.Y.ToString();
+            if (e.hasBox)
             {
-                case DisplayControlEventID.PointLost:
-                case DisplayControlEventID.PointSelected:
-                default:
-                    eventArgs =
-                        "X = " + e.clip.X.ToString() +
-                        "; Y = " + e.clip.Y.ToString();
-                    break;
-                case DisplayControlEventID.RubberCreated:
-                case DisplayControlEventID.RubberUpdated:
-                    eventArgs =
-                        "X = " + e.clip.X.ToString() +
-                        "; Y = " + e.clip.Y.ToString() +
-                        "; W = " + e.clip.Width.ToString() +
-                        "; H = " + e.clip.Height.ToString();
-                    break;
-                case DisplayControlEventID.ViewChanged:
-                case DisplayControlEventID.ZoomChanged:
-                    eventArgs =
-                        "Selected Item Index = " + e.cmbItemID.ToString();
-                    break;
+                eventArgs +=
+                    "; W = " + e.clip.Width.ToString() +
+                    "; H = " + e.clip.Height.ToString();
             }
             string messageText = eventName + ": " + eventArgs;
                 
             MessageBox.Show(messageText,
-                "Canvas " + e.controlID.ToString() + " raised an event!");
+                "Viewer " + e.controlID.ToString() + " raised an event!");
+        }
+
+        // Обработчик события от пользовательского элемента управления
+        private void OnDisplayListEvent(
+            object sender, DisplayListEventArgs e)
+        {
+            string eventName;
+            switch (e.eventID)
+            {
+                case DisplayListEventID.ViewChanged:
+                default:
+                    eventName = "View Changed";
+                    break;
+                case DisplayListEventID.ZoomChanged:
+                    eventName = "Zoom Changed";
+                    break;
+            }
+            string eventArgs =
+                "Selected Item Index = " + e.listItemID.ToString();
+            string messageText = eventName + ": " + eventArgs;
+
+            MessageBox.Show(messageText,
+                "Viewer " + e.controlID.ToString() + " raised an event!");
         }
 
         public Form2()
@@ -95,8 +100,10 @@ namespace DisplayControlTester
 
             // Создаем интерактивный элемент отображения видео
             control = new DisplayControl();
-            control.RunEvent += new UserCanvasControl.controlEventHandler(
-                OnDisplayControlEvent);
+            control.RunCanvasEvent += new UserCanvasControl.canvasEventHandler(
+                OnDisplayCanvasEvent);
+            control.RunListEvent += new UserCanvasControl.listEventHandler(
+                OnDisplayListEvent);
             control.Dock = DockStyle.Fill;
             panel1.Controls.Add(control);
 
@@ -155,10 +162,10 @@ namespace DisplayControlTester
             control.SetViewerImage(1, InitialFrame);
             control.SetViewerImage(2, InitialFrame);
             control.SetViewerImage(3, InitialFrame);
-            control.SetViewerMode(0, CanvasModeID.RubberUpdate, 
+            control.SetViewerMode(0, DisplayCanvasModeID.BoxUpdate, 
                 new Rectangle(20, 20, 40, 40));
-            control.SetViewerMode(1, CanvasModeID.RubberCreate);
-            control.SetViewerMode(2, CanvasModeID.PointSelect);
+            control.SetViewerMode(1, DisplayCanvasModeID.BoxCreate);
+            control.SetViewerMode(2, DisplayCanvasModeID.FocusPoint);
             isVideoOpened = true;
         }
 

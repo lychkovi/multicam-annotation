@@ -18,15 +18,22 @@ namespace DisplayControlWin
 {
     public partial class DisplayControl : UserControl
     {
-        private List<Panel> viewerPanels;  // массив панелей отображения видов
-        private List<UserCanvasControl> viewerCanvases;
-        // Массив элементов управления WPF для отображения видов
-        public event UserCanvasControl.controlEventHandler RunEvent;
+        // Mассив панелей отображения видов
+        private List<Panel> viewerPanels;  
 
-        // Обработчик события от одного поля вывода изображения
-        private void OnViewerEvent(object sender, DisplayControlEventArgs e)
+        // Массив элементов управления WPF для отображения видов
+        private List<UserCanvasControl> viewerCanvases;
+
+        // Обработчики событий от отдельных полей вывода
+        public event UserCanvasControl.canvasEventHandler RunCanvasEvent;
+        public event UserCanvasControl.listEventHandler RunListEvent;
+        private void OnViewerCanvasEvent(object sender, DisplayCanvasEventArgs e)
         {
-            RunEvent(sender, e);
+            RunCanvasEvent(sender, e);
+        }
+        private void OnViewerListEvent(object sender, DisplayListEventArgs e)
+        {
+            RunListEvent(sender, e);
         }
 
         public DisplayControl()
@@ -52,8 +59,10 @@ namespace DisplayControlWin
                     new DisplayControlWpf.UserCanvasControl(icontrol);
                 wpfControl.InitializeComponent();
                 ctrlHost.Child = wpfControl;
-                wpfControl.RunEvent += new 
-                    UserCanvasControl.controlEventHandler(OnViewerEvent);
+                wpfControl.RunCanvasEvent += new
+                    UserCanvasControl.canvasEventHandler(OnViewerCanvasEvent);
+                wpfControl.RunListEvent += new
+                    UserCanvasControl.listEventHandler(OnViewerListEvent);
                 viewerCanvases.Add(wpfControl);
                 icontrol++;
             }
@@ -106,7 +115,7 @@ namespace DisplayControlWin
         // изображения, а также рамку выделения (при необходимости)
         public void SetViewerMode(
             int nviewer, 
-            CanvasModeID mode,
+            DisplayCanvasModeID mode,
             System.Drawing.Rectangle clip = new System.Drawing.Rectangle())
         {
             viewerCanvases[nviewer].SetMode(mode, clip);
@@ -115,7 +124,7 @@ namespace DisplayControlWin
         // Метод задаём режим взаимодействия с мышкой для всех полей вывода
         // изображения, а также рамку выделения (при необходимости)
         public void SetViewersMode(
-            CanvasModeID mode, 
+            DisplayCanvasModeID mode, 
             System.Drawing.Rectangle clip = new System.Drawing.Rectangle())
         {
             for (int i = 0; i < viewerCanvases.Count; i++)

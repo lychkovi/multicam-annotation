@@ -119,7 +119,7 @@ namespace UniversalAnnotationApp
 
         // Обработчик событий от пользовательского элемента управления
         private void m_OnViewerEvent(object sender, 
-            DisplayControlWpf.DisplayControlEventArgs e)
+            DisplayControlWpf.DisplayCanvasEventArgs e)
         {
 
         }
@@ -171,6 +171,7 @@ namespace UniversalAnnotationApp
         // Удаление полей для вывода изображений
         private void m_OnCameraClosed()
         {
+//-- Перепроверить
             if (m_IsOpened)
             {
                 // TODO: 1. Удаляем все поля для вывода изображений
@@ -184,12 +185,15 @@ namespace UniversalAnnotationApp
                 m_ActiveViewerIndex = -1;
                 m_IsOpened = false;
             }
+
+//-- Перепроверить
         }
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
         override protected bool DisplayCameraOpen(RecordingInfo rec)
         {
+//-- Перепроверить
             if (MarkupCameraOpen(rec))
             {
                 m_OnCameraOpened();
@@ -197,16 +201,20 @@ namespace UniversalAnnotationApp
             }
             else
                 return false;
+//-- Перепроверить
         }
 
         override protected void DisplayCameraClose()
         {
+//-- Перепроверить
             MarkupCameraClose();
             m_OnCameraClosed();
+//-- Перепроверить
         }
 
         override protected bool DisplayMarkupOpen(string MarkupFilePath)
         {
+//-- Перепроверить
             if (MarkupOpen(MarkupFilePath))
             {
                 m_Refresh();
@@ -214,12 +222,15 @@ namespace UniversalAnnotationApp
             }
             else
                 return false;
+//-- Перепроверить
         }
 
         override protected void DisplayMarkupClose()
         {
+//-- Перепроверить
             MarkupClose();
             m_Refresh();
+//-- Перепроверить
         }
 
         // Метод перерисовки кадров на форме
@@ -231,6 +242,7 @@ namespace UniversalAnnotationApp
         // Метод буферизует все виды для указанного кадра
         override protected void DisplayLoadFrame(int frameIndex)
         {
+//-- Перепроверить
             // Загружаем изображения видов кадра из видеофайлов
             List<Image> viewImages;
             CameraLoadFrame(frameIndex, out viewImages);
@@ -245,11 +257,13 @@ namespace UniversalAnnotationApp
             {
                 m_ViewerUpdateSettings(i);
             }
+//-- Перепроверить
         }
 
         // Метод привязки элементов управления формы к объекту DisplayManager
         override public void DisplayGuiBind(DisplayManagerControls controls)
         {
+//-- Перепроверить
             m_gui = controls;
 
             // Подключаем пользовательский элемент управления
@@ -267,17 +281,18 @@ namespace UniversalAnnotationApp
 
                 // Регистрируем обработчик событий от полей вывода
                 m_gui.DisplayCtrl.RunEvent += new DisplayControlWpf.
-                    UserCanvasControl.controlEventHandler(m_OnViewerEvent);
+                    UserCanvasControl.canvasEventHandler(m_OnViewerEvent);
             }
+//-- Перепроверить
         }
 
         // Инициализация всех полей начальными значениями
         public DisplayManager()
         {
             m_gui = new DisplayManagerControls();
-            m_IsOpened = false;
+//-- Перепроверить
             m_BufferedFrameID = -1;
-            m_ActiveViewerIndex = -1;
+//-- Перепроверить
         }
     }
 }

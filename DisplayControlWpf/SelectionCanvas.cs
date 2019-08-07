@@ -17,36 +17,6 @@ using CameraData;           // DeleteObject() для освобождения Bi
 
 namespace DisplayControlWpf
 {
-    // Перечень поддерживаемых режимов 
-    public enum CanvasModeID
-    {
-        Disabled,           // изображение отсутствует
-        Idle,               // события мыши не обрабатываются
-        PointSelect,        // ожидаем ввод координат точки
-        RubberCreate,       // ожидаем ввод координат рамки
-        RubberUpdate        // ожидаем изменение координат рамки
-    }
-
-    public enum CanvasEventID
-    {
-        PointSelected,      // указали точку
-        RubberCreated,      // создали новую рамку
-        RubberUpdated,      // изменили рамку
-        PointLost           // за пределы рамки нажали
-    }
-
-    public class CanvasEventArgs : EventArgs
-    {
-        public readonly CanvasEventID msg;
-        public System.Drawing.Rectangle clip;
-
-        public CanvasEventArgs(CanvasEventID message)
-        {
-            msg = message;
-            clip = new System.Drawing.Rectangle();
-        }
-    }
-
     // Точки крепления маркеров к рамке выделения
     public enum AnchorID
     {
@@ -404,7 +374,7 @@ namespace DisplayControlWpf
     {
         #region Instance fields
         private bool m_IsOpened;          // признак наличия изображения
-        private CanvasModeID m_mode;
+        private DisplayCanvasModeID m_mode;
         //private string ImgUrl = "D:\\Igorek\\Disser\\YanaNewNew\\MyVideoAnno\\Debug\\Koala.jpg";
         //private System.Windows.Media.Imaging.BitmapImage imgSource;
         private System.Windows.Media.ImageSource imgSource;
@@ -415,7 +385,7 @@ namespace DisplayControlWpf
 
 
         public delegate void CanvasEventHandler(
-            object sender, CanvasEventArgs e);
+            object sender, DisplayCanvasEventArgs e);
         public event CanvasEventHandler RunEvent;
         #endregion
 
@@ -453,7 +423,7 @@ namespace DisplayControlWpf
             m_IsOpened = false;
 
             // Переводим поле вывода в неактивный режим
-            SetMode(CanvasModeID.Disabled);
+            SetMode(DisplayCanvasModeID.Disabled);
         }
         #endregion
 
@@ -485,40 +455,44 @@ namespace DisplayControlWpf
 
             if (this.IsMouseCaptured)
             {
-                CanvasEventArgs args;
+                DisplayCanvasEventArgs args;
                 switch (m_mode)
                 {
-                    case CanvasModeID.PointSelect:
-                        args = new CanvasEventArgs(CanvasEventID.PointSelected);
+                    case DisplayCanvasModeID.FocusPoint:
+                        args = new DisplayCanvasEventArgs(DisplayCanvasEventID.FocusPointed);
                         args.clip.X = (int) e.GetPosition(this).X;
                         args.clip.Y = (int) e.GetPosition(this).Y;
                         RunEvent(this, args);
                         break;
-                    case CanvasModeID.RubberCreate:
-                        args = new CanvasEventArgs(CanvasEventID.RubberCreated);
+                    case DisplayCanvasModeID.BoxCreate:
+                        args = new DisplayCanvasEventArgs(DisplayCanvasEventID.NodeCreated);
                         args.clip = rubber.GetClientRect();
+                        args.hasBox = true;
                         RunEvent(this, args);
                         break;
-                    case CanvasModeID.RubberUpdate:
+                    case DisplayCanvasModeID.BoxUpdate:
                         if (anchors.activeAnchorID != AnchorID.None)
                         {
-                            args = new CanvasEventArgs(CanvasEventID.RubberUpdated);
+                            args = new DisplayCanvasEventArgs(DisplayCanvasEventID.NodeUpdated);
                             args.clip = rubber.GetClientRect();
+                            args.hasBox = true;
                             rubber.ReInit(); // Фиксируем изменения рамки
                         }
                         else
                         {
                             // Нажали мимо рамки - потеря фокуса
-                            args = new CanvasEventArgs(CanvasEventID.PointLost);
+                            args = new DisplayCanvasEventArgs(DisplayCanvasEventID.FocusPointed);
                             args.clip.X = (int) e.GetPosition(this).X;
                             args.clip.Y = (int) e.GetPosition(this).Y;
+                            args.hasBox = false;
                         }
                         RunEvent(this, args);
                         break;
-                    case CanvasModeID.Idle:
-                    case CanvasModeID.Disabled:
-                    default:
+                    case DisplayCanvasModeID.Passive:
+                    case DisplayCanvasModeID.Disabled:
                         break;
+                    default:
+                        throw new Exception("Unsupported canvas mode detected!");
                 }
                 this.ReleaseMouseCapture();
             }
@@ -541,12 +515,12 @@ namespace DisplayControlWpf
             {
                 switch (m_mode)
                 {
-                    case CanvasModeID.RubberCreate:
+                    case DisplayCanvasModeID.BoxCreate:
                         rubber.currentTopLeftCorner = mouseLeftDownPoint;
                         rubber.currentBottomRightCorner = currentPoint;
                         //rubberBand.BringIntoView();
                         break;
-                    case CanvasModeID.RubberUpdate:
+                    case DisplayCanvasModeID.BoxUpdate:
                         if (anchors.activeAnchorID != AnchorID.None)
                         {
                             // Обновляем положение рамки выделения
@@ -616,9 +590,9 @@ namespace DisplayControlWpf
                             anchors.Update(rubber, currentPoint, true);
                         }
                         break;
-                    case CanvasModeID.PointSelect:
-                    case CanvasModeID.Idle:
-                    case CanvasModeID.Disabled:
+                    case DisplayCanvasModeID.FocusPoint:
+                    case DisplayCanvasModeID.Passive:
+                    case DisplayCanvasModeID.Disabled:
                     default:
                         break;
                 }
@@ -626,7 +600,7 @@ namespace DisplayControlWpf
             else
             {
                 // В режиме редактирования рамки выделяем активный якорь
-                if (m_mode == CanvasModeID.RubberUpdate)
+                if (m_mode == DisplayCanvasModeID.BoxUpdate)
                     anchors.Update(rubber, currentPoint, false);
             }
         }
@@ -685,8 +659,8 @@ namespace DisplayControlWpf
             m_IsOpened = true;
 
             // Выходим из неактивного режима
-            if (m_mode == CanvasModeID.Disabled)
-                SetMode(CanvasModeID.Idle);
+            if (m_mode == DisplayCanvasModeID.Disabled)
+                SetMode(DisplayCanvasModeID.Passive);
         }
 
         // Метод удаляет изображение из поля вывода и переводит его
@@ -699,15 +673,15 @@ namespace DisplayControlWpf
             m_IsOpened = false;
 
             // Входим в неактивный режим
-            SetMode(CanvasModeID.Disabled);
+            SetMode(DisplayCanvasModeID.Disabled);
         }
 
         // Метод задаём режим взаимодействия с мышкой для всех полей вывода
         // изображения, а также рамку выделения (при необходимости)
-        public void SetMode(CanvasModeID mode, 
+        public void SetMode(DisplayCanvasModeID mode, 
             System.Drawing.Rectangle clip = new System.Drawing.Rectangle())
         {
-            if (mode == CanvasModeID.Disabled)
+            if (mode == DisplayCanvasModeID.Disabled)
             {
                 rubber.Hide();
                 anchors.Hide();
@@ -715,14 +689,14 @@ namespace DisplayControlWpf
             }
             else
             {
-                if (m_mode == CanvasModeID.Disabled && !m_IsOpened)
+                if (m_mode == DisplayCanvasModeID.Disabled && !m_IsOpened)
                 {
                     throw new ApplicationException(
                         "Cannot enable element without image loaded!");
                 }
                 rubber.Init(clip, new Size(this.Width, this.Height));
                 rubber.Show();
-                if (mode == CanvasModeID.RubberUpdate)
+                if (mode == DisplayCanvasModeID.BoxUpdate)
                 {
                     anchors.Update(rubber, new Point(1e6, 1e6), false);
                     anchors.Show();

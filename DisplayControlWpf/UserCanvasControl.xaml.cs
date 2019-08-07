@@ -14,18 +14,88 @@ using System.Windows.Shapes;
 
 namespace DisplayControlWpf
 {
+    // Перечень поддерживаемых режимов 
+    public enum DisplayCanvasModeID
+    {
+        Disabled,        // изображение отсутствует
+        Passive,         // события мыши не обрабатываются
+        FocusPoint,      // ожидаем ввод координат интересующего объекта
+        BoxCreate,       // ожидаем ввод координат рамки
+        BoxUpdate,       // ожидаем изменение координат рамки
+        MarkerCreate,    // ожидаем ввод координат маркера
+        MarkerUpdate     // ожидаем изменение координат маркера
+    }
+
+    // Перечисление задает типы событий, которые может вырабатывать
+    // пользовательский элемент управления при манипуляциях с 
+    // полем ввода и редактирования разметки кадра
+    public enum DisplayCanvasEventID
+    {
+        NodeCreated,     // создали новую рамку или маркер
+        NodeUpdated,     // изменили рамку или маркер
+        FocusPointed         // указали точку интереса (для выбора др. объекта)
+    }
+
+    // Параметры события при манипуляциях с полем ввода и редактирования 
+    // разметки кадра
+    public class DisplayCanvasEventArgs
+    {
+        public readonly DisplayCanvasEventID eventID;
+        public int controlID; // идентификатор элемента управления
+        public int viewID;    // идентификатор вида (задается DisplayManager)
+        public System.Drawing.Rectangle clip;
+        public bool hasBox;   // true для Box, false для Marker
+
+        public DisplayCanvasEventArgs(DisplayCanvasEventID EventID)
+        {
+            eventID = EventID;
+            controlID = -1;
+            viewID = -1;
+            clip = new System.Drawing.Rectangle();
+            hasBox = false;
+        }
+    }
+
+    // Перечисление задает типы событий, которые может вырабатывать
+    // пользовательский элемент управления при изменении состояния
+    // выпадающих списков
+    public enum DisplayListEventID
+    {
+        ZoomChanged,        // изменение режима зуммирования
+        ViewChanged         // изменение вида для отображения
+    }
+
+    // Параметры события выпадающего списка
+    public class DisplayListEventArgs
+    {
+        public readonly DisplayListEventID eventID;
+        public int controlID;   // идентификатор элемента управления
+        public int listItemID;  // индекс элемента выпадающего списка
+
+        public DisplayListEventArgs(DisplayListEventID EventID)
+        {
+            eventID = EventID;
+            controlID = -1;
+            listItemID = -1;
+        }
+    }
+
     /// <summary>
     /// Логика взаимодействия для UserControl1.xaml
     /// </summary>
     public partial class UserCanvasControl : UserControl
     {
         private SelectionCanvas canvas;
-
-        // Обработка события от элемента управления
         private int m_controlID;     // идентификатор элемента в массиве
-        public delegate void controlEventHandler(
-            object sender, DisplayControlEventArgs args);
-        public event controlEventHandler RunEvent;
+
+        // Обработка событий от элемента управления
+        public delegate void canvasEventHandler(
+            object sender, DisplayCanvasEventArgs args);
+        public event canvasEventHandler RunCanvasEvent;
+
+        public delegate void listEventHandler(
+            object sender, DisplayListEventArgs args);
+        public event listEventHandler RunListEvent;
 
         /// <span class="code-SummaryComment"><summary></span>
         /// creates the selection canvas, where user can draw
@@ -49,6 +119,7 @@ namespace DisplayControlWpf
         }
 
         /// <span class="code-SummaryComment"><summary></span>
+        /// <summary>
         /// Raised by the <span class="code-SummaryComment"><see cref="selectionCanvas">selectionCanvas</see></span>
         /// when the new crop shape (rectangle) has been drawn. This event
         /// then replaces the current selectionCanvas with a
@@ -56,30 +127,11 @@ namespace DisplayControlWpf
         /// which can then be used to drag the crop area around
         /// within a Canvas
         /// </summary>
-        private void OnCanvasEvent(object sender, CanvasEventArgs e)
+        private void OnCanvasEvent(object sender, DisplayCanvasEventArgs args)
         {
             // Вызываем внешний обработчик события
-            DisplayControlEventID eventID;
-            switch (e.msg)
-            {
-                case CanvasEventID.PointLost:
-                default:
-                    eventID = DisplayControlEventID.PointLost;
-                    break;
-                case CanvasEventID.PointSelected:
-                    eventID = DisplayControlEventID.PointSelected;
-                    break;
-                case CanvasEventID.RubberCreated:
-                    eventID = DisplayControlEventID.RubberCreated;
-                    break;
-                case CanvasEventID.RubberUpdated:
-                    eventID = DisplayControlEventID.RubberUpdated;
-                    break;
-            }
-            DisplayControlEventArgs args = new DisplayControlEventArgs(eventID);
             args.controlID = m_controlID;
-            args.clip = e.clip;
-            RunEvent(this, args);
+            RunCanvasEvent(this, args);
         }
 
         public UserCanvasControl(int controlID)
@@ -89,7 +141,7 @@ namespace DisplayControlWpf
             createSelectionCanvas();
             canvas.RunEvent +=
                 new SelectionCanvas.CanvasEventHandler(OnCanvasEvent);
-            SetMode(CanvasModeID.Disabled);
+            SetMode(DisplayCanvasModeID.Disabled);
         }
 
         // Метод возвращает фактические размеры поля вывода изображения на форме
@@ -140,10 +192,10 @@ namespace DisplayControlWpf
 
         // Метод задаём режим взаимодействия с мышкой для всех полей вывода
         // изображения, а также рамку выделения (при необходимости)
-        public void SetMode(CanvasModeID mode,
+        public void SetMode(DisplayCanvasModeID mode,
             System.Drawing.Rectangle clip = new System.Drawing.Rectangle())
         {
-            if (mode == CanvasModeID.Disabled)
+            if (mode == DisplayCanvasModeID.Disabled)
                 this.IsEnabled = false;
             else
                 this.IsEnabled = true;
@@ -171,11 +223,11 @@ namespace DisplayControlWpf
             // Изменился текущий выбранный для отображения вид
             if (cmbView.SelectedIndex != -1 && cmbZoom.SelectedIndex != -1)
             {
-                DisplayControlEventArgs args = new DisplayControlEventArgs(
-                    DisplayControlEventID.ViewChanged);
+                DisplayListEventArgs args = new DisplayListEventArgs(
+                    DisplayListEventID.ViewChanged);
                 args.controlID = m_controlID;
-                args.cmbItemID = cmbView.SelectedIndex;
-                RunEvent(this, args);
+                args.listItemID = cmbView.SelectedIndex;
+                RunListEvent(this, args);
             }
         }
 
@@ -184,42 +236,12 @@ namespace DisplayControlWpf
             // Изменился текущий выбранный зум для отображения
             if (cmbView.SelectedIndex != -1 && cmbZoom.SelectedIndex != -1)
             {
-                DisplayControlEventArgs args = new DisplayControlEventArgs(
-                    DisplayControlEventID.ZoomChanged);
+                DisplayListEventArgs args = new DisplayListEventArgs(
+                    DisplayListEventID.ZoomChanged);
                 args.controlID = m_controlID;
-                args.cmbItemID = cmbZoom.SelectedIndex;
-                RunEvent(this, args);
+                args.listItemID = cmbZoom.SelectedIndex;
+                RunListEvent(this, args);
             }
-        }
-    }
-
-    // Перечисление задает типы событий, которые может вырабатывать
-    // пользовательский элемент управления при изменении состояния
-    // выпадающих списков
-    public enum DisplayControlEventID
-    {
-        PointSelected,      // указали точку
-        RubberCreated,      // создали новую рамку
-        RubberUpdated,      // изменили рамку
-        PointLost,          // за пределы рамки нажали
-        ZoomChanged,        // изменение режима зуммирования
-        ViewChanged         // изменение вида для отображения
-    }
-
-    // Параметры события выпадающего списка
-    public class DisplayControlEventArgs
-    {
-        public readonly DisplayControlEventID msg;
-        public int controlID;  // идентификатор элемента управления
-        public System.Drawing.Rectangle clip;
-        public int cmbItemID;  // индекс элемента выпадающего списка
-
-        public DisplayControlEventArgs(DisplayControlEventID message)
-        {
-            msg = message;
-            controlID = -1;
-            clip = new System.Drawing.Rectangle();
-            cmbItemID = -1;
         }
     }
 }
