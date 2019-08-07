@@ -1,3 +1,5 @@
+# Prerequisites
+*.d
 
 #ignore thumbnails created by windows
 Thumbs.db
