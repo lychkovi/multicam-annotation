@@ -14,10 +14,15 @@ namespace CameraData
     /* Абстрактный родительский класс для всех классов чтения кадров. */
     abstract public class CameraProvider
     {
+        // Методы работы с видеозаписью
         abstract public bool Open(string VideoFilePath, out int VideoHandle,
             out Image InitialFrame, out int FramesCount, out double Fps);
         abstract public Image GetFrame(int VideoHandle, int FrameID);
         abstract public void Close(int VideoHandle);
+
+        // Вспомогательные методы работы с изображениями
+        abstract public void ImageResize(
+            Image src, double scale, out Image dst);
     }
 
     /* Класс, реализующий чтение кадров из видеофайлов. */
@@ -46,6 +51,10 @@ namespace CameraData
 
         [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int VideoClose(int videoHandle);
+
+        [DllImport("OcvWrapperMfcDLL.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int ImageResize(IntPtr hBmpSrc, double scale, 
+            out IntPtr hBmpDst);
 
         // Открытие источника видео
         override public bool Open(string VideoFilePath, out int VideoHandle,
@@ -114,9 +123,32 @@ namespace CameraData
             VideoClose(VideoHandle);
         }
 
+        // Вспомогтальные методы работы с изображениями
         public static void ReleaseBitmap(IntPtr bitmap)
         {
             DeleteObject(bitmap);
         }
+
+        override public void ImageResize(
+            Image src, double scale, out Image dst)
+        {
+            IntPtr hBmpSrc, hBmpDst;
+
+            // Извлекаем битмап из исходного изображения
+            Bitmap bmp;
+            bmp = new Bitmap(src);
+            hBmpSrc = bmp.GetHbitmap();
+
+            // Вызываем функцию из нативной библиотеки
+            int errcode = ImageResize(hBmpSrc, scale, out hBmpDst);
+            if (errcode != 0)
+                throw new Exception("Problem while image resizing!");
+
+            // Восстанавливаем объект изображения из битмапа
+            dst = Image.FromHbitmap(hBmpDst);
+            DeleteObject(hBmpSrc);
+            DeleteObject(hBmpDst);
+        }
+
     }
 }

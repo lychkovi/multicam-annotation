@@ -40,12 +40,15 @@
             this.picVideo = new System.Windows.Forms.PictureBox();
             this.pbrVideo = new System.Windows.Forms.ProgressBar();
             this.grpVideo = new System.Windows.Forms.GroupBox();
-            this.lblVideoFramesCount = new System.Windows.Forms.Label();
-            this.tbxVideoTotalFrames = new System.Windows.Forms.TextBox();
-            this.lblVideoFps = new System.Windows.Forms.Label();
             this.tbxVideoFps = new System.Windows.Forms.TextBox();
+            this.lblVideoFps = new System.Windows.Forms.Label();
+            this.tbxVideoTotalFrames = new System.Windows.Forms.TextBox();
+            this.lblVideoFramesCount = new System.Windows.Forms.Label();
             this.grpImages = new System.Windows.Forms.GroupBox();
             this.dlgVideoOpen = new System.Windows.Forms.OpenFileDialog();
+            this.btnImageResize = new System.Windows.Forms.Button();
+            this.txtImageScale = new System.Windows.Forms.TextBox();
+            this.lblImageScale = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picVideo)).BeginInit();
             this.grpVideo.SuspendLayout();
             this.SuspendLayout();
@@ -106,7 +109,7 @@
             // radVideoPlay
             // 
             this.radVideoPlay.AutoSize = true;
-            this.radVideoPlay.Location = new System.Drawing.Point(30, 166);
+            this.radVideoPlay.Location = new System.Drawing.Point(21, 154);
             this.radVideoPlay.Name = "radVideoPlay";
             this.radVideoPlay.Size = new System.Drawing.Size(45, 17);
             this.radVideoPlay.TabIndex = 6;
@@ -117,7 +120,7 @@
             // 
             this.radVideoStop.AutoSize = true;
             this.radVideoStop.Checked = true;
-            this.radVideoStop.Location = new System.Drawing.Point(95, 166);
+            this.radVideoStop.Location = new System.Drawing.Point(86, 154);
             this.radVideoStop.Name = "radVideoStop";
             this.radVideoStop.Size = new System.Drawing.Size(47, 17);
             this.radVideoStop.TabIndex = 7;
@@ -152,6 +155,9 @@
             // 
             // grpVideo
             // 
+            this.grpVideo.Controls.Add(this.lblImageScale);
+            this.grpVideo.Controls.Add(this.txtImageScale);
+            this.grpVideo.Controls.Add(this.btnImageResize);
             this.grpVideo.Controls.Add(this.tbxVideoFps);
             this.grpVideo.Controls.Add(this.lblVideoFps);
             this.grpVideo.Controls.Add(this.tbxVideoTotalFrames);
@@ -174,22 +180,13 @@
             this.grpVideo.TabStop = false;
             this.grpVideo.Text = "Video";
             // 
-            // lblVideoFramesCount
+            // tbxVideoFps
             // 
-            this.lblVideoFramesCount.AutoSize = true;
-            this.lblVideoFramesCount.Location = new System.Drawing.Point(27, 106);
-            this.lblVideoFramesCount.Name = "lblVideoFramesCount";
-            this.lblVideoFramesCount.Size = new System.Drawing.Size(68, 13);
-            this.lblVideoFramesCount.TabIndex = 11;
-            this.lblVideoFramesCount.Text = "Total Frames";
-            // 
-            // tbxVideoTotalFrames
-            // 
-            this.tbxVideoTotalFrames.Location = new System.Drawing.Point(145, 103);
-            this.tbxVideoTotalFrames.Name = "tbxVideoTotalFrames";
-            this.tbxVideoTotalFrames.ReadOnly = true;
-            this.tbxVideoTotalFrames.Size = new System.Drawing.Size(100, 20);
-            this.tbxVideoTotalFrames.TabIndex = 12;
+            this.tbxVideoFps.Location = new System.Drawing.Point(145, 129);
+            this.tbxVideoFps.Name = "tbxVideoFps";
+            this.tbxVideoFps.ReadOnly = true;
+            this.tbxVideoFps.Size = new System.Drawing.Size(100, 20);
+            this.tbxVideoFps.TabIndex = 14;
             // 
             // lblVideoFps
             // 
@@ -200,13 +197,22 @@
             this.lblVideoFps.TabIndex = 13;
             this.lblVideoFps.Text = "Video Fps";
             // 
-            // tbxVideoFps
+            // tbxVideoTotalFrames
             // 
-            this.tbxVideoFps.Location = new System.Drawing.Point(145, 129);
-            this.tbxVideoFps.Name = "tbxVideoFps";
-            this.tbxVideoFps.ReadOnly = true;
-            this.tbxVideoFps.Size = new System.Drawing.Size(100, 20);
-            this.tbxVideoFps.TabIndex = 14;
+            this.tbxVideoTotalFrames.Location = new System.Drawing.Point(145, 103);
+            this.tbxVideoTotalFrames.Name = "tbxVideoTotalFrames";
+            this.tbxVideoTotalFrames.ReadOnly = true;
+            this.tbxVideoTotalFrames.Size = new System.Drawing.Size(100, 20);
+            this.tbxVideoTotalFrames.TabIndex = 12;
+            // 
+            // lblVideoFramesCount
+            // 
+            this.lblVideoFramesCount.AutoSize = true;
+            this.lblVideoFramesCount.Location = new System.Drawing.Point(27, 106);
+            this.lblVideoFramesCount.Name = "lblVideoFramesCount";
+            this.lblVideoFramesCount.Size = new System.Drawing.Size(68, 13);
+            this.lblVideoFramesCount.TabIndex = 11;
+            this.lblVideoFramesCount.Text = "Total Frames";
             // 
             // grpImages
             // 
@@ -220,6 +226,32 @@
             // dlgVideoOpen
             // 
             this.dlgVideoOpen.Filter = "AVI|*.avi|MP4|*.mp4|MPEG|*.mpg";
+            // 
+            // btnImageResize
+            // 
+            this.btnImageResize.Location = new System.Drawing.Point(19, 178);
+            this.btnImageResize.Name = "btnImageResize";
+            this.btnImageResize.Size = new System.Drawing.Size(102, 23);
+            this.btnImageResize.TabIndex = 15;
+            this.btnImageResize.Text = "Image Resize";
+            this.btnImageResize.UseVisualStyleBackColor = true;
+            this.btnImageResize.Click += new System.EventHandler(this.btnImageResize_Click);
+            // 
+            // txtImageScale
+            // 
+            this.txtImageScale.Location = new System.Drawing.Point(145, 180);
+            this.txtImageScale.Name = "txtImageScale";
+            this.txtImageScale.Size = new System.Drawing.Size(100, 20);
+            this.txtImageScale.TabIndex = 16;
+            // 
+            // lblImageScale
+            // 
+            this.lblImageScale.AutoSize = true;
+            this.lblImageScale.Location = new System.Drawing.Point(142, 164);
+            this.lblImageScale.Name = "lblImageScale";
+            this.lblImageScale.Size = new System.Drawing.Size(35, 13);
+            this.lblImageScale.TabIndex = 17;
+            this.lblImageScale.Text = "scale:";
             // 
             // Form1
             // 
@@ -258,6 +290,9 @@
         private System.Windows.Forms.Label lblVideoFramesCount;
         private System.Windows.Forms.GroupBox grpImages;
         private System.Windows.Forms.OpenFileDialog dlgVideoOpen;
+        private System.Windows.Forms.Button btnImageResize;
+        private System.Windows.Forms.Label lblImageScale;
+        private System.Windows.Forms.TextBox txtImageScale;
     }
 }
 

@@ -102,6 +102,30 @@ extern "C"
         return S_OK;
     }
 
+	// Функция масштабирует изображение
+	__declspec(dllexport) HRESULT ImageResize(HBITMAP hBmpSrc, 
+		double scale, /* out */ HBITMAP * hBitmap)
+	{
+		Mat src;
+        if (!copyHbitmapToMat(hBmpSrc, src))
+            return S_FALSE;
+
+		Mat dst;
+		try
+		{
+			resize(src, dst, Size(), scale, scale);
+		}
+		catch (...)
+		{
+			return S_FALSE;
+		}
+		        
+		if (!copyMatToHbitmap(dst, hBitmap))
+            return S_FALSE;
+        
+        return S_OK;
+	}
+
     // Функция сохраняет изображение в файл на диске
     __declspec(dllexport) HRESULT ImageSave(
         const char* filepath, HBITMAP hBitmap)

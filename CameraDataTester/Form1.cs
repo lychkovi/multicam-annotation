@@ -112,5 +112,36 @@ namespace CameraDataTester
             btnVideoClose_Click(sender, e);
         }
 
+        private void btnImageResize_Click(object sender, EventArgs e)
+        {
+            if (!isVideoOpened) return;
+
+            double scale;
+            if (double.TryParse(txtImageScale.Text, out scale))
+            {
+                // Изменяем масштаб изображения
+                Image src = picVideo.Image;
+                Image dst = null;
+
+                try
+                {
+                    cam.ImageResize(src, scale, out dst);
+                }
+                catch (Exception exception)
+                {
+                    MessageBox.Show(exception.Message, "ERROR!",
+                        MessageBoxButtons.OK);
+                }
+
+                picVideo.Image = dst;
+            }
+            else
+            {
+                MessageBox.Show("Wrong scale value!", "ERROR!",
+                    MessageBoxButtons.OK);
+                txtImageScale.Text = "";
+            }
+        }
+
     }
 }

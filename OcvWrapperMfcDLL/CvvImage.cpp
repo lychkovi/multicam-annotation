@@ -158,11 +158,16 @@ void  CvvImage::CopyOf( IplImage* img, int desired_color )
 		if( color < 0 )
 			color = img->nChannels > 1;
 
+		int dstChannels = 
+			!color ? 1 : img->nChannels > 1 ? img->nChannels : 3;
+
 		if( Create( size.width, size.height,
-			(!color ? 1 : img->nChannels > 1 ? img->nChannels : 3)*8,
-			img->origin ))
+			dstChannels*8, img->origin ) )
 		{
-			cvConvertImage( img, m_img, 0 );
+			if (dstChannels == 4)
+				cvCopy(img, m_img);
+			else
+				cvConvertImage( img, m_img, 0 );
 		}
 	}
 }
