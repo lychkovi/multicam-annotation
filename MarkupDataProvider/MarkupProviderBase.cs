@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;               // Rectangle
 
 namespace MarkupData
 {
@@ -62,6 +63,8 @@ namespace MarkupData
         public int ID;          // идентификатор траектории
         public int ViewID;      // идентификатор видеозаписи с одной камеры
         public int TagID;       // идентификатор объекта
+        public int FrameStart;  // начальный кадр траектории
+        public int FrameEnd;    // конечный кадр траектории
         public bool HasBox;     // индикатор наличия рамки объекта
     }
 
@@ -70,12 +73,22 @@ namespace MarkupData
     {
         public int TraceID;     // идентификатор траектории
         public int FrameID;     // номер кадра видеозаписи
-        public double BoundLeft;// координаты ограничительной рамки
-        public double BoundTop;
-        public double BoundRight;
-        public double BoundBottom;
+        public int PosX;     // координаты ограничительной рамки
+        public int PosY;
+        public int Width;    // размеры ограничительной рамки
+        public int Height;
         public bool IsShaded;   // признак затененности объекта
         public bool IsOccluded; // признак перекрытия объекта в кадре
+
+        public Rectangle GetRectangle(double scale = 1.0)
+        {
+            Rectangle rect = new Rectangle();
+            rect.X = (int) (PosX * scale);
+            rect.Y = (int) (PosY * scale);
+            rect.Width = (int) (Width * scale);
+            rect.Height = (int) (Height * scale);
+            return rect;
+        }
     }
 
     /* Marker: Точечный маркер объекта или его элемента на отдельном кадре */
@@ -83,8 +96,8 @@ namespace MarkupData
     {
         public int TraceID;     // идентификатор траектории
         public int FrameID;     // номер кадра видеозаписи
-        public double CenterX;  // координата по оси абсцисс
-        public double CenterY;  // координата по оси ординат
+        public int PosX;     // координата по оси абсцисс
+        public int PosY;     // координата по оси ординат
         public bool IsShaded;   // признак затененности объекта
     }
 
@@ -104,9 +117,38 @@ namespace MarkupData
         abstract public RecordingInfo GetHeader();
         abstract public bool CheckHeader(RecordingInfo rec);//<--> Views и RecInfo
 
-        abstract public int CategoryInsert(Category category);
+        abstract public int CategoryCreate(Category category);
         abstract public void CategoryUpdate(Category category);
         abstract public void CategoryDelete(int categoryID);
-        abstract public List<Category> CategorySelectAll();
+        abstract public List<Category> CategoryGetAll();
+        abstract public bool CategoryGetByID(
+            int categoryID, out Category category);
+
+        abstract public int TagCreate(Tag tag);
+        abstract public void TagUpdate(Tag tag);
+        abstract public void TagDelete(int tagID);
+        abstract public List<Tag> TagGetAll();
+        abstract public bool TagGetByID(int tagID, out Tag tag);
+
+        abstract public int TraceCreate(Trace trace);
+        abstract public void TraceUpdate(Trace trace);
+        abstract public void TraceDelete(int traceID);
+        abstract public List<Trace> TraceGetAll();
+        abstract public bool TraceGetByID(int traceID, out Trace trace);
+
+        abstract public void BoxCreate(Box box);
+        abstract public void BoxUpdate(Box box);
+        abstract public void BoxDelete(int traceID, int frameID);
+        abstract public bool BoxGetByID(
+            int traceID, int frameID, out Box box);
+        abstract public List<Box> BoxGetByView(int frameID, int viewID);
+
+        abstract public void MarkerCreate(Marker marker);
+        abstract public void MarkerUpdate(Marker marker);
+        abstract public void MarkerDelete(int traceID, int frameID);
+        abstract public bool MarkerGetByID(
+            int traceID, int frameID, out Marker marker);
+        abstract public List<Marker> MarkerGetByView(
+            int frameID, int viewID);
     }
 }

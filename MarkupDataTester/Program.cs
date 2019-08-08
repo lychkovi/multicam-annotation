@@ -39,12 +39,28 @@ namespace MarkupDataTester
         {
             List<Category> list;
 
-            list = markup.CategorySelectAll();
+            list = markup.CategoryGetAll();
 
             foreach (Category c in list)
             {
                 Console.WriteLine("ID = {0}, Name = {1}, Comment = {2}",
                     c.ID, c.Name, c.Comment);
+            }
+        }
+
+
+        /* Вспомогательный метод для вывода в консоль категории по номеру. */
+        static void CategoryPrintByID(MarkupProvider markup, int id)
+        {
+            Category category;
+            bool found;
+
+            found = markup.CategoryGetByID(id, out category);
+
+            if (found)
+            {
+                Console.WriteLine("ID = {0}, Name = {1}, Comment = {2}",
+                    category.ID, category.Name, category.Comment);
             }
         }
 
@@ -61,7 +77,15 @@ namespace MarkupDataTester
             c.ColorGreen = 255;
             c.ColorBlue = 255;
 
-            return markup.CategoryInsert(c);
+            return markup.CategoryCreate(c);
+        }
+
+        /* Метод тестирует просмотр категории, заданной номером. */
+        static void TestCategorySelectByID(RecordingInfo rec)
+        {
+            MarkupProvider markup = new MarkupProviderADO();
+            markup.Init(rec);
+            CategoryPrintByID(markup, 0);
         }
 
         /* Метод тестирует просмотр всех категорий в списке. */
@@ -105,7 +129,7 @@ namespace MarkupDataTester
 
             List<Category> list;
             Category c;
-            list = markup.CategorySelectAll();
+            list = markup.CategoryGetAll();
             c = list[1];
             c.Name = "New3";
             markup.CategoryUpdate(c);
@@ -146,22 +170,56 @@ namespace MarkupDataTester
             }
         }
 
+        /* Метод тестирует запрос к объединению двух таблиц */
+        static void TestTraceBoxJoin(RecordingInfo rec)
+        {
+            MarkupProvider markup = new MarkupProviderADO();
+            markup.Init(rec);
+            Trace trace = new Trace();
+            trace.TagID = 0;
+            trace.ViewID = 0;
+            trace.FrameStart = 0;
+            trace.FrameEnd = 0;
+            trace.ID = markup.TraceCreate(trace);
+
+            Box box = new Box();
+            box.TraceID = trace.ID;
+            box.FrameID = trace.FrameStart;
+            box.PosX = 10;
+            box.PosY = 30;
+            box.Width = 15;
+            box.Height = 25;
+            markup.BoxCreate(box);
+
+            List<Box> boxes = markup.BoxGetByView(0, 0);
+            foreach (Box item in boxes)
+            {
+                Console.WriteLine("TraceID = {0}, FrameID = {1}, PosX = {2}",
+                    item.TraceID, item.FrameID, item.PosX);
+            }
+        }
+
+
         static void Main(string[] args)
         {
             RecordingInfo rec;
             RecordingInfoInit(out rec);
-
-            Console.WriteLine("1 - Test Category Select;");
+            Console.WriteLine("0 - Test Category SelectByID;");
+            Console.WriteLine("1 - Test Category SelectAll;");
             Console.WriteLine("2 - Test Category Insert;");
             Console.WriteLine("3 - Test Category Delete;");
             Console.WriteLine("4 - Test Category Update;");
             Console.WriteLine("5 - Test saving markup to Xml;");
             Console.WriteLine("6 - Test loading markup from Xml;");
+            Console.WriteLine("7 - Test query to Boxes JOIN Traces;");
             Console.Write("Your choise: ");
             ConsoleKeyInfo key = Console.ReadKey();
             Console.WriteLine();
             switch (key.KeyChar)
             {
+                case '0':
+                    TestCategorySelectByID(rec);
+                    break;
                 case '1':
                     TestCategorySelect(rec);
                     break;
@@ -179,6 +237,9 @@ namespace MarkupDataTester
                     break;
                 case '6':
                     TestXmlRead();
+                    break;
+                case '7':
+                    TestTraceBoxJoin(rec);
                     break;
                 default:
                     Console.WriteLine("Wrong input!");

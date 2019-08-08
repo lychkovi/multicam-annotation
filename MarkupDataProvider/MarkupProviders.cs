@@ -197,13 +197,22 @@ namespace MarkupData
             TagIdColumn.AllowDBNull = false;
             TagIdColumn.DefaultValue = 0;
 
+            DataColumn FrameStartColumn =
+                new DataColumn("FrameStart", typeof(int));
+            FrameStartColumn.AllowDBNull = false;
+
+            DataColumn FrameEndColumn =
+                new DataColumn("FrameEnd", typeof(int));
+            FrameEndColumn.AllowDBNull = false;
+
             DataColumn HasBoxColumn = new DataColumn("HasBox", typeof(bool));
             HasBoxColumn.ReadOnly = true;
             HasBoxColumn.AllowDBNull = false;
 
             DataTable TracesTable = new DataTable("Traces");
             TracesTable.Columns.AddRange(new DataColumn[] { IdColumn, 
-                ViewIdColumn, TagIdColumn, HasBoxColumn });
+                ViewIdColumn, TagIdColumn, FrameStartColumn, FrameEndColumn, 
+                HasBoxColumn });
             TracesTable.PrimaryKey =
                 new DataColumn[] { TracesTable.Columns["ID"] };
 
@@ -223,18 +232,18 @@ namespace MarkupData
             FrameIdColumn.ReadOnly = true;
             FrameIdColumn.AllowDBNull = false;
 
-            DataColumn BoundLeftColumn = 
-                new DataColumn("BoundLeft", typeof(double));
-            DataColumn BoundTopColumn = 
-                new DataColumn("BoundTop", typeof(double));
-            DataColumn BoundRightColumn = 
-                new DataColumn("BoundRight", typeof(double));
-            DataColumn BoundBottomColumn = 
-                new DataColumn("BoundBottom", typeof(double));
-            BoundLeftColumn.AllowDBNull = false;
-            BoundTopColumn.AllowDBNull = false;
-            BoundRightColumn.AllowDBNull = false;
-            BoundBottomColumn.AllowDBNull = false;
+            DataColumn PosXColumn = 
+                new DataColumn("PosX", typeof(int));
+            DataColumn PosYColumn = 
+                new DataColumn("PosY", typeof(int));
+            DataColumn WidthColumn = 
+                new DataColumn("Width", typeof(int));
+            DataColumn HeightColumn = 
+                new DataColumn("Height", typeof(int));
+            PosXColumn.AllowDBNull = false;
+            PosYColumn.AllowDBNull = false;
+            WidthColumn.AllowDBNull = false;
+            HeightColumn.AllowDBNull = false;
 
             DataColumn IsOccludedColumn = 
                 new DataColumn("IsOccluded", typeof(bool));
@@ -248,8 +257,8 @@ namespace MarkupData
 
             DataTable BoxesTable = new DataTable("Boxes");
             BoxesTable.Columns.AddRange(new DataColumn[] { TraceIdColumn, 
-                FrameIdColumn, BoundLeftColumn, BoundTopColumn, 
-                BoundRightColumn, BoundBottomColumn, IsOccludedColumn, 
+                FrameIdColumn, PosXColumn, PosYColumn, 
+                WidthColumn, HeightColumn, IsOccludedColumn, 
                 IsShadedColumn });
             BoxesTable.PrimaryKey = new DataColumn[] 
                 { BoxesTable.Columns["TraceID"], 
@@ -271,13 +280,13 @@ namespace MarkupData
             FrameIdColumn.ReadOnly = true;
             FrameIdColumn.AllowDBNull = false;
 
-            DataColumn CenterXColumn = 
-                new DataColumn("CenterX", typeof(double));
-            CenterXColumn.AllowDBNull = false;
+            DataColumn PosXColumn = 
+                new DataColumn("PosX", typeof(int));
+            PosXColumn.AllowDBNull = false;
 
-            DataColumn CenterYColumn =
-                new DataColumn("CenterY", typeof(double));
-            CenterYColumn.AllowDBNull = false;
+            DataColumn PosYColumn =
+                new DataColumn("PosY", typeof(int));
+            PosYColumn.AllowDBNull = false;
 
             DataColumn IsShadedColumn =
                 new DataColumn("IsShaded", typeof(bool));
@@ -286,8 +295,8 @@ namespace MarkupData
 
             DataTable MarkersTable = new DataTable("Markers");
             MarkersTable.Columns.AddRange(new DataColumn[] 
-                { TraceIdColumn, FrameIdColumn, CenterXColumn, 
-                    CenterYColumn, IsShadedColumn });
+                { TraceIdColumn, FrameIdColumn, PosXColumn, 
+                    PosYColumn, IsShadedColumn });
             MarkersTable.PrimaryKey = new DataColumn[] 
                 { MarkersTable.Columns["TraceID"], 
                     MarkersTable.Columns["FrameID"] };
@@ -475,13 +484,32 @@ namespace MarkupData
         }
 
         /* Блок методов для работы с таблицей категорий объектов. */
-        override public int CategoryInsert(Category category)
+        private Category m_CategoryRead(DataRow row)
+        {
+            Category category = new Category();
+            category.ID = (int)row["ID"];
+            category.Name = (string)row["Name"];
+            category.Comment = (string)row["Comment"];
+            category.ColorRed = (UInt16)row["ColorRed"];
+            category.ColorGreen = (UInt16)row["ColorGreen"];
+            category.ColorBlue = (UInt16)row["ColorBlue"];
+            return category;
+        }
+
+        private void m_CategoryWrite(Category category, DataRow row)
+        {
+            row.BeginEdit();
+            row["Name"] = category.Name;
+            row["Comment"] = category.Comment;
+            row.EndEdit();
+        }
+
+        override public int CategoryCreate(Category category)
         {
             int ID;
             DataRow row = m_data.Tables["Categories"].NewRow();
             ID = (int) row["ID"];
-            row["Name"] = category.Name;
-            row["Comment"] = category.Comment;
+            m_CategoryWrite(category, row);
             m_data.Tables["Categories"].Rows.Add(row);
             return ID;
         }
@@ -490,7 +518,7 @@ namespace MarkupData
         {
             // Фильтр для выбора интересующей строки
             string filterStr = 
-                string.Format("ID = '{0}'", category.ID.ToString());
+                string.Format("ID = '{0}'", category.ID);
 
             DataRow[] rows = m_data.Tables["Categories"].Select(filterStr);
 
@@ -503,10 +531,7 @@ namespace MarkupData
             {
                 // Обновляем содержание найденной строки
                 DataRow row = rows[0];
-                row.BeginEdit();
-                row["Name"] = category.Name;
-                row["Comment"] = category.Comment;
-                row.EndEdit();
+                m_CategoryWrite(category, row);
                 m_data.AcceptChanges();
             }
         }
@@ -532,20 +557,523 @@ namespace MarkupData
             }
         }
 
-        override public List<Category> CategorySelectAll()
+        override public List<Category> CategoryGetAll()
         {
             DataRow[] rows = m_data.Tables["Categories"].Select();
             List<Category> list = new List<Category>();
             for (int i = 0; i < rows.Length; i++)
             {
-                Category item = new Category();
-                DataRow row = rows[i];
-                item.ID = (int) row["ID"];
-                item.Name = (string) row["Name"];
-                item.Comment = (string) row["Comment"];
-                item.ColorRed = (UInt16) row["ColorRed"];
-                item.ColorGreen = (UInt16) row["ColorGreen"];
-                item.ColorBlue = (UInt16) row["ColorBlue"];
+                Category item = m_CategoryRead(rows[i]);
+                list.Add(item);
+            }
+            return list;
+        }
+
+        override public bool CategoryGetByID(
+            int categoryID, out Category item)
+        {
+            string filterStr = string.Format("ID = '{0}'", categoryID);
+            // более сложный фильтр: "ID = 0 AND Name = 'Unknown0'";
+            DataRow[] rows =
+                m_data.Tables["Categories"].Select(filterStr);
+            if (rows.Length > 0)
+            {
+                item = m_CategoryRead(rows[0]);
+                return true;
+            }
+            else
+            {
+                item = new Category();
+                return false;
+            }
+        }
+
+        /* Блок методов для работы с таблицей объектов. */
+        private Tag m_TagRead(DataRow row)
+        {
+            Tag tag = new Tag();
+            tag.ID = (int)row["ID"];
+            tag.CategoryID = (int)row["CategoryID"];
+            tag.Comment = (string)row["Comment"];
+            return tag;
+        }
+
+        private void m_TagWrite(Tag tag, DataRow row)
+        {
+            row.BeginEdit();
+            row["CategoryID"] = tag.CategoryID;
+            row["Comment"] = tag.Comment;
+            row.EndEdit();
+        }
+
+        override public int TagCreate(Tag tag)
+        {
+            int ID;
+            DataRow row = m_data.Tables["Tags"].NewRow();
+            ID = (int)row["ID"];
+            m_TagWrite(tag, row);
+            m_data.Tables["Tags"].Rows.Add(row);
+            return ID;
+        }
+
+        override public void TagUpdate(Tag tag)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("ID = '{0}'", tag.ID);
+
+            DataRow[] rows = m_data.Tables["Tags"].Select(filterStr);
+
+            if (rows.Length == 0)
+            {
+                // Интересующая строка не найдена!
+                throw new KeyNotFoundException();
+            }
+            else
+            {
+                // Обновляем содержание найденной строки
+                DataRow row = rows[0];
+                m_TagWrite(tag, row);
+                m_data.AcceptChanges();
+            }
+        }
+
+        override public void TagDelete(int tagID)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("ID = '{0}'", tagID);
+
+            DataRow[] rows = m_data.Tables["Tags"].Select(filterStr);
+
+            if (rows.Length == 0)
+            {
+                // Интересующая строка не найдена!
+                throw new KeyNotFoundException();
+            }
+            else
+            {
+                // Удаляем найденную строку
+                rows[0].Delete();
+                m_data.AcceptChanges();
+            }
+        }
+
+        override public List<Tag> TagGetAll()
+        {
+            DataRow[] rows = m_data.Tables["Tags"].Select();
+            List<Tag> list = new List<Tag>();
+            for (int i = 0; i < rows.Length; i++)
+            {
+                Tag tag = m_TagRead(rows[i]);
+                list.Add(tag);
+            }
+            return list;
+        }
+
+        override public bool TagGetByID(int tagID, out Tag tag)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr = string.Format("ID = '{0}'", tagID);
+            DataRow[] rows = m_data.Tables["Tags"].Select(filterStr);
+            if (rows.Length > 0)
+            {
+                tag = m_TagRead(rows[0]);
+                return true;
+            }
+            else
+            {
+                tag = new Tag();
+                return false;
+            }
+        }
+
+        /* Блок методов для работы с таблицей траекторий. */
+        private Trace m_TraceRead(DataRow row)
+        {
+            Trace trace = new Trace();
+            trace.ID = (int)row["ID"];
+            trace.ViewID = (int)row["ViewID"];
+            trace.TagID = (int)row["TagID"];
+            trace.FrameStart = (int)row["FrameStart"];
+            trace.FrameEnd = (int)row["FrameEnd"];
+            trace.HasBox = (bool)row["HasBox"];
+            return trace;
+        }
+
+        private void m_TraceWrite(Trace trace, DataRow row)
+        {
+            row.BeginEdit();
+            // Дополнительная защита для полей READ-ONLY
+            if (row.RowState == DataRowState.Detached)
+            {
+                row["ViewID"] = trace.ViewID;
+                row["TagID"] = trace.TagID;
+                row["HasBox"] = trace.HasBox;
+            }
+            row["FrameStart"] = trace.FrameStart;
+            row["FrameEnd"] = trace.FrameEnd;
+            row.EndEdit();
+        }
+
+        override public int TraceCreate(Trace trace)
+        {
+            int ID;
+            DataRow row = m_data.Tables["Traces"].NewRow();
+            ID = (int)row["ID"];
+            m_TraceWrite(trace, row);
+            m_data.Tables["Traces"].Rows.Add(row);
+            return ID;
+        }
+
+        override public void TraceUpdate(Trace trace)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("ID = '{0}'", trace.ID);
+
+            DataRow[] rows = m_data.Tables["Traces"].Select(filterStr);
+
+            if (rows.Length == 0)
+            {
+                // Интересующая строка не найдена!
+                throw new KeyNotFoundException();
+            }
+            else
+            {
+                // Обновляем содержание найденной строки
+                DataRow row = rows[0];
+                m_TraceWrite(trace, row);
+                m_data.AcceptChanges();
+            }
+        }
+
+        override public void TraceDelete(int traceID)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("ID = '{0}'", traceID);
+
+            DataRow[] rows = m_data.Tables["Traces"].Select(filterStr);
+
+            if (rows.Length == 0)
+            {
+                // Интересующая строка не найдена!
+                throw new KeyNotFoundException();
+            }
+            else
+            {
+                // Удаляем найденную строку
+                rows[0].Delete();
+                m_data.AcceptChanges();
+            }
+        }
+
+        override public List<Trace> TraceGetAll()
+        {
+            DataRow[] rows = m_data.Tables["Traces"].Select();
+            List<Trace> list = new List<Trace>();
+            for (int i = 0; i < rows.Length; i++)
+            {
+                Trace trace = m_TraceRead(rows[i]);
+                list.Add(trace);
+            }
+            return list;
+        }
+
+        override public bool TraceGetByID(int traceID, out Trace trace)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr = string.Format("ID = '{0}'", traceID);
+            DataRow[] rows = m_data.Tables["Tags"].Select(filterStr);
+            if (rows.Length > 0)
+            {
+                trace = m_TraceRead(rows[0]);
+                return true;
+            }
+            else
+            {
+                trace = new Trace();
+                return false;
+            }
+        }
+
+        /* Блок методов для работы с таблицей рамок объектов. */
+        private Box m_BoxRead(DataRow row)
+        {
+            Box box = new Box();
+            box.TraceID = (int)row["TraceID"];
+            box.FrameID = (int)row["FrameID"];
+            box.PosX = (int)row["PosX"];
+            box.PosY = (int)row["PosY"];
+            box.Width = (int)row["Width"];
+            box.Height = (int)row["Height"];
+            box.IsShaded = (bool)row["IsShaded"];
+            box.IsOccluded = (bool)row["IsOccluded"];
+            return box;
+        }
+
+        private void m_BoxWrite(Box box, DataRow row)
+        {
+            row.BeginEdit();
+            // Дополнительная защита для полей READ-ONLY
+            if (row.RowState == DataRowState.Detached)
+            {
+                row["TraceID"] = box.TraceID;
+                row["FrameID"] = box.FrameID;
+            }
+            row["PosX"] = box.PosX;
+            row["PosY"] = box.PosY;
+            row["Width"] = box.Width;
+            row["Height"] = box.Height;
+            row["IsShaded"] = box.IsShaded;
+            row["IsOccluded"] = box.IsOccluded;
+            row.EndEdit();
+        }
+
+        override public void BoxCreate(Box box)
+        {
+            DataRow row = m_data.Tables["Boxes"].NewRow();
+            m_BoxWrite(box, row);
+            m_data.Tables["Boxes"].Rows.Add(row);
+        }
+
+        override public void BoxUpdate(Box box)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("TraceID = '{0}' AND FrameID = '{1}", 
+                box.TraceID, box.FrameID);
+
+            DataRow[] rows = m_data.Tables["Boxes"].Select(filterStr);
+
+            if (rows.Length == 0)
+            {
+                // Интересующая строка не найдена!
+                throw new KeyNotFoundException();
+            }
+            else
+            {
+                // Обновляем содержание найденной строки
+                DataRow row = rows[0];
+                m_BoxWrite(box, row);
+                m_data.AcceptChanges();
+            }
+        }
+
+        override public void BoxDelete(int traceID, int frameID)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                traceID, frameID);
+
+            DataRow[] rows = m_data.Tables["Boxes"].Select(filterStr);
+
+            if (rows.Length == 0)
+            {
+                // Интересующая строка не найдена!
+                throw new KeyNotFoundException();
+            }
+            else
+            {
+                // Удаляем найденную строку
+                rows[0].Delete();
+                m_data.AcceptChanges();
+            }
+        }
+
+        override public bool BoxGetByID(
+            int traceID, int frameID, out Box box)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                traceID, frameID);
+            DataRow[] rows = m_data.Tables["Boxes"].Select(filterStr);
+            if (rows.Length > 0)
+            {
+                box = m_BoxRead(rows[0]);
+                return true;
+            }
+            else
+            {
+                box = new Box();
+                return false;
+            }
+        }
+
+        override public List<Box> BoxGetByView(int frameID, int viewID)
+        {
+            // Запрос к объединению двух таблиц
+            DataTable boxes = m_data.Tables["Boxes"];
+            DataTable traces = m_data.Tables["Traces"];
+
+            var query =
+                from box in boxes.AsEnumerable()
+                join trace in traces.AsEnumerable()
+                on box.Field<int>("TraceID") equals
+                    trace.Field<int>("ID")
+                where box.Field<int>("FrameID") == frameID
+                && trace.Field<int>("ViewID") == viewID
+                select new
+                {
+                    TraceID = box.Field<int>("TraceID"),
+                    PosX = box.Field<int>("PosX"),
+                    PosY = box.Field<int>("PosY"),
+                    Width = box.Field<int>("Width"),
+                    Height = box.Field<int>("Height"),
+                    IsShaded = box.Field<bool>("IsShaded"),
+                    IsOccluded = box.Field<bool>("IsOccluded")
+                };
+
+            List<Box> list = new List<Box>();
+            foreach (var elem in query)
+            {
+                Box item = new Box();
+                item.TraceID = elem.TraceID;
+                item.FrameID = frameID;
+                item.PosX = elem.PosX;
+                item.PosY = elem.PosY;
+                item.Width = elem.Width;
+                item.Height = elem.Height;
+                item.IsShaded = elem.IsShaded;
+                item.IsOccluded = elem.IsOccluded;
+                list.Add(item);
+            }
+            return list;
+        }
+
+        /* Блок методов для работы с таблицей маркеров объектов. */
+        private Marker m_MarkerRead(DataRow row)
+        {
+            Marker marker = new Marker();
+            marker.TraceID = (int)row["TraceID"];
+            marker.FrameID = (int)row["FrameID"];
+            marker.PosX = (int)row["PosX"];
+            marker.PosY = (int)row["PosY"];
+            marker.IsShaded = (bool)row["IsShaded"];
+            return marker;
+        }
+
+        private void m_MarkerWrite(Marker marker, DataRow row)
+        {
+            int traceID = (int)row["TraceID"];
+            int frameID = (int)row["FrameID"];
+
+            row.BeginEdit();
+            // Дополнительная защита для полей READ-ONLY
+            if (traceID != marker.TraceID) row["TraceID"] = marker.TraceID;
+            if (frameID != marker.FrameID) row["FrameID"] = marker.FrameID;
+            row["PosX"] = marker.PosX;
+            row["PosY"] = marker.PosY;
+            row["IsShaded"] = marker.IsShaded;
+            row.EndEdit();
+        }
+
+        override public void MarkerCreate(Marker marker)
+        {
+            DataRow row = m_data.Tables["Markers"].NewRow();
+            m_MarkerWrite(marker, row);
+            m_data.Tables["Markers"].Rows.Add(row);
+        }
+
+        override public void MarkerUpdate(Marker marker)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                marker.TraceID, marker.FrameID);
+
+            DataRow[] rows = m_data.Tables["Markers"].Select(filterStr);
+
+            if (rows.Length == 0)
+            {
+                // Интересующая строка не найдена!
+                throw new KeyNotFoundException();
+            }
+            else
+            {
+                // Обновляем содержание найденной строки
+                DataRow row = rows[0];
+                m_MarkerWrite(marker, row);
+                m_data.AcceptChanges();
+            }
+        }
+
+        override public void MarkerDelete(int traceID, int frameID)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                traceID, frameID);
+
+            DataRow[] rows = m_data.Tables["Markers"].Select(filterStr);
+
+            if (rows.Length == 0)
+            {
+                // Интересующая строка не найдена!
+                throw new KeyNotFoundException();
+            }
+            else
+            {
+                // Удаляем найденную строку
+                rows[0].Delete();
+                m_data.AcceptChanges();
+            }
+        }
+
+        override public bool MarkerGetByID(
+            int traceID, int frameID, out Marker marker)
+        {
+            // Фильтр для выбора интересующей строки
+            string filterStr =
+                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                traceID, frameID);
+            DataRow[] rows = m_data.Tables["Markers"].Select(filterStr);
+            if (rows.Length > 0)
+            {
+                marker = m_MarkerRead(rows[0]);
+                return true;
+            }
+            else
+            {
+                marker = new Marker();
+                return false;
+            }
+        }
+
+        override public List<Marker> MarkerGetByView(
+            int frameID, int viewID)
+        {
+            // Запрос к объединению двух таблиц
+            DataTable markers = m_data.Tables["Markers"];
+            DataTable traces = m_data.Tables["Traces"];
+
+            var query =
+                from marker in markers.AsEnumerable()
+                join trace in traces.AsEnumerable()
+                on marker.Field<int>("TraceID") equals
+                    trace.Field<int>("ID")
+                where marker.Field<int>("FrameID") == frameID
+                && trace.Field<int>("ViewID") == viewID
+                select new
+                {
+                    TraceID = marker.Field<int>("TraceID"),
+                    PosX = marker.Field<int>("PosX"),
+                    PosY = marker.Field<int>("PosY"),
+                    IsShaded = marker.Field<bool>("IsShaded")
+                };
+
+            List<Marker> list = new List<Marker>();
+            foreach (var elem in query)
+            {
+                Marker item = new Marker();
+                item.TraceID = elem.TraceID;
+                item.FrameID = frameID;
+                item.PosX = elem.PosX;
+                item.PosY = elem.PosY;
+                item.IsShaded = elem.IsShaded;
                 list.Add(item);
             }
             return list;
