@@ -199,6 +199,34 @@ namespace MarkupDataTester
             }
         }
 
+        /* Метод тестирует запрос к объединению двух таблиц */
+        static void TestTraceMarkerJoin(RecordingInfo rec)
+        {
+            MarkupProvider markup = new MarkupProviderADO();
+            markup.Init(rec);
+            Trace trace = new Trace();
+            trace.TagID = 0;
+            trace.ViewID = 0;
+            trace.FrameStart = 0;
+            trace.FrameEnd = 0;
+            trace.ID = markup.TraceCreate(trace);
+
+            Marker marker = new Marker();
+            marker.TraceID = trace.ID;
+            marker.FrameID = trace.FrameStart;
+            marker.PosX = 10;
+            marker.PosY = 30;
+            markup.MarkerCreate(marker);
+            marker.PosX = 20;
+            markup.MarkerUpdate(marker);
+
+            List<Marker> markers = markup.MarkerGetByView(0, 0);
+            foreach (Marker item in markers)
+            {
+                Console.WriteLine("TraceID = {0}, FrameID = {1}, PosX = {2}",
+                    item.TraceID, item.FrameID, item.PosX);
+            }
+        }
 
         static void Main(string[] args)
         {
@@ -212,6 +240,7 @@ namespace MarkupDataTester
             Console.WriteLine("5 - Test saving markup to Xml;");
             Console.WriteLine("6 - Test loading markup from Xml;");
             Console.WriteLine("7 - Test query to Boxes JOIN Traces;");
+            Console.WriteLine("8 - Test query to Markers JOIN Traces;");
             Console.Write("Your choise: ");
             ConsoleKeyInfo key = Console.ReadKey();
             Console.WriteLine();
@@ -240,6 +269,9 @@ namespace MarkupDataTester
                     break;
                 case '7':
                     TestTraceBoxJoin(rec);
+                    break;
+                case '8':
+                    TestTraceMarkerJoin(rec);
                     break;
                 default:
                     Console.WriteLine("Wrong input!");

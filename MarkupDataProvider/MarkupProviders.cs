@@ -842,7 +842,7 @@ namespace MarkupData
         {
             // Фильтр для выбора интересующей строки
             string filterStr =
-                string.Format("TraceID = '{0}' AND FrameID = '{1}", 
+                string.Format("TraceID = '{0}' AND FrameID = '{1}'", 
                 box.TraceID, box.FrameID);
 
             DataRow[] rows = m_data.Tables["Boxes"].Select(filterStr);
@@ -958,13 +958,13 @@ namespace MarkupData
 
         private void m_MarkerWrite(Marker marker, DataRow row)
         {
-            int traceID = (int)row["TraceID"];
-            int frameID = (int)row["FrameID"];
-
             row.BeginEdit();
             // Дополнительная защита для полей READ-ONLY
-            if (traceID != marker.TraceID) row["TraceID"] = marker.TraceID;
-            if (frameID != marker.FrameID) row["FrameID"] = marker.FrameID;
+            if (row.RowState == DataRowState.Detached)
+            {
+                row["TraceID"] = marker.TraceID;
+                row["FrameID"] = marker.FrameID;
+            }
             row["PosX"] = marker.PosX;
             row["PosY"] = marker.PosY;
             row["IsShaded"] = marker.IsShaded;
@@ -982,7 +982,7 @@ namespace MarkupData
         {
             // Фильтр для выбора интересующей строки
             string filterStr =
-                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                string.Format("TraceID = '{0}' AND FrameID = '{1}'",
                 marker.TraceID, marker.FrameID);
 
             DataRow[] rows = m_data.Tables["Markers"].Select(filterStr);
