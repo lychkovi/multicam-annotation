@@ -8,44 +8,23 @@ using System.Linq;
 using System.Text;
 
 using MarkupData;
-using TraceData;            // интерфейс ITraceStateHolder
 
 
 namespace UniversalAnnotationApp
 {
-    public interface ITrace
+    public class TraceManagerControls
     {
-        void TraceGuiBind();
-        void TraceOnUpdateBegin(int StepDir);  // начать изменение 
-        void TraceOnAppendBegin(int StepDir);
-        void TraceOnUpdateProceed();
-        void TraceOnUpdateEnd(); // завершить изменение траектории
-
-        // Перемотка видео, инициированная слоем Timeline
-        void TraceOnSliderChange();
-        void TraceOnMoveNext();
-        void TraceOnMovePrev();
     }
 
-    // Типы указателей на функции обратного вызова верхних слоев приложения
-    public delegate void DisplayRefreshCallback();
+    public interface ITrace
+    {
+        void TraceGuiBind(TraceManagerControls controls);
+        void TraceTraceCreate(); // для вызова из меню
+        void TraceTraceDelete(); // для вызова из меню
+    }
 
     abstract class TraceManagerBase : DisplayManager, ITrace
     {
-        // Сведения о состоянии объекта TraceManager для верхних слоев
-        // приложения. 
-        abstract protected int TraceFrameID { get; } 
-            // индекс текущего кадра
-        abstract protected int TraceFrameIncrementDir { get; } 
-            // шаг приращения кадра при изменении траектории (+1) или (-1)
-
-        // Методы регистрации функций обратного вызвоа для обновления
-        // состояния слоев верхнего уровня при обработке событий от кнопок
-        // графического интерфейса, ассоциированных с TraceManager.
-        // Данные о состоянии TraceManager они могут считать из свойств выше
-        abstract protected void TraceSetDisplayRefreshCallback(
-            DisplayRefreshCallback fcn);
-
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
         abstract protected bool TraceCameraOpen(RecordingInfo rec);
@@ -53,123 +32,75 @@ namespace UniversalAnnotationApp
         abstract protected bool TraceMarkupOpen(string MarkupFilePath);
         abstract protected void TraceMarkupClose();
 
-        // Перемотка видео, инициированная слоем Timeline
-        abstract public void TraceOnSliderChange();
-        abstract public void TraceOnMoveNext();
-        abstract public void TraceOnMovePrev();
+        // Навигация
+        abstract protected void TraceMoveToFrame(int frameID);
 
-        // Выбор траектории (инициируется слоем Display по событию мыши)
-        abstract protected void TraceSelect(int TraceID); // выбр. траект. N
-        abstract protected void TraceUnSelect(); // отменить выбор траект.
+        // Создание/удаление траектории
+        abstract public void TraceTraceCreate(); // для вызова из меню
+        abstract public void TraceTraceDelete(); // для вызова из меню
 
-        // Создание траектории
-        abstract protected void TraceCreateBegin(bool isMarker); // инициировать создание
-        abstract protected void TraceCreateProceed(); // 1ый угол рамки ввели
-        abstract protected void TraceCreateEnd(int TraceID);
-            /* Завершитиь создание траектории, индекс созданной траектории
-             * указан в параметре TraceID. */
-
-        // Редактирование траектории
-        abstract public void TraceOnUpdateBegin(int StepDir);// начать измен.
-        abstract public void TraceOnAppendBegin(int StepDir);
-            // начать добавление в конец (частный случай изменения)
-        abstract protected void TraceBoxUpdateBegin(); // нач. измен. рамки
-        abstract protected void TraceBoxUpdateEnd();
-        abstract public void TraceOnUpdateProceed(); 
-            // перейти к следующему кадру (обновить рамку траектории на
-            // следующем кадре в разметке).
-        abstract public void TraceOnUpdateEnd(); // завершить изм. траектории
-
-        abstract public void TraceGuiBind();
+        abstract public void TraceGuiBind(TraceManagerControls controls);
     }
 
 
     class TraceManager: TraceManagerBase
     {
-        private int m_FrameID;          // индекс текущего кадра
-        private int m_FrameIncrementDir;  // шаг приращения кадра (+1/-1)
-        private ITraceStateHolder m_state;// переменные состояния
+        private TraceManagerControls m_gui;
 
-        // Поля для регистрации функций обратного вызова
-        private DisplayRefreshCallback m_DisplayRefreshCallback;
+        private bool m_IsTraceSelected;
+        private Trace m_CurrTrace;
+        private Box m_CurrBox;       // если m_CurrTrace.HasBox == true
+        private Marker m_CurrMarker; // если m_CurrTrace.HasBox == false
+        private Tag m_CurrTag;
+        private Category m_CurrCategory;
+        private bool m_IsCategoryEdit;
 
-        // Метод перехода в начальное состояние
-        private void m_ResetState()    
-        {
-            m_FrameIncrementDir = 0;
+        private int m_CurrFrameID;
+        private bool m_IsPlaybackMode;
 
-            // TODO: Очистить панель отображения свойств текущей выбранной
-            // траектории. 
-            /* ... */
+        // Выбор траектории 
+        private void m_TraceSelect(int TraceID)
+        { // выбрать траекторию N
+
         }
 
-        // Перемотка видео, инициированная ползунком или кнопкой
-        private void m_MoveToFrame(int FrameID)
+        // Отменить выбор траектории
+        private void m_TraceUnSelect()
         {
-            if (FrameID != m_FrameID &&
-                FrameID >= 0 &&
-                FrameID < CameraRecordingInfo.FramesCount)
-            {
-                m_FrameID = FrameID;
 
-                if (m_state.IsTraceSelected)
-                {
-                    // TODO: Выясняем, присутствует ли текущая выбранная
-                    // траектория на новом кадре
-                    /* ... */
-                    if (true /* Не присутствует*/)
-                    {
-                        // Отменяем выбор траектории
-                        TraceUnSelect();
-                    }
-                }
-
-                // Обновляем состояние слоя Display
-                if (m_DisplayRefreshCallback != null)
-                    m_DisplayRefreshCallback();
-
-                // TODO: Обновляем положения ползунка
-                /* ... */
-            }
         }
 
-        // Сведения о состоянии объекта TraceManager для верхних слоев
-        // приложения. 
-        override protected int TraceFrameID // индекс текущего кадра
+        // Обслуживание элементов графического интерфейса
+        private void m_ControlsUpdate()
         {
-            get
-            {
-                return m_FrameID;
-            }
         }
 
-        override protected int TraceFrameIncrementDir
-        { // шаг приращения кадра при изменении траектории (+1) или (-1)
-            get
-            {
-                return m_FrameIncrementDir;
-            }
+        private void m_ControlsInit()
+        {
         }
 
-        // Методы регистрации функций обратного вызвоа для обновления
-        // состояния слоев верхнего уровня при обработке событий от кнопок
-        // графического интерфейса, ассоциированных с TraceManager.
-        // Данные о состоянии TraceManager они могут считать из свойств выше
-        override protected void TraceSetDisplayRefreshCallback(
-            DisplayRefreshCallback fcn)
+        // ************************** Навигация *****************************
+        private void m_PlaybackStop()
         {
-            m_DisplayRefreshCallback = fcn;
+
+        }
+
+        override protected void TraceMoveToFrame(int frameID)
+        {
+
         }
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
         override protected bool TraceCameraOpen(RecordingInfo rec)
         {
+            if (CameraIsOpened)
+                TraceCameraClose();
+
             if (DisplayCameraOpen(rec))
             {
-                m_ResetState();
-                m_FrameID = 0;
-                /* TODO: Инициализировать ползунок. */
+                TraceMoveToFrame(0);
+                m_ControlsInit();
                 return true;
             }
             else
@@ -178,17 +109,27 @@ namespace UniversalAnnotationApp
 
         override protected void TraceCameraClose()
         {
-            DisplayCameraClose();
-            m_ResetState();
-            m_FrameID = -1;
-            /* TODO: Деинициализировать ползунок. */
+            if (CameraIsOpened)
+            {
+                m_PlaybackStop();
+                TraceMarkupClose();
+                DisplayCameraClose();
+                m_CurrFrameID = -1;
+                m_ControlsInit();
+            }
         }
 
         override protected bool TraceMarkupOpen(string MarkupFilePath)
         {
+            if (MarkupIsOpened)
+                TraceMarkupClose();
+
             if (DisplayMarkupOpen(MarkupFilePath))
             {
-                m_ResetState();
+                // Загружаем тэг и категорию по умолчанию
+                MarkupCategoryGetByID(0, out m_CurrCategory);
+                MarkupTagGetByID(0, out m_CurrTag);
+                m_ControlsInit();
                 return true;
             }
             else
@@ -197,180 +138,47 @@ namespace UniversalAnnotationApp
 
         override protected void TraceMarkupClose()
         {
-            DisplayMarkupClose();
-            m_ResetState();
-        }
-
-        override public void TraceOnMoveNext()
-        {
-            m_MoveToFrame(m_FrameID + 1);
-        }
-
-        override public void TraceOnMovePrev()
-        {
-            m_MoveToFrame(m_FrameID - 1);
-        }
-
-        // Выбор траектории (инициируется слоем Display по событию мыши)
-        override protected void TraceSelect(int TraceID)
-        { // выбрать траекторию N
-            if (m_state.IsStateUpdate)
-                throw new NotSupportedException("Select while edit!");
-
-            m_state.IsTraceSelected = true;
-            m_state.TraceSelectedID = TraceID;
-
-            // TODO: Еще нужно обновить панель свойств текущей траектории
-            /* ... */
-        }
-
-        override protected void TraceUnSelect() // отменить выбор траектории
-        {
-            if (m_state.IsStateUpdate)
-                throw new NotSupportedException("Unselect while edit!");
-
-            m_state.IsTraceSelected = false;
-
-            // TODO: Еще нужно очистить панель свойств текущей траектории
-            /* ... */
-        }
-
-        // Создание траектории
-        override protected void TraceCreateBegin(bool isMarker)
-        { // инициировать создание
-            if (m_state.IsStateUpdate)
-                TraceOnUpdateEnd(); // останавливаем редактирование
-
-            TraceUnSelect();        // снимаем выделение траектории
-
-            m_state.IsStateCreate = true;
-            m_state.IsStateCreateStretch = false;
-            m_state.IsStateCreateMarker = isMarker;
-        }
-
-        override protected void TraceCreateProceed()
-        { // 1-ый угол рамки введен, ждем второй (не обязательно)
-            if (!m_state.IsStateCreate)
-                throw new NotSupportedException("Need to create trace!");
-
-            m_state.IsStateCreateStretch = true;
-        }
-
-        /* Завершить создание траектории, индекс созданной траектории
-         * указан в параметре TraceID. */
-        override protected void TraceCreateEnd(int TraceID)
-        {
-            if (!m_state.IsStateCreate)
-                throw new NotSupportedException("Need to create trace!");
-
-            m_state.IsStateCreate = false;
-            m_state.IsStateCreateStretch = false;
-        }   
-
-        // Редактирование траектории
-        override public void TraceOnUpdateBegin(int StepDir)
-        { // начать изменение 
-            if (!m_state.IsTraceSelected)
-                throw new NotSupportedException("Need to select trace!");
-
-            m_state.IsStateCreate = false;
-            m_state.IsStateUpdate = true;
-            m_state.IsStateUpdateStretch = false;
-            m_FrameIncrementDir = StepDir;
-
-            /* TODO: Заблокировать ползунок */
-        }
-
-        override public void TraceOnAppendBegin(int StepDir)
-        { // начать добавление в конец (частный случай изменения)
-            if (!m_state.IsTraceSelected)
-                throw new NotSupportedException("Need to select trace!");
-
-            // TODO: 1. В зависимости от StepDir перейти к крайнему кадру
-            // траектории
-            /* ... */
-
-            // 2. Инициировать режим редактирования
-            TraceOnUpdateBegin(StepDir);
-
-            // 3. Инициировать режим добалвения в конец
-            m_state.IsStateUpdateAppend = true;
-        }
-
-        override protected void TraceBoxUpdateBegin()
-        { // начать изменение рамки
-            if (!m_state.IsStateUpdate)
-                throw new NotSupportedException("Need to edit trace!");
-
-            m_state.IsStateUpdateStretch = true;
-        }
-
-        override protected void TraceBoxUpdateEnd()
-        {
-            if (!m_state.IsStateUpdate)
-                throw new NotSupportedException("Need to edit trace!");
-
-            m_state.IsStateUpdateStretch = false;
-        }
-
-        // перейти к следующему кадру (обновить рамку траектории на
-        // следующем кадре в разметке).
-        override public void TraceOnUpdateProceed()
-        {
-            if (!m_state.IsStateUpdate)
-                throw new NotSupportedException("Need to edit trace!");
-
-            int FrameProceed = m_FrameID + m_FrameIncrementDir;
-            if (FrameProceed >= 0 &&
-                FrameProceed < CameraRecordingInfo.FramesCount)
+            if (MarkupIsOpened)
             {
-                // 1. Узнать коордианты рамки траектории на текущем кадре
-
-                // 2. Вычислить прогнозные координаты рамки траектории на
-                // кадре FrameProceed
-
-                // 3. Сохранить их в баду данных
-
-                // 4. Перейти к следующему кадру
-                m_MoveToFrame(FrameProceed);
+                m_TraceUnSelect();
+                DisplayMarkupClose();
+                m_IsCategoryEdit = false;
+                m_ControlsInit();
             }
         }
-            
-        override public void TraceOnUpdateEnd()
-        { // завершить изменение траектории
-            if (!m_state.IsStateUpdate)
-                throw new NotSupportedException("Need to edit trace!");
 
-            m_state.IsStateUpdate = false;
-            m_state.IsStateUpdateAppend = false;
-
-            /* TODO: Разблокрировать ползунок. */
+        // Создание/удаление траектории
+        override public void TraceTraceCreate() // для вызова из меню
+        {
         }
 
-        /* Обработчик события изменения положения ползунка. */
-        override public void TraceOnSliderChange()
+        override public void TraceTraceDelete() // для вызова из меню
         {
-            if (m_state.IsStateUpdate)
-                throw new NotSupportedException("Unable to navigate!");
-
-            /* TODO: Вычислить номер кадра, к которому перейти. */
-            int FrameProceed = 0;
-
-            m_MoveToFrame(FrameProceed);
         }
 
         /* Регистрация эелементов управления: ползунка, кнопок, 
          * выпадающих списков и т. п. */
-        override public void TraceGuiBind()
+        override public void TraceGuiBind(TraceManagerControls controls)
         {
 
         }
 
         public TraceManager()
         {
-            m_state = new TraceStateHolderDummy();
-            m_ResetState(); // Переход в начальное состояние
-            m_FrameID = -1;
+            // Инициализируем все поля
+            m_IsTraceSelected = false;
+            m_CurrTrace = new Trace();
+            m_CurrBox = new Box();
+            m_CurrMarker = new Marker();
+            m_CurrTag = new Tag();
+            m_CurrCategory = new Category();
+            m_IsCategoryEdit = false;
+
+            m_CurrFrameID = -1;
+            m_IsPlaybackMode = false;
+
+            // Это должно инициализироваться методом TraceGuiBind
+            m_gui = null;
         }
     }
 }
