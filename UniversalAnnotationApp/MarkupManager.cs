@@ -42,6 +42,41 @@ namespace UniversalAnnotationApp
         abstract protected bool MarkupIsSaved { get; }
 
         abstract public void MarkupGuiBind(MarkupManagerControls controls);
+
+        abstract public int MarkupCategoryCreate(Category category);
+        abstract public void MarkupCategoryUpdate(Category category);
+        abstract public void MarkupCategoryDelete(int categoryID);
+        abstract public List<Category> MarkupCategoryGetAll();
+        abstract public bool MarkupCategoryGetByID(
+            int categoryID, out Category category);
+
+        abstract public int MarkupTagCreate(Tag tag);
+        abstract public void MarkupTagUpdate(Tag tag);
+        abstract public void MarkupTagDelete(int tagID);
+        abstract public List<Tag> MarkupTagGetAll();
+        abstract public bool MarkupTagGetByID(int tagID, out Tag tag);
+
+        abstract public int MarkupTraceCreate(Trace trace);
+        abstract public void MarkupTraceUpdate(Trace trace);
+        abstract public void MarkupTraceDelete(int traceID);
+        abstract public List<Trace> MarkupTraceGetAll();
+        abstract public bool MarkupTraceGetByID(
+            int traceID, out Trace trace);
+
+        abstract public void MarkupBoxCreate(Box box);
+        abstract public void MarkupBoxUpdate(Box box);
+        abstract public void MarkupBoxDelete(int traceID, int frameID);
+        abstract public bool MarkupBoxGetByID(
+            int traceID, int frameID, out Box box);
+        abstract public List<Box> MarkupBoxGetByView(int frameID, int viewID);
+
+        abstract public void MarkupMarkerCreate(Marker marker);
+        abstract public void MarkupMarkerUpdate(Marker marker);
+        abstract public void MarkupMarkerDelete(int traceID, int frameID);
+        abstract public bool MarkupMarkerGetByID(
+            int traceID, int frameID, out Marker marker);
+        abstract public List<Marker> MarkupMarkerGetByView(
+            int frameID, int viewID);
     }
 
     /* Класс обеспечивает доступ к флагам состояния слоя только через 
@@ -120,8 +155,144 @@ namespace UniversalAnnotationApp
     class MarkupManager : MarkupManagerBase
     {
         private MarkupProvider m_markup;    // поставщик данных
-        MarkupManagerState m_state;     // флаги состояния + GUI
+        private MarkupManagerState m_state;     // флаги состояния + GUI
 
+        // Методы работы с таблицей категорий объектов
+        override public int MarkupCategoryCreate(Category category)
+        {
+            return m_markup.CategoryCreate(category);
+        }
+
+        override public void MarkupCategoryUpdate(Category category)
+        {
+            m_markup.CategoryUpdate(category);
+        }
+
+        override public void MarkupCategoryDelete(int categoryID)
+        {
+            m_markup.CategoryDelete(categoryID);
+        }
+
+        override public List<Category> MarkupCategoryGetAll()
+        {
+            return m_markup.CategoryGetAll();
+        }
+
+        override public bool MarkupCategoryGetByID(
+            int categoryID, out Category category)
+        {
+            return m_markup.CategoryGetByID(categoryID, out category);
+        }
+
+        // Методы работы с таблицей объектов
+        override public int MarkupTagCreate(Tag tag)
+        {
+            return m_markup.TagCreate(tag);
+        }
+
+        override public void MarkupTagUpdate(Tag tag)
+        {
+            m_markup.TagUpdate(tag);
+        }
+
+        override public void MarkupTagDelete(int tagID)
+        {
+            m_markup.TagDelete(tagID);
+        }
+
+        override public List<Tag> MarkupTagGetAll()
+        {
+            return m_markup.TagGetAll();
+        }
+
+        override public bool MarkupTagGetByID(int tagID, out Tag tag)
+        {
+            return m_markup.TagGetByID(tagID, out tag);
+        }
+
+        // Методы работы с таблицей траекторий объектов
+        override public int MarkupTraceCreate(Trace trace)
+        {
+            return m_markup.TraceCreate(trace);
+        }
+
+        override public void MarkupTraceUpdate(Trace trace)
+        {
+            m_markup.TraceUpdate(trace);
+        }
+
+        override public void MarkupTraceDelete(int traceID)
+        {
+            m_markup.TraceDelete(traceID);
+        }
+
+        override public List<Trace> MarkupTraceGetAll()
+        {
+            return m_markup.TraceGetAll();
+        }
+
+        override public bool MarkupTraceGetByID(
+            int traceID, out Trace trace)
+        {
+            return m_markup.TraceGetByID(traceID, out trace);
+        }
+
+        // Методы работы с таблицей рамок объектов
+        override public void MarkupBoxCreate(Box box)
+        {
+            m_markup.BoxCreate(box);
+        }
+
+        override public void MarkupBoxUpdate(Box box)
+        {
+            m_markup.BoxUpdate(box);
+        }
+
+        override public void MarkupBoxDelete(int traceID, int frameID)
+        {
+            m_markup.BoxDelete(traceID, frameID);
+        }
+
+        override public bool MarkupBoxGetByID(
+            int traceID, int frameID, out Box box)
+        {
+            return m_markup.BoxGetByID(traceID, frameID, out box);
+        }
+
+        override public List<Box> MarkupBoxGetByView(int frameID, int viewID)
+        {
+            return m_markup.BoxGetByView(frameID, viewID);
+        }
+
+        // Методы работы с таблицей маркеров объектов
+        override public void MarkupMarkerCreate(Marker marker)
+        {
+            m_markup.MarkerCreate(marker);
+        }
+
+        override public void MarkupMarkerUpdate(Marker marker)
+        {
+            m_markup.MarkerUpdate(marker);
+        }
+
+        override public void MarkupMarkerDelete(int traceID, int frameID)
+        {
+            m_markup.MarkerDelete(traceID, frameID);
+        }
+
+        override public bool MarkupMarkerGetByID(
+            int traceID, int frameID, out Marker marker)
+        {
+            return m_markup.MarkerGetByID(traceID, frameID, out marker);
+        }
+
+        override public List<Marker> MarkupMarkerGetByView(
+            int frameID, int viewID)
+        {
+            return m_markup.MarkerGetByView(frameID, viewID);
+        }
+
+        // Методы файловых операций
         override protected bool MarkupCameraOpen(RecordingInfo rec)
         {
             if (!CameraOpen(rec))
