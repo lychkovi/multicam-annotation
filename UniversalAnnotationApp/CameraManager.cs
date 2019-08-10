@@ -37,6 +37,8 @@ namespace UniversalAnnotationApp
             string[] ViewFilePaths, string Comment);
         abstract protected void CameraLoadFrame(
             int FrameID, out List<Image> viewImages);
+        abstract protected void CameraImageResize(
+            Image src, double scale, out Image dst);
     }
 
     /* Класс обеспечивает доступ к флагам состояния слоя только через 
@@ -170,6 +172,12 @@ namespace UniversalAnnotationApp
                     viewImages.Add(image);
                 }
             }
+        }
+
+        override protected void CameraImageResize(
+            Image src, double scale, out Image dst)
+        {
+            m_cam.ImageResize(src, scale, out dst);
         }
 
         /* Метод принимает на вход список путей к файлам видео отдельных

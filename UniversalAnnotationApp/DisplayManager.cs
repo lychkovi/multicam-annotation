@@ -1,6 +1,10 @@
 ﻿/* DisplayManager: Класс реализует отображение кадров видео с отдельных
  * камер видеозаписи, отображение разметки объектов на этих кадрах и 
- * обработку событий мыши на поля для вывода изображений. */
+ * обработку событий мыши на поля для вывода изображений. 
+ *
+ * Внимание!!! Класс не реализует изменение разметки в базе данных, а
+ * только передает соообщения о манипуляциях мышью пользователем в класс
+ * TraceManager для внесения изменений в базу. */
 
 using System;
 using System.Collections.Generic;
@@ -9,22 +13,23 @@ using System.Text;
 using System.Drawing;       // Класс Image
 
 using MarkupData;
+using DisplayControlWpf;
 
 
 namespace UniversalAnnotationApp
 {
     public struct DisplayManagerControls
     {
-        public DisplayControlWin.DisplayControl DisplayCtrl;
+        public DisplayControlWin.DisplayControl Ctrl;
     }
 
     // Класс представляет информацию для обслуживания отдельного
     // поля вывода изображения
     public struct ViewerData
     {
-        public Image zoomedImage; // зуммированное изображение (без разметки)
-        public int zoomIndex;     // индекс текущего выбранного зума
-        public int viewID;        // идентификатор текущего зума
+        public int ViewID;        // идентификатор текущего зума
+        public int ZoomID;     // индекс текущего выбранного зума
+        public Image ZoomedImage; // зуммированное изображение (без разметки)
     }
 
     public interface IDisplay
@@ -32,10 +37,17 @@ namespace UniversalAnnotationApp
         void DisplayGuiBind(DisplayManagerControls controls);
     }
 
+    public delegate void displayCallback(
+        object sender, DisplayCanvasEventArgs args);
+
     abstract class DisplayManagerBase : MarkupManager, IDisplay
     {
-        // Метод привязки элементов управления форму к объекту DisplayManager
+        // Метод привязки элементов управления формы к объекту DisplayManager
         abstract public void DisplayGuiBind(DisplayManagerControls controls);
+
+        // Метод регистрации функции обратного вызова для передачи сообщений 
+        // на верхний слой TraceManager
+        abstract protected void DisplaySetCallback(displayCallback cbFcn);
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
@@ -45,254 +57,373 @@ namespace UniversalAnnotationApp
         abstract protected void DisplayMarkupClose();
 
         // Метод перерисовки кадров на форме
-        abstract protected void DisplayRefresh();
+        abstract protected void DisplayUpdate(
+            DisplayCanvasModeID generalViewMode,
+            bool isTraceSelected = false,
+            int selectedTraceID = -1,
+            DisplayCanvasModeID selectedViewMode =
+                DisplayCanvasModeID.FocusPoint);
         abstract protected void DisplayLoadFrame(int frameIndex);
-
     }
 
     class DisplayManager: DisplayManagerBase
     {
-        private DisplayManagerControls m_gui;
-        private bool m_IsOpened;   // признак инициализированного дисплея
-        private int m_BufferedFrameID;      // номер текущего буферизованного кадра
-        private Image[] m_BufferedFrameViews;   
-            // буферизованные изображения видов текущего кадра
-        private ViewerData[] m_ViewerDatas;
-            // зуммированные мзображения для отдельных полей вывода изображений, 
-            // а также индексы текущих выбранных зума и вида
-        private double[] m_ZoomSeries;  // ряд стандартных значений зума
-        private int m_ActiveViewerIndex;    // индекс активного поля вывода
+        private DisplayManagerControls m_gui; // связь с формой
+        private displayCallback m_RaiseEvent; // связь с TraceManager
 
-        // Инициализация полей вывода изображений
-        private void m_OnCameraOpened()
+        private bool m_IsTraceSelected;     // наличие выбранной траектории
+        private int m_SelectedTraceID;      // номер выбранной траектории
+        private DisplayCanvasModeID m_SelectedViewMode; 
+            // режим работы поля вывода выбранной траектории
+        private DisplayCanvasModeID m_GeneralViewMode;
+        // режим работы остальных полей вывода
+
+        private int m_BufferedFrameID;      // номер буферизованного кадра
+        private List<Image> m_ViewBuffers;   
+            // буферы видов текущего кадра (по количеству видов)
+        private ViewerData[] m_Viewers;
+            // зуммированные мзображения для отдельных полей вывода 
+            // изображений, а также индексы текущих выбранных зума и вида 
+            // (по колву полей вывода)
+        private double[] m_ZoomValues;  // ряд стандартных значений зума
+        private string[] m_ZoomCaptions;// подписи значений зума
+        private int m_ZoomDefaultID;        // индекс начального зума
+
+        // Обработчик события от поля вывода разметки
+        private void m_OnDisplayCanvasEvent(
+            object sender, DisplayCanvasEventArgs e)
         {
-            // Выделение памяти для буферизации всех видов
-            int nviews = CameraRecordingInfo.Views.Count;
-            m_BufferedFrameViews = new Image[nviews];
+            int viewID = m_Viewers[e.controlID].ViewID;
+            int zoomID = m_Viewers[e.controlID].ZoomID;
+            double zoomValue = m_ZoomValues[zoomID];
 
-            // Создаём список поддерживаемых значений зума
-            m_ZoomSeries = new double[3];
-            m_ZoomSeries[0] = 1.0;
-            m_ZoomSeries[1] = 2.0;
-            m_ZoomSeries[2] = 0.5;
+            DisplayCanvasEventArgs eTraceArgs;
+            eTraceArgs = new DisplayCanvasEventArgs(e.eventID);
+            eTraceArgs.controlID = -1;      // не используется далее
+            eTraceArgs.viewID = viewID;
+            eTraceArgs.clip.X = (int)(e.clip.X * zoomValue);
+            eTraceArgs.clip.Y = (int)(e.clip.Y * zoomValue);
+            eTraceArgs.clip.Width = (int)(e.clip.Width * zoomValue);
+            eTraceArgs.clip.Height = (int)(e.clip.Height * zoomValue);
+            eTraceArgs.hasBox = e.hasBox;
 
-            // Загружаем список видов и список зумов в поля вывода
-            if (m_gui.DisplayCtrl != null)
-            {
-                // Создаём список названий видов
-                List<string> viewCaptions = new List<string>();
-                string caption;
-                for (int i = 0; i < nviews; i++)
-                {
-                    caption = "View" + i.ToString();
-                    viewCaptions.Add(caption);
-                }
-
-                // Создаём список названий зумов
-                List<string> zoomCaptions = new List<string>();
-                for (int i = 0; i < m_ZoomSeries.Count(); i++)
-                {
-                    caption = m_ZoomSeries[i].ToString() + "x";
-                    zoomCaptions.Add(caption);
-                }
-
-                // Загружаем списки названий видов и зумов в каждое поле
-                int iview = 0;
-                int currZoomIndex = 0;
-                for (int i = 0; i < m_ViewerDatas.Count(); i++) /* по полям вывода */
-                {
-                    // Загружаем список видов
-                    m_gui.DisplayCtrl.SetViewerListOfViews(i, viewCaptions, iview);
-                    m_ViewerDatas[i].viewID = iview;
-                    if (iview < nviews - 1)
-                        ++iview;
-                    // Загружаем список значений зумов
-                    m_gui.DisplayCtrl.SetViewerListOfZooms(i, zoomCaptions, currZoomIndex);
-                    m_ViewerDatas[i].zoomIndex = currZoomIndex;
-                }
-            }
-
-            // Буферизуем все виды первого кадра из видеофайлов
-            m_IsOpened = true;
-            DisplayLoadFrame(0);
+            // Обработку события и изменение состояния слоя DisplayManager
+            // будет выполнять слой TraceManager
+            m_RaiseEvent(sender, eTraceArgs);
         }
 
-        // Обработчик событий от пользовательского элемента управления
-        private void m_OnViewerEvent(object sender, 
-            DisplayControlWpf.DisplayCanvasEventArgs e)
+        // Метод обновляет изображение разметки в указанном поле визуализации
+        // в зависимости от текущего режима, указанного в полях объекта this
+        private void m_UpdateMarkup(int iviewer)
         {
+            if (!CameraIsOpened)
+                throw new Exception("Camera is not opened!");
 
-        }
+            int viewID = m_Viewers[iviewer].ViewID;
+            int zoomID = m_Viewers[iviewer].ZoomID;
+            double zoomValue = m_ZoomValues[zoomID];
+            double scale = 1.0 / zoomValue;
 
-        // Метод обновляет зуммированный кадр поля вывода и перерисовывает его
-        private void m_ViewerUpdateSettings(int iviewer)
-        {
-            // Обновляем зуммированное изображение поля вывода
-            int nview = m_ViewerDatas[iviewer].viewID;
-            int nzoom = m_ViewerDatas[iviewer].zoomIndex;
-            double zoomValue = m_ZoomSeries[nzoom];
+            // Признак выделения текущей выбранной траектории
+            bool isSelectedBox = m_IsTraceSelected &&
+                m_SelectedViewMode == DisplayCanvasModeID.BoxUpdate;
 
-            if (zoomValue == 1.0)
+            Image markedFrame = 
+                (Image) m_Viewers[iviewer].ZoomedImage.Clone();
+
+            // Наносим разметку
+            if (MarkupIsOpened)
             {
-                m_ViewerDatas[iviewer].zoomedImage = (Image)m_BufferedFrameViews[nview];
-            }
-            else
-                throw new NotImplementedException("Unsupported zoom value!");
+                Rectangle rect;
+                List<Box> boxes;
+                boxes = MarkupBoxGetByView(m_BufferedFrameID, viewID);
 
-            // Обновляем изображение элемента управления
-            m_ViewerRedraw(iviewer);
-        }
+                Brush brush = new SolidBrush(Color.Red);
+                Pen pen = new Pen(brush);
+                Graphics g = Graphics.FromImage(markedFrame);
+                foreach (Box box in boxes)
+                if (m_SelectedTraceID == box.TraceID && isSelectedBox)
+                {
+                    rect = box.GetRectangle(scale);
+                    g.DrawRectangle(pen, rect);
+                }
 
-        // Метод перерисовывает изображение на отдельном поле вывода
-        private void m_ViewerRedraw(int iviewer)
-        {
-            // Наносим разметку на изображение
-            Image buffer = (Image) m_ViewerDatas[iviewer].zoomedImage.Clone();
-
-            // Выдаём размеченное изображение в поле вывода
-            if (m_gui.DisplayCtrl != null)
-            {
-                m_gui.DisplayCtrl.SetViewerImage(iviewer, buffer);
+                if (m_gui.Ctrl != null)
+                    m_gui.Ctrl.SetViewerImage(iviewer, markedFrame);
             }
         }
 
-        // отрисовка изображений на форме
-        private void m_Refresh()
+        private void m_UpdateMarkups()
         {
-            if (m_IsOpened)
+            for (int i = 0; i < m_Viewers.Length; i++)
             {
-                for (int i = 0; i < m_ViewerDatas.Count(); i++)
-                {
-                    m_ViewerRedraw(i);
-                }
+                m_UpdateMarkup(i);
             }
         }
 
-        // Удаление полей для вывода изображений
-        private void m_OnCameraClosed()
+        // Метод буферизует новый кадр, зуммирует его и обновляет разметку
+        void m_UpdateCamera(int frameID)
         {
-//-- Перепроверить
-            if (m_IsOpened)
-            {
-                // TODO: 1. Удаляем все поля для вывода изображений
-                if (m_gui.DisplayCtrl != null)
-                {
-                    for (int i = 0; i < m_ViewerDatas.Count(); i++)
-                        m_gui.DisplayCtrl.DelViewerImage(i);
-                }
+            if (!CameraIsOpened)
+                throw new Exception("DisplayManager: Camera is not opened!");
 
-                m_BufferedFrameID = -1;
-                m_ActiveViewerIndex = -1;
-                m_IsOpened = false;
+            // При необходимости буферизуем кадр
+            if (m_BufferedFrameID != frameID)
+            {
+                CameraLoadFrame(frameID, out m_ViewBuffers);
+                m_BufferedFrameID = frameID;
             }
 
-//-- Перепроверить
+            m_UpdateViews();
+        }
+
+        // Метод обновляет зуммированный кадр в буфере поля вывода и 
+        // обновляет его разметку.
+        private void m_UpdateView(int iviewer)
+        {
+            if (!CameraIsOpened)
+                throw new Exception("DisplayManager: Camera is not opened!");
+
+            int nview = m_Viewers[iviewer].ViewID;
+            int nzoom = m_Viewers[iviewer].ZoomID;
+            double scale = 1.0 / m_ZoomValues[nzoom];
+
+            // Масштабируем изображение по текущему зуму
+            CameraImageResize(m_ViewBuffers[nview], scale, 
+                out m_Viewers[iviewer].ZoomedImage);
+
+            m_UpdateMarkup(iviewer);
+        }
+
+        private void m_UpdateViews()
+        {
+            for (int i = 0; i < m_Viewers.Length; i++)
+            {
+                m_UpdateView(i);
+            }
+        }
+
+        // Обработчик события от выпадающего списка
+        private void m_OnDisplayListEvent(
+            object sender, DisplayListEventArgs e)
+        {
+            switch (e.eventID)
+            {
+                case DisplayListEventID.ViewChanged:
+                    m_Viewers[e.controlID].ViewID = e.listItemID;
+                    m_UpdateView(e.controlID);
+                    break;
+                case DisplayListEventID.ZoomChanged:
+                    m_Viewers[e.controlID].ZoomID = e.listItemID;
+                    m_UpdateView(e.controlID);
+                    break;
+            }
+        }
+
+        // Сброс полей в начальное состояние
+        private void m_Reset(bool resetBuffer = true)
+        {
+            m_IsTraceSelected = false;
+            m_SelectedTraceID = -1;
+            m_SelectedViewMode = DisplayCanvasModeID.Passive;
+            m_GeneralViewMode = DisplayCanvasModeID.Passive;
+            if (resetBuffer) m_BufferedFrameID = -1;
         }
 
         // Такие четыре метода должны быть у всех слоев выше слоя Markup
         // Слои вызывают эти методы рекурсивно по цепочке
         override protected bool DisplayCameraOpen(RecordingInfo rec)
         {
-//-- Перепроверить
-            if (MarkupCameraOpen(rec))
-            {
-                m_OnCameraOpened();
-                return true;
-            }
-            else
+            if (CameraIsOpened)
+                DisplayCameraClose();
+
+            if (!MarkupCameraOpen(rec))
                 return false;
-//-- Перепроверить
+
+            if (m_gui.Ctrl != null)
+            {
+                // Составляем список названий видов
+                int nviews = CameraRecordingInfo.Views.Count;
+                List<string> viewCaptions = new List<string>();
+                for (int j = 0; j < nviews; j++)
+                {
+                    string name = CameraRecordingInfo.Views[j].Comment;
+                    viewCaptions.Add(name);
+                }
+
+                // Резревируем память на буферы полей визуализации
+                int nviewers = m_gui.Ctrl.GetViewersCount();
+                if (m_Viewers.Count() != nviewers)
+                    m_Viewers = new ViewerData[nviewers];
+
+                // Инициализируем состояние каждого поля визуализации
+                for (int i = 0; i < nviewers; i++)
+                {
+                    int viewID = i < nviews ? i : nviews - 1;
+                    int zoomID = m_ZoomDefaultID;
+                    m_gui.Ctrl.SetViewerListOfViews(i, viewCaptions, viewID);
+                    m_gui.Ctrl.SetViewerListOfZooms(
+                        i, m_ZoomCaptions.ToList(), zoomID);
+                    m_Viewers[i].ViewID = viewID;
+                    m_Viewers[i].ZoomID = zoomID;
+                }
+            }
+
+            // Сброс полей в начальное состояние и буферизация первого кадра
+            m_Reset(true);
+            m_UpdateCamera(0);
+            return true;
         }
 
         override protected void DisplayCameraClose()
         {
-//-- Перепроверить
-            MarkupCameraClose();
-            m_OnCameraClosed();
-//-- Перепроверить
+            if (CameraIsOpened)
+            {
+                MarkupCameraClose();
+                // Очищаем все поля для вывода изображений
+                if (m_gui.Ctrl != null)
+                {
+                    for (int i = 0; i < m_Viewers.Count(); i++)
+                        m_gui.Ctrl.DelViewerImage(i);
+                }
+                m_Reset();
+            }
         }
 
         override protected bool DisplayMarkupOpen(string MarkupFilePath)
         {
-//-- Перепроверить
+            if (MarkupIsOpened)
+                DisplayMarkupClose();
+
             if (MarkupOpen(MarkupFilePath))
             {
-                m_Refresh();
+                m_Reset(false);
+                m_UpdateMarkups();
                 return true;
             }
             else
                 return false;
-//-- Перепроверить
         }
 
         override protected void DisplayMarkupClose()
         {
-//-- Перепроверить
-            MarkupClose();
-            m_Refresh();
-//-- Перепроверить
+            if (MarkupIsOpened)
+            {
+                MarkupClose();
+                m_Reset(false);
+                m_UpdateMarkups();
+            }
         }
 
         // Метод перерисовки кадров на форме
-        override protected void DisplayRefresh()
+        override protected void DisplayUpdate(
+            DisplayCanvasModeID generalViewMode,
+            bool isTraceSelected = false,
+            int selectedTraceID = -1,
+            DisplayCanvasModeID selectedViewMode = 
+                DisplayCanvasModeID.FocusPoint)
         {
-            m_Refresh();
+            if (!CameraIsOpened)
+                throw new Exception("DisplayManager: Camera is not opened!");
+
+            // Проверять наличие выбранной траектории на текущем кадре здесь
+            // не будем - это должна делать вызывающая функция из уровня 
+            // TraceManager. 
+
+            // Сохраняем настройки режимов во внутренние поля объекта
+            m_IsTraceSelected = isTraceSelected;
+            m_SelectedTraceID = selectedTraceID;
+            m_GeneralViewMode = generalViewMode;
+            m_SelectedViewMode = selectedViewMode;
+
+            // Узнаем координаты рамки текущей выбранной траектории
+            int selectedViewID = -1;
+            Box box = new Box();
+            bool isSuccess = false;
+            if (isTraceSelected)
+            {
+                isSuccess = MarkupBoxGetByID(
+                    m_SelectedTraceID, m_BufferedFrameID, out box);
+
+                if (isSuccess)
+                {
+                    Trace trace;
+                    MarkupTraceGetByID(box.TraceID, out trace);
+                    selectedViewID = trace.ViewID;
+                }
+            }
+
+            // Задаем режимы работы для полей вывода
+            if (m_gui.Ctrl != null)
+            for (int i = 0; i < m_Viewers.Length; i++)
+            {
+                if (isSuccess && m_Viewers[i].ViewID == selectedViewID)
+                {
+                    int zoomID = m_Viewers[i].ZoomID;
+                    double scale = 1.0 / m_ZoomValues[zoomID];
+                    Rectangle rect = box.GetRectangle(scale);
+                    m_gui.Ctrl.SetViewerMode(i, m_SelectedViewMode, rect);
+                }
+                else
+                    m_gui.Ctrl.SetViewerMode(i, m_GeneralViewMode);
+            }
+
+            // Обновляем разметку кадра
+            m_UpdateMarkups();
         }
 
         // Метод буферизует все виды для указанного кадра
-        override protected void DisplayLoadFrame(int frameIndex)
+        override protected void DisplayLoadFrame(int frameID)
         {
-//-- Перепроверить
-            // Загружаем изображения видов кадра из видеофайлов
-            List<Image> viewImages;
-            CameraLoadFrame(frameIndex, out viewImages);
-            for (int i = 0; i < viewImages.Count; i++)
-            {
-                m_BufferedFrameViews[i] = viewImages[i];
-            }
-            m_BufferedFrameID = frameIndex;
+            if (!CameraIsOpened)
+                throw new Exception("DisplayManager: Camera is not opened!");
 
-            // Обновляем содержимое всех полей вывода
-            for (int i = 0; i < m_ViewerDatas.Count(); i++)
-            {
-                m_ViewerUpdateSettings(i);
-            }
-//-- Перепроверить
+            // Буферизуем кадр
+            m_UpdateCamera(frameID);
+
+            // Обновляем режимы полей визуализации
+            DisplayUpdate(m_GeneralViewMode, m_IsTraceSelected, 
+                m_SelectedTraceID, m_SelectedViewMode);
         }
 
         // Метод привязки элементов управления формы к объекту DisplayManager
         override public void DisplayGuiBind(DisplayManagerControls controls)
         {
-//-- Перепроверить
             m_gui = controls;
 
             // Подключаем пользовательский элемент управления
-            if (m_gui.DisplayCtrl != null)
+            if (m_gui.Ctrl != null)
             {
                 // Инициализируем информацию для обслуживания полей вывода
-                int nviewers = m_gui.DisplayCtrl.GetViewersCount();
-                m_ViewerDatas = new ViewerData[nviewers];
-                for (int i = 0; i < nviewers; i++)
-                {
-                    m_ViewerDatas[i].viewID = -1;
-                    m_ViewerDatas[i].zoomedImage = null;
-                    m_ViewerDatas[i].zoomIndex = -1;
-                }
+                int nviewers = m_gui.Ctrl.GetViewersCount();
+                m_Viewers = new ViewerData[nviewers];
 
                 // Регистрируем обработчик событий от полей вывода
-                m_gui.DisplayCtrl.RunEvent += new DisplayControlWpf.
-                    UserCanvasControl.canvasEventHandler(m_OnViewerEvent);
+                m_gui.Ctrl.RunCanvasEvent += new UserCanvasControl.
+                    canvasEventHandler(m_OnDisplayCanvasEvent);
+
+                // Регистрируем обработчик событий от списка
+                m_gui.Ctrl.RunListEvent += new UserCanvasControl.
+                    listEventHandler(m_OnDisplayListEvent);
             }
-//-- Перепроверить
+        }
+
+        // Метод регистрации функции обратного вызова для передачи сообщений 
+        // на верхний слой TraceManager
+        override protected void DisplaySetCallback(displayCallback cbFcn)
+        {
+            m_RaiseEvent = cbFcn;
         }
 
         // Инициализация всех полей начальными значениями
         public DisplayManager()
         {
             m_gui = new DisplayManagerControls();
-//-- Перепроверить
-            m_BufferedFrameID = -1;
-//-- Перепроверить
+            m_ViewBuffers = new List<Image>();
+            m_ZoomValues = new double[] {0.5, 1.0, 2.0, 3.0, 4.0 };
+            m_ZoomCaptions = new string[] { "1/2x", "1x", "2x", "3x", "4x" };
+            m_ZoomDefaultID = 1; // 1x
+            m_Reset();
         }
     }
 }

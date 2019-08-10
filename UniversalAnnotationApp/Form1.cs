@@ -43,7 +43,7 @@ namespace UniversalAnnotationApp
             engine.MarkupGuiBind(markupControls);
 
             DisplayManagerControls displayControls;
-            displayControls.DisplayCtrl = DisplayCtrl;
+            displayControls.Ctrl = DisplayCtrl;
             engine.DisplayGuiBind(displayControls);
 
             FileManagerControls fileControls;
