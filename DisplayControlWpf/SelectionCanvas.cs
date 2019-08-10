@@ -443,6 +443,13 @@ namespace DisplayControlWpf
             {
                 mouseLeftDownPoint = e.GetPosition(this);
                 this.CaptureMouse();
+
+                if (m_mode == DisplayCanvasModeID.BoxCreate)
+                {
+                    rubber.currentTopLeftCorner = mouseLeftDownPoint;
+                    rubber.currentBottomRightCorner = mouseLeftDownPoint;
+                    rubber.Show();
+                }
             }
         }
 
@@ -679,15 +686,20 @@ namespace DisplayControlWpf
                     throw new ApplicationException(
                         "Cannot enable element without image loaded!");
                 }
-                rubber.Init(clip, new Size(this.Width, this.Height));
-                rubber.Show();
+
                 if (mode == DisplayCanvasModeID.BoxUpdate)
                 {
+                    rubber.Init(clip, new Size(this.Width, this.Height));
+                    rubber.Show();
                     anchors.Update(rubber, new Point(1e6, 1e6), false);
                     anchors.Show();
                 }
                 else
+                {
+                    rubber.Hide();
                     anchors.Hide();
+                }
+
                 img.Visibility = System.Windows.Visibility.Visible;
             }
             m_mode = mode;
