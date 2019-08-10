@@ -785,7 +785,7 @@ namespace MarkupData
         {
             // Фильтр для выбора интересующей строки
             string filterStr = string.Format("ID = '{0}'", traceID);
-            DataRow[] rows = m_data.Tables["Tags"].Select(filterStr);
+            DataRow[] rows = m_data.Tables["Traces"].Select(filterStr);
             if (rows.Length > 0)
             {
                 trace = m_TraceRead(rows[0]);
@@ -865,7 +865,7 @@ namespace MarkupData
         {
             // Фильтр для выбора интересующей строки
             string filterStr =
-                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                string.Format("TraceID = '{0}' AND FrameID = '{1}'",
                 traceID, frameID);
 
             DataRow[] rows = m_data.Tables["Boxes"].Select(filterStr);
@@ -888,7 +888,7 @@ namespace MarkupData
         {
             // Фильтр для выбора интересующей строки
             string filterStr =
-                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                string.Format("TraceID = '{0}' AND FrameID = '{1}'",
                 traceID, frameID);
             DataRow[] rows = m_data.Tables["Boxes"].Select(filterStr);
             if (rows.Length > 0)
@@ -1005,7 +1005,7 @@ namespace MarkupData
         {
             // Фильтр для выбора интересующей строки
             string filterStr =
-                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                string.Format("TraceID = '{0}' AND FrameID = '{1}'",
                 traceID, frameID);
 
             DataRow[] rows = m_data.Tables["Markers"].Select(filterStr);
@@ -1028,7 +1028,7 @@ namespace MarkupData
         {
             // Фильтр для выбора интересующей строки
             string filterStr =
-                string.Format("TraceID = '{0}' AND FrameID = '{1}",
+                string.Format("TraceID = '{0}' AND FrameID = '{1}'",
                 traceID, frameID);
             DataRow[] rows = m_data.Tables["Markers"].Select(filterStr);
             if (rows.Length > 0)

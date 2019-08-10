@@ -40,19 +40,19 @@ namespace DisplayControlWpf
     // разметки кадра
     public class DisplayCanvasEventArgs
     {
-        public readonly DisplayCanvasEventID eventID;
-        public int controlID; // идентификатор элемента управления
-        public int viewID;    // идентификатор вида (задается DisplayManager)
+        public readonly DisplayCanvasEventID EventID;
+        public int ControlID; // идентификатор элемента управления
+        public int ViewID;    // идентификатор вида (задается DisplayManager)
         public System.Drawing.Rectangle clip;
-        public bool hasBox;   // true для Box, false для Marker
+        public bool HasBox;   // true для Box, false для Marker
 
-        public DisplayCanvasEventArgs(DisplayCanvasEventID EventID)
+        public DisplayCanvasEventArgs(DisplayCanvasEventID eventID)
         {
-            eventID = EventID;
-            controlID = -1;
-            viewID = -1;
+            EventID = eventID;
+            ControlID = -1;
+            ViewID = -1;
             clip = new System.Drawing.Rectangle();
-            hasBox = false;
+            HasBox = false;
         }
     }
 
@@ -68,15 +68,15 @@ namespace DisplayControlWpf
     // Параметры события выпадающего списка
     public class DisplayListEventArgs
     {
-        public readonly DisplayListEventID eventID;
-        public int controlID;   // идентификатор элемента управления
-        public int listItemID;  // индекс элемента выпадающего списка
+        public readonly DisplayListEventID EventID;
+        public int ControlID;   // идентификатор элемента управления
+        public int ListItemID;  // индекс элемента выпадающего списка
 
-        public DisplayListEventArgs(DisplayListEventID EventID)
+        public DisplayListEventArgs(DisplayListEventID eventID)
         {
-            eventID = EventID;
-            controlID = -1;
-            listItemID = -1;
+            EventID = eventID;
+            ControlID = -1;
+            ListItemID = -1;
         }
     }
 
@@ -130,7 +130,7 @@ namespace DisplayControlWpf
         private void OnCanvasEvent(object sender, DisplayCanvasEventArgs args)
         {
             // Вызываем внешний обработчик события
-            args.controlID = m_controlID;
+            args.ControlID = m_controlID;
             RunCanvasEvent(this, args);
         }
 
@@ -225,8 +225,8 @@ namespace DisplayControlWpf
             {
                 DisplayListEventArgs args = new DisplayListEventArgs(
                     DisplayListEventID.ViewChanged);
-                args.controlID = m_controlID;
-                args.listItemID = cmbView.SelectedIndex;
+                args.ControlID = m_controlID;
+                args.ListItemID = cmbView.SelectedIndex;
                 RunListEvent(this, args);
             }
         }
@@ -238,8 +238,8 @@ namespace DisplayControlWpf
             {
                 DisplayListEventArgs args = new DisplayListEventArgs(
                     DisplayListEventID.ZoomChanged);
-                args.controlID = m_controlID;
-                args.listItemID = cmbZoom.SelectedIndex;
+                args.ControlID = m_controlID;
+                args.ListItemID = cmbZoom.SelectedIndex;
                 RunListEvent(this, args);
             }
         }

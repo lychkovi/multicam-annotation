@@ -53,12 +53,15 @@
             this.pnlDisplay = new System.Windows.Forms.Panel();
             this.pnlFilesOpened = new System.Windows.Forms.Panel();
             this.pnlTools = new System.Windows.Forms.Panel();
-            this.grpNavigation = new System.Windows.Forms.GroupBox();
             this.grpTracking = new System.Windows.Forms.GroupBox();
+            this.grpNavigation = new System.Windows.Forms.GroupBox();
             this.pnlAttributes = new System.Windows.Forms.Panel();
             this.grpAttributes = new System.Windows.Forms.GroupBox();
             this.pnlTimeLine = new System.Windows.Forms.Panel();
             this.tbrTimeLine = new System.Windows.Forms.TrackBar();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuTraceCreate = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuTraceDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.pnlFilesOpened.SuspendLayout();
@@ -71,7 +74,8 @@
             // menuStrip
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.editToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(746, 24);
@@ -264,15 +268,6 @@
             this.pnlTools.Size = new System.Drawing.Size(154, 369);
             this.pnlTools.TabIndex = 8;
             // 
-            // grpNavigation
-            // 
-            this.grpNavigation.Location = new System.Drawing.Point(4, 7);
-            this.grpNavigation.Name = "grpNavigation";
-            this.grpNavigation.Size = new System.Drawing.Size(147, 127);
-            this.grpNavigation.TabIndex = 0;
-            this.grpNavigation.TabStop = false;
-            this.grpNavigation.Text = "Navigation";
-            // 
             // grpTracking
             // 
             this.grpTracking.Location = new System.Drawing.Point(4, 140);
@@ -281,6 +276,15 @@
             this.grpTracking.TabIndex = 1;
             this.grpTracking.TabStop = false;
             this.grpTracking.Text = "Tracking";
+            // 
+            // grpNavigation
+            // 
+            this.grpNavigation.Location = new System.Drawing.Point(4, 7);
+            this.grpNavigation.Name = "grpNavigation";
+            this.grpNavigation.Size = new System.Drawing.Size(147, 127);
+            this.grpNavigation.TabIndex = 0;
+            this.grpNavigation.TabStop = false;
+            this.grpNavigation.Text = "Navigation";
             // 
             // pnlAttributes
             // 
@@ -315,6 +319,29 @@
             this.tbrTimeLine.Name = "tbrTimeLine";
             this.tbrTimeLine.Size = new System.Drawing.Size(428, 42);
             this.tbrTimeLine.TabIndex = 0;
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuTraceCreate,
+            this.menuTraceDelete});
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.editToolStripMenuItem.Text = "Edit";
+            // 
+            // menuTraceCreate
+            // 
+            this.menuTraceCreate.Name = "menuTraceCreate";
+            this.menuTraceCreate.Size = new System.Drawing.Size(152, 22);
+            this.menuTraceCreate.Text = "Trace Create";
+            this.menuTraceCreate.Click += new System.EventHandler(this.menuTraceCreate_Click);
+            // 
+            // menuTraceDelete
+            // 
+            this.menuTraceDelete.Name = "menuTraceDelete";
+            this.menuTraceDelete.Size = new System.Drawing.Size(152, 22);
+            this.menuTraceDelete.Text = "Trace Delete";
+            this.menuTraceDelete.Click += new System.EventHandler(this.menuTraceDelete_Click);
             // 
             // Form1
             // 
@@ -382,6 +409,9 @@
         private System.Windows.Forms.GroupBox grpAttributes;
         private System.Windows.Forms.Panel pnlTimeLine;
         private System.Windows.Forms.TrackBar tbrTimeLine;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem menuTraceCreate;
+        private System.Windows.Forms.ToolStripMenuItem menuTraceDelete;
     }
 }
 

@@ -98,5 +98,15 @@ namespace UniversalAnnotationApp
         {
             engine.FileOnMarkupClose();
         }
+
+        private void menuTraceCreate_Click(object sender, EventArgs e)
+        {
+            engine.TraceTraceCreate();
+        }
+
+        private void menuTraceDelete_Click(object sender, EventArgs e)
+        {
+            engine.TraceTraceDelete();
+        }
     }
 }

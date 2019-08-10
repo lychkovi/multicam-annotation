@@ -37,20 +37,20 @@ namespace DisplayControlTester
             object sender, DisplayCanvasEventArgs e)
         {
             string eventName;
-            switch (e.eventID)
+            switch (e.EventID)
             {
                 case DisplayCanvasEventID.FocusPointed:
                 default:
                     eventName = "Focus Pointed";
                     break;
                 case DisplayCanvasEventID.NodeCreated:
-                    if (e.hasBox)
+                    if (e.HasBox)
                         eventName = "Box Created";
                     else
                         eventName = "Marker Created";
                     break;
                 case DisplayCanvasEventID.NodeUpdated:
-                    if (e.hasBox)
+                    if (e.HasBox)
                         eventName = "Box Updated";
                     else
                         eventName = "Marker Updated";
@@ -59,7 +59,7 @@ namespace DisplayControlTester
             string eventArgs =
                 "X = " + e.clip.X.ToString() +
                 "; Y = " + e.clip.Y.ToString();
-            if (e.hasBox)
+            if (e.HasBox)
             {
                 eventArgs +=
                     "; W = " + e.clip.Width.ToString() +
@@ -68,7 +68,7 @@ namespace DisplayControlTester
             string messageText = eventName + ": " + eventArgs;
                 
             MessageBox.Show(messageText,
-                "Viewer " + e.controlID.ToString() + " raised an event!");
+                "Viewer " + e.ControlID.ToString() + " raised an event!");
         }
 
         // Обработчик события от пользовательского элемента управления
@@ -76,7 +76,7 @@ namespace DisplayControlTester
             object sender, DisplayListEventArgs e)
         {
             string eventName;
-            switch (e.eventID)
+            switch (e.EventID)
             {
                 case DisplayListEventID.ViewChanged:
                 default:
@@ -87,11 +87,11 @@ namespace DisplayControlTester
                     break;
             }
             string eventArgs =
-                "Selected Item Index = " + e.listItemID.ToString();
+                "Selected Item Index = " + e.ListItemID.ToString();
             string messageText = eventName + ": " + eventArgs;
 
             MessageBox.Show(messageText,
-                "Viewer " + e.controlID.ToString() + " raised an event!");
+                "Viewer " + e.ControlID.ToString() + " raised an event!");
         }
 
         public Form2()

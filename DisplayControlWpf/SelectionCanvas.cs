@@ -467,7 +467,7 @@ namespace DisplayControlWpf
                     case DisplayCanvasModeID.BoxCreate:
                         args = new DisplayCanvasEventArgs(DisplayCanvasEventID.NodeCreated);
                         args.clip = rubber.GetClientRect();
-                        args.hasBox = true;
+                        args.HasBox = true;
                         RunEvent(this, args);
                         break;
                     case DisplayCanvasModeID.BoxUpdate:
@@ -475,7 +475,7 @@ namespace DisplayControlWpf
                         {
                             args = new DisplayCanvasEventArgs(DisplayCanvasEventID.NodeUpdated);
                             args.clip = rubber.GetClientRect();
-                            args.hasBox = true;
+                            args.HasBox = true;
                             rubber.ReInit(); // Фиксируем изменения рамки
                         }
                         else
@@ -484,7 +484,7 @@ namespace DisplayControlWpf
                             args = new DisplayCanvasEventArgs(DisplayCanvasEventID.FocusPointed);
                             args.clip.X = (int) e.GetPosition(this).X;
                             args.clip.Y = (int) e.GetPosition(this).Y;
-                            args.hasBox = false;
+                            args.HasBox = false;
                         }
                         RunEvent(this, args);
                         break;
@@ -633,21 +633,6 @@ namespace DisplayControlWpf
             height = (int) this.Height;
         }
 
-        // Метод задаёт содержание выпадающего списка для выбора конкретного 
-        // вида для визуализации на отдельном поле вывода изображения, а также
-        // индекс активного элемента списка
-        public void SetListOfViews(List<string> viewCaptions, int currViewIndex)
-        {
-
-        }
-
-        // Метод задаёт содержание выпадающего списка для выбора конкретного 
-        // зума при визуализации на отдельном поле вывода изображения
-        public void SetListOfZooms(List<string> zoomCaptions, int currZoomIndex)
-        {
-
-        }
-
         // Метод задаёт изображение для отдельного поля вывода
         public void SetImage(System.Drawing.Image newImage)
         {
@@ -701,6 +686,8 @@ namespace DisplayControlWpf
                     anchors.Update(rubber, new Point(1e6, 1e6), false);
                     anchors.Show();
                 }
+                else
+                    anchors.Hide();
                 img.Visibility = System.Windows.Visibility.Visible;
             }
             m_mode = mode;

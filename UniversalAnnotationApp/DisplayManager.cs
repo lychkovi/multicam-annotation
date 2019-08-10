@@ -62,7 +62,7 @@ namespace UniversalAnnotationApp
             bool isTraceSelected = false,
             int selectedTraceID = -1,
             DisplayCanvasModeID selectedViewMode =
-                DisplayCanvasModeID.FocusPoint);
+                DisplayCanvasModeID.Passive);
         abstract protected void DisplayLoadFrame(int frameIndex);
     }
 
@@ -93,19 +93,19 @@ namespace UniversalAnnotationApp
         private void m_OnDisplayCanvasEvent(
             object sender, DisplayCanvasEventArgs e)
         {
-            int viewID = m_Viewers[e.controlID].ViewID;
-            int zoomID = m_Viewers[e.controlID].ZoomID;
+            int viewID = m_Viewers[e.ControlID].ViewID;
+            int zoomID = m_Viewers[e.ControlID].ZoomID;
             double zoomValue = m_ZoomValues[zoomID];
 
             DisplayCanvasEventArgs eTraceArgs;
-            eTraceArgs = new DisplayCanvasEventArgs(e.eventID);
-            eTraceArgs.controlID = -1;      // не используется далее
-            eTraceArgs.viewID = viewID;
+            eTraceArgs = new DisplayCanvasEventArgs(e.EventID);
+            eTraceArgs.ControlID = -1;      // не используется далее
+            eTraceArgs.ViewID = viewID;
             eTraceArgs.clip.X = (int)(e.clip.X * zoomValue);
             eTraceArgs.clip.Y = (int)(e.clip.Y * zoomValue);
             eTraceArgs.clip.Width = (int)(e.clip.Width * zoomValue);
             eTraceArgs.clip.Height = (int)(e.clip.Height * zoomValue);
-            eTraceArgs.hasBox = e.hasBox;
+            eTraceArgs.HasBox = e.HasBox;
 
             // Обработку события и изменение состояния слоя DisplayManager
             // будет выполнять слой TraceManager
@@ -142,7 +142,7 @@ namespace UniversalAnnotationApp
                 Pen pen = new Pen(brush);
                 Graphics g = Graphics.FromImage(markedFrame);
                 foreach (Box box in boxes)
-                if (m_SelectedTraceID == box.TraceID && isSelectedBox)
+                if (!isSelectedBox || m_SelectedTraceID != box.TraceID)
                 {
                     rect = box.GetRectangle(scale);
                     g.DrawRectangle(pen, rect);
@@ -207,17 +207,22 @@ namespace UniversalAnnotationApp
         private void m_OnDisplayListEvent(
             object sender, DisplayListEventArgs e)
         {
-            switch (e.eventID)
+            switch (e.EventID)
             {
                 case DisplayListEventID.ViewChanged:
-                    m_Viewers[e.controlID].ViewID = e.listItemID;
-                    m_UpdateView(e.controlID);
+                    m_Viewers[e.ControlID].ViewID = e.ListItemID;
+                    m_UpdateView(e.ControlID);
                     break;
                 case DisplayListEventID.ZoomChanged:
-                    m_Viewers[e.controlID].ZoomID = e.listItemID;
-                    m_UpdateView(e.controlID);
+                    m_Viewers[e.ControlID].ZoomID = e.ListItemID;
+                    m_UpdateView(e.ControlID);
                     break;
             }
+
+            DisplayUpdate(m_GeneralViewMode, 
+                m_IsTraceSelected, 
+                m_SelectedTraceID,
+                m_SelectedViewMode);
         }
 
         // Сброс полей в начальное состояние
@@ -321,7 +326,7 @@ namespace UniversalAnnotationApp
             bool isTraceSelected = false,
             int selectedTraceID = -1,
             DisplayCanvasModeID selectedViewMode = 
-                DisplayCanvasModeID.FocusPoint)
+                DisplayCanvasModeID.Passive)
         {
             if (!CameraIsOpened)
                 throw new Exception("DisplayManager: Camera is not opened!");
