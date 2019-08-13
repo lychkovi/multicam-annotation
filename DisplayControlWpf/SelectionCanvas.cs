@@ -525,7 +525,6 @@ namespace DisplayControlWpf
                     case DisplayCanvasModeID.BoxCreate:
                         rubber.currentTopLeftCorner = mouseLeftDownPoint;
                         rubber.currentBottomRightCorner = currentPoint;
-                        //rubberBand.BringIntoView();
                         break;
                     case DisplayCanvasModeID.BoxUpdate:
                         if (anchors.activeAnchorID != AnchorID.None)
@@ -648,6 +647,9 @@ namespace DisplayControlWpf
             img.RenderTransform = new ScaleTransform(1.0, 1.0, 0, 0);
             this.Width = imgSource.Width;
             this.Height = imgSource.Height;
+            rubber.Init(
+                rubber.GetClientRect(), 
+                new Size(this.Width, this.Height));
             m_IsOpened = true;
 
             // Выходим из неактивного режима
@@ -687,17 +689,18 @@ namespace DisplayControlWpf
                         "Cannot enable element without image loaded!");
                 }
 
-                if (mode == DisplayCanvasModeID.BoxUpdate)
+                switch (mode)
                 {
-                    rubber.Init(clip, new Size(this.Width, this.Height));
-                    rubber.Show();
-                    anchors.Update(rubber, new Point(1e6, 1e6), false);
-                    anchors.Show();
-                }
-                else
-                {
-                    rubber.Hide();
-                    anchors.Hide();
+                    case DisplayCanvasModeID.BoxUpdate:
+                        rubber.Init(clip, new Size(this.Width, this.Height));
+                        rubber.Show();
+                        anchors.Update(rubber, new Point(1e6, 1e6), false);
+                        anchors.Show();
+                        break;
+                    default:
+                        rubber.Hide();
+                        anchors.Hide();
+                        break;
                 }
 
                 img.Visibility = System.Windows.Visibility.Visible;

@@ -147,10 +147,11 @@ namespace UniversalAnnotationApp
                     rect = box.GetRectangle(scale);
                     g.DrawRectangle(pen, rect);
                 }
-
-                if (m_gui.Ctrl != null)
-                    m_gui.Ctrl.SetViewerImage(iviewer, markedFrame);
             }
+
+            // Визуализируем изображение
+            if (m_gui.Ctrl != null)
+                m_gui.Ctrl.SetViewerImage(iviewer, markedFrame);
         }
 
         private void m_UpdateMarkups()
@@ -304,6 +305,7 @@ namespace UniversalAnnotationApp
             {
                 m_Reset(false);
                 m_UpdateMarkups();
+                DisplayUpdate(DisplayCanvasModeID.FocusPoint);
                 return true;
             }
             else
