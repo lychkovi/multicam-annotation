@@ -46,6 +46,24 @@ namespace UniversalAnnotationApp
             displayControls.Ctrl = DisplayCtrl;
             engine.DisplayGuiBind(displayControls);
 
+            TraceManagerControls traceControls;
+            traceControls = new TraceManagerControls();
+            traceControls.grpNavigation = grpNavigation;
+            traceControls.btnNaviGotoFrame = btnNaviGotoFrame;
+            traceControls.btnNaviNext = btnNaviNext;
+            traceControls.btnNaviPlayStop = btnNaviPlayStop;
+            traceControls.btnNaviPrevious = btnNaviPrevious;
+            traceControls.chkNaviPlayReversed = chkNaviPlayReverse;
+            traceControls.cmbNaviPlaySpeed = cmbNaviPlaySpeed;
+            traceControls.radNaviBoxMajor = radNaviBoxMajor;
+            traceControls.radNaviMarkerMajor = radNaviMarkerMajor;
+            traceControls.txtNaviCurrFrame = txtNaviCurrFrame;
+            traceControls.txtNaviGotoFrame = txtNaviGotoFrame;
+            traceControls.txtNaviTotalFrames = txtNaviTotalFrames;
+            traceControls.trbNaviSlider = trbNaviSlider;
+            traceControls.tmrPlayTimer = tmrPlayTimer;
+            engine.TraceGuiBind(traceControls);
+
             FileManagerControls fileControls;
             fileControls.dlgMarkupOpen = dlgMarkupOpen;
             fileControls.dlgMarkupSave = dlgMarkupSave;

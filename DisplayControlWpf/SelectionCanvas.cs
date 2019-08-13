@@ -616,19 +616,21 @@ namespace DisplayControlWpf
         // в среде Windows Presentation Forms. 
         public static BitmapSource GetImageStream(System.Drawing.Image myImage)
         {
-            var bitmap = new System.Drawing.Bitmap(myImage);
-            IntPtr bmpPt = bitmap.GetHbitmap();
-            BitmapSource bitmapSource =
-                System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                    bmpPt,
-                    IntPtr.Zero,
-                    Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
+            BitmapSource bitmapSource;
+            using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(myImage))
+            {
+                IntPtr bmpPt = bitmap.GetHbitmap();
+                bitmapSource =
+                    System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                        bmpPt,
+                        IntPtr.Zero,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromEmptyOptions());
 
-            //freeze bitmapSource and clear memory to avoid memory leaks
-            bitmapSource.Freeze();
-            CameraProviderVideo.ReleaseBitmap(bmpPt);
-
+                //freeze bitmapSource and clear memory to avoid memory leaks
+                bitmapSource.Freeze();
+                CameraProviderVideo.ReleaseBitmap(bmpPt);
+            }
             return bitmapSource;
         }
 
@@ -642,6 +644,7 @@ namespace DisplayControlWpf
         // Метод задаёт изображение для отдельного поля вывода
         public void SetImage(System.Drawing.Image newImage)
         {
+            ImageSource imgSourceOld = img.Source;
             imgSource = GetImageStream(newImage);
             img.Source = imgSource;
             img.RenderTransform = new ScaleTransform(1.0, 1.0, 0, 0);
@@ -651,6 +654,11 @@ namespace DisplayControlWpf
                 rubber.GetClientRect(), 
                 new Size(this.Width, this.Height));
             m_IsOpened = true;
+
+            // Ждем освобождения всей памяти
+            GC.Collect();
+            //GC.WaitForPendingFinalizers();
+            //GC.Collect();
 
             // Выходим из неактивного режима
             if (m_mode == DisplayCanvasModeID.Disabled)

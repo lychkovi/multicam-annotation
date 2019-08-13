@@ -16,8 +16,21 @@ namespace UniversalAnnotationApp
 {
     public class TraceManagerControls
     {
-        public RadioButton radNaviBox;     // радиокнопки рамка-маркер
-        public RadioButton radNaviMarker;
+        // Панель навигации
+        public GroupBox grpNavigation;
+        public TextBox txtNaviCurrFrame;
+        public Button btnNaviGotoFrame;
+        public TextBox txtNaviGotoFrame;
+        public TextBox txtNaviTotalFrames;
+        public Button btnNaviPrevious;
+        public Button btnNaviNext;
+        public CheckBox chkNaviPlayReversed;
+        public ComboBox cmbNaviPlaySpeed;
+        public Button btnNaviPlayStop;
+        public RadioButton radNaviBoxMajor;     // радиокнопки рамка-маркер
+        public RadioButton radNaviMarkerMajor;
+        public TrackBar trbNaviSlider;
+        public Timer tmrPlayTimer;
     }
 
     public interface ITrace
@@ -51,6 +64,7 @@ namespace UniversalAnnotationApp
     {
         private TraceManagerControls m_gui;
 
+        // Атрибуты текущей выбранной таектории
         private bool m_IsTraceSelected;
         private Trace m_CurrTrace;
         private Box m_CurrBox;       // если m_CurrTrace.HasBox == true
@@ -60,7 +74,16 @@ namespace UniversalAnnotationApp
         private bool m_IsCategoryEdit;
 
         private int m_CurrFrameID;
+        private bool m_IsBoxMajor;
+
+        // Воспроизведение видеозаписи
         private bool m_IsPlaybackMode;
+        private int m_PlayDir;       // (+1) - вперед, (-1) - назад
+        private List<string> m_PlaySpeedCaptions;
+        private List<double> m_PlaySpeedValues;
+        private int m_PlaySpeedDefaultID;
+        double m_PlaySpeed;
+        private bool m_IsPlayTimerLocked;
 
         // Выбрать траекторию N
         private bool m_TraceSelect(int traceID)
@@ -128,10 +151,18 @@ namespace UniversalAnnotationApp
         // Обслуживание элементов графического интерфейса
         private void m_ControlsUpdate()
         {
+            if (m_gui != null)
+            {
+                m_ControlNaviUpdate();
+            }
         }
 
         private void m_ControlsInit()
         {
+            if (m_gui != null)
+            {
+                m_ControlNaviInit();
+            }
         }
 
         // ************************** Навигация *****************************
@@ -142,14 +173,154 @@ namespace UniversalAnnotationApp
 
         override protected void TraceMoveToFrame(int frameID)
         {
+            if (!CameraIsOpened)
+                throw new Exception("Camera is not opened!");
+
+            if (frameID < 0 || frameID >= CameraRecordingInfo.FramesCount)
+                throw new Exception("Frame number is out of bounds!");
+
+            if (frameID == m_CurrFrameID) return;
+
+            DisplayLoadFrame(frameID);
             m_CurrFrameID = frameID;
+
+            // Проверяем, присутствует ли текущая выбранная траектория на 
+            // интересующем кадре и соответственно обновляем элементы 
+            // управления на форме
+            if (MarkupIsOpened && m_IsTraceSelected && 
+                m_CurrTrace.FrameStart >= frameID && 
+                m_CurrTrace.FrameEnd <= frameID)
+            {
+                m_TraceSelect(m_CurrTrace.ID);
+            }
+            else
+            {
+                m_TraceUnSelect();
+            }
+        }
+
+        // Обработчик изменения полосы прокрутки времени
+        private void m_ControlNavi_OnSliderChange(object sender, EventArgs e)
+        {
+            int frameID = m_gui.trbNaviSlider.Value;
+            TraceMoveToFrame(frameID);
+        }
+
+        // Обработчик нажатия на кнопку перехода к заданному кадру
+        private void m_ControlNavi_OnGotoFrameClick(
+            object sender, EventArgs e)
+        {
+            int frameID;
+
+            if (!int.TryParse(m_gui.txtNaviGotoFrame.Text, out frameID))
+            {
+                MessageBox.Show("Please, enter numeric integer value!");
+                return;
+            }
+
+            try
+            {
+                TraceMoveToFrame(frameID);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+                return;
+            }
+        }
+
+        // Обработчик нажатия на кнопку "Next"
+        private void m_ControlNavi_OnNextClick(object sender, EventArgs e)
+        {
+            int frameID = m_CurrFrameID + 1;
+            if (frameID < CameraRecordingInfo.FramesCount)
+                TraceMoveToFrame(frameID);
+        }
+
+        // Обработчик нажатия на кнопку "Previous"
+        private void m_ControlNavi_OnPreviousClick(object sender,EventArgs e)
+        {
+            int frameID = m_CurrFrameID - 1;
+            if (frameID >= 0)
+                TraceMoveToFrame(frameID);
+        }
+
+        // Обработчик нажатия на галочку Play Direction Reversed
+        private void m_ControlNavi_OnPlayReversedChecked(
+            object sender, EventArgs e)
+        {
+            m_PlayDir = (m_gui.chkNaviPlayReversed.Checked) ? -1 : +1 ;
+        }
+
+        // Обновление содержания панели навигации на форме
+        private void m_ControlNaviUpdate()
+        {
+            if (m_gui == null) return;
+
+            if (CameraIsOpened)
+            {
+                m_gui.grpNavigation.Enabled = true;
+                m_gui.txtNaviCurrFrame.Text = m_CurrFrameID.ToString();
+                m_gui.trbNaviSlider.Scroll -=
+                    new EventHandler(m_ControlNavi_OnSliderChange);
+                m_gui.trbNaviSlider.Value = m_CurrFrameID;
+                m_gui.trbNaviSlider.Scroll +=
+                    new EventHandler(m_ControlNavi_OnSliderChange);
+                if (m_IsPlaybackMode)
+                {
+                    m_gui.btnNaviGotoFrame.Enabled = false;
+                    m_gui.btnNaviPrevious.Enabled = false;
+                    m_gui.btnNaviNext.Enabled = false;
+                    m_gui.btnNaviPlayStop.Text = "Stop";
+                    m_gui.trbNaviSlider.Enabled = false;
+                }
+                else
+                {
+                    m_gui.btnNaviGotoFrame.Enabled = true;
+                    m_gui.btnNaviPrevious.Enabled = (m_CurrFrameID >= 1);
+                    m_gui.btnNaviNext.Enabled = (m_CurrFrameID <
+                        CameraRecordingInfo.FramesCount - 1);
+                    m_gui.btnNaviPlayStop.Text = "Play";
+                    m_gui.trbNaviSlider.Enabled = true;
+                }
+            }
+            else
+            {
+                m_gui.grpNavigation.Enabled = false;
+                m_gui.trbNaviSlider.Enabled = false;
+            }
+        }
+
+        // Начальная инициализация содержания панели навигации на форме
+        private void m_ControlNaviInit()
+        {
+            if (m_gui == null) return;
+
+            if (CameraIsOpened)
+            {
+                int nframes = CameraRecordingInfo.FramesCount;
+                m_gui.txtNaviTotalFrames.Text = nframes.ToString();
+
+                // Инициализируем полосу прокрутки
+                if (m_gui.trbNaviSlider.Maximum != nframes)
+                {
+                    m_gui.trbNaviSlider.Scroll -= 
+                        new EventHandler(m_ControlNavi_OnSliderChange);
+                    m_gui.trbNaviSlider.Maximum = nframes;
+                    m_gui.trbNaviSlider.LargeChange = Math.Max(1,nframes/20);
+                    m_gui.trbNaviSlider.SmallChange = 1;
+                    m_gui.trbNaviSlider.Scroll +=
+                        new EventHandler(m_ControlNavi_OnSliderChange);
+                }
+            }
+            m_ControlNaviUpdate();
         }
 
         // ***************** Общие манипуляции с траекторией ****************
 
         // Метод переводит пользовательский элемент управления в режим
         // ожидания ввода первого узла траектории
-        private void m_TraceCreateBegin(bool hasBox = true)
+        private void m_TraceCreateBegin(bool hasBox)
         {
             if (!MarkupIsOpened || m_IsPlaybackMode) return;
 
@@ -161,7 +332,6 @@ namespace UniversalAnnotationApp
                 DisplayUpdate(DisplayCanvasModeID.BoxCreate);
             else
                 DisplayUpdate(DisplayCanvasModeID.MarkerCreate);
-            
         }
 
         // Метод выполняет создание траектории на основе исходных данных,
@@ -302,8 +472,7 @@ namespace UniversalAnnotationApp
             // 3. Выбираем траекторию
             if (boxFound)
             {
-                if (markerFound && m_gui != null && 
-                    m_gui.radNaviMarker.Checked)
+                if (markerFound && !m_IsBoxMajor)
                 {
                     m_TraceSelect(nearestMarker.TraceID);
                 }
@@ -445,8 +614,7 @@ namespace UniversalAnnotationApp
                     MessageBoxButtons.OK);
                 return;
             }
-            bool hasBox = (m_gui == null || m_gui.radNaviBox.Checked);
-            m_TraceCreateBegin(hasBox);
+            m_TraceCreateBegin(m_IsBoxMajor);
         }
 
         override public void TraceTraceDelete() // для вызова из меню
@@ -470,7 +638,25 @@ namespace UniversalAnnotationApp
          * выпадающих списков и т. п. */
         override public void TraceGuiBind(TraceManagerControls controls)
         {
+            m_gui = controls;
 
+            // Панель Navigation
+            m_gui.btnNaviGotoFrame.Click += 
+                new EventHandler(m_ControlNavi_OnGotoFrameClick);
+            m_gui.btnNaviPrevious.Click +=
+                new EventHandler(m_ControlNavi_OnPreviousClick);
+            m_gui.btnNaviNext.Click +=
+                new EventHandler(m_ControlNavi_OnNextClick);
+
+            m_gui.chkNaviPlayReversed.Checked = (m_PlayDir < 0);
+            m_gui.chkNaviPlayReversed.CheckedChanged +=
+                new EventHandler(m_ControlNavi_OnPlayReversedChecked);
+
+            for (int i = 0; i < m_PlaySpeedValues.Count; i++)
+                m_gui.cmbNaviPlaySpeed.Items.Add(m_PlaySpeedCaptions[i]);
+            m_gui.cmbNaviPlaySpeed.SelectedIndex = m_PlaySpeedDefaultID;
+            //m_gui.cmbNaviPlaySpeed.SelectedIndexChanged +=
+            //    new EventHandler(m_ControlNavi_OnPlaySpeedChanged);
         }
 
         public TraceManager()
@@ -483,9 +669,22 @@ namespace UniversalAnnotationApp
             m_CurrTag = new Tag();
             m_CurrCategory = new Category();
             m_IsCategoryEdit = false;
+            m_IsBoxMajor = true;
 
             m_CurrFrameID = -1;
+
+            // Параметры воспроизвдения
             m_IsPlaybackMode = false;
+            m_IsPlayTimerLocked = false;
+            m_PlayDir = 1;
+            string[] playSpeedCaptions = new string[] 
+                {"1/4x", "1/2x", "1x", "2x", "4x"};
+            m_PlaySpeedCaptions = playSpeedCaptions.ToList();
+            double[] playSpeedValues = new double[] 
+                {0.25, 0.5, 1.0, 2.0, 4.0};
+            m_PlaySpeedValues = playSpeedValues.ToList();
+            m_PlaySpeedDefaultID = 2;
+            m_PlaySpeed = m_PlaySpeedValues[m_PlaySpeedDefaultID];
 
             // Это должно инициализироваться методом TraceGuiBind
             m_gui = null;

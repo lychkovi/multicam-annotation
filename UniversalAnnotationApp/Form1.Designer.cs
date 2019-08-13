@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRecordingOpen = new System.Windows.Forms.ToolStripMenuItem();
@@ -37,6 +38,9 @@
             this.menuMarkupSave = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMarkupSaveAd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMarkupClose = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuTraceCreate = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuTraceDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusVideo = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusMarkup = new System.Windows.Forms.ToolStripStatusLabel();
@@ -58,17 +62,31 @@
             this.pnlAttributes = new System.Windows.Forms.Panel();
             this.grpAttributes = new System.Windows.Forms.GroupBox();
             this.pnlTimeLine = new System.Windows.Forms.Panel();
-            this.tbrTimeLine = new System.Windows.Forms.TrackBar();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuTraceCreate = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuTraceDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.trbNaviSlider = new System.Windows.Forms.TrackBar();
+            this.tmrPlayTimer = new System.Windows.Forms.Timer(this.components);
+            this.lblNaviCurrFrame = new System.Windows.Forms.Label();
+            this.txtNaviCurrFrame = new System.Windows.Forms.TextBox();
+            this.btnNaviGotoFrame = new System.Windows.Forms.Button();
+            this.txtNaviGotoFrame = new System.Windows.Forms.TextBox();
+            this.lblNaviTotalFrames = new System.Windows.Forms.Label();
+            this.txtNaviTotalFrames = new System.Windows.Forms.TextBox();
+            this.btnNaviPrevious = new System.Windows.Forms.Button();
+            this.btnNaviNext = new System.Windows.Forms.Button();
+            this.lblNaviPlayDir = new System.Windows.Forms.Label();
+            this.chkNaviPlayReverse = new System.Windows.Forms.CheckBox();
+            this.lblNaviPlaySpeed = new System.Windows.Forms.Label();
+            this.cmbNaviPlaySpeed = new System.Windows.Forms.ComboBox();
+            this.radNaviBoxMajor = new System.Windows.Forms.RadioButton();
+            this.radNaviMarkerMajor = new System.Windows.Forms.RadioButton();
+            this.btnNaviPlayStop = new System.Windows.Forms.Button();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.pnlFilesOpened.SuspendLayout();
             this.pnlTools.SuspendLayout();
+            this.grpNavigation.SuspendLayout();
             this.pnlAttributes.SuspendLayout();
             this.pnlTimeLine.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrTimeLine)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trbNaviSlider)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip
@@ -144,6 +162,29 @@
             this.menuMarkupClose.Size = new System.Drawing.Size(158, 22);
             this.menuMarkupClose.Text = "Markup Close";
             this.menuMarkupClose.Click += new System.EventHandler(this.menuMarkupClose_Click);
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuTraceCreate,
+            this.menuTraceDelete});
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.editToolStripMenuItem.Text = "Edit";
+            // 
+            // menuTraceCreate
+            // 
+            this.menuTraceCreate.Name = "menuTraceCreate";
+            this.menuTraceCreate.Size = new System.Drawing.Size(137, 22);
+            this.menuTraceCreate.Text = "Trace Create";
+            this.menuTraceCreate.Click += new System.EventHandler(this.menuTraceCreate_Click);
+            // 
+            // menuTraceDelete
+            // 
+            this.menuTraceDelete.Name = "menuTraceDelete";
+            this.menuTraceDelete.Size = new System.Drawing.Size(137, 22);
+            this.menuTraceDelete.Text = "Trace Delete";
+            this.menuTraceDelete.Click += new System.EventHandler(this.menuTraceDelete_Click);
             // 
             // statusStrip
             // 
@@ -270,18 +311,33 @@
             // 
             // grpTracking
             // 
-            this.grpTracking.Location = new System.Drawing.Point(4, 140);
+            this.grpTracking.Location = new System.Drawing.Point(4, 228);
             this.grpTracking.Name = "grpTracking";
-            this.grpTracking.Size = new System.Drawing.Size(147, 226);
+            this.grpTracking.Size = new System.Drawing.Size(147, 138);
             this.grpTracking.TabIndex = 1;
             this.grpTracking.TabStop = false;
             this.grpTracking.Text = "Tracking";
             // 
             // grpNavigation
             // 
+            this.grpNavigation.Controls.Add(this.btnNaviPlayStop);
+            this.grpNavigation.Controls.Add(this.radNaviMarkerMajor);
+            this.grpNavigation.Controls.Add(this.radNaviBoxMajor);
+            this.grpNavigation.Controls.Add(this.cmbNaviPlaySpeed);
+            this.grpNavigation.Controls.Add(this.lblNaviPlaySpeed);
+            this.grpNavigation.Controls.Add(this.chkNaviPlayReverse);
+            this.grpNavigation.Controls.Add(this.lblNaviPlayDir);
+            this.grpNavigation.Controls.Add(this.btnNaviNext);
+            this.grpNavigation.Controls.Add(this.btnNaviPrevious);
+            this.grpNavigation.Controls.Add(this.txtNaviTotalFrames);
+            this.grpNavigation.Controls.Add(this.lblNaviTotalFrames);
+            this.grpNavigation.Controls.Add(this.txtNaviGotoFrame);
+            this.grpNavigation.Controls.Add(this.btnNaviGotoFrame);
+            this.grpNavigation.Controls.Add(this.txtNaviCurrFrame);
+            this.grpNavigation.Controls.Add(this.lblNaviCurrFrame);
             this.grpNavigation.Location = new System.Drawing.Point(4, 7);
             this.grpNavigation.Name = "grpNavigation";
-            this.grpNavigation.Size = new System.Drawing.Size(147, 127);
+            this.grpNavigation.Size = new System.Drawing.Size(147, 215);
             this.grpNavigation.TabIndex = 0;
             this.grpNavigation.TabStop = false;
             this.grpNavigation.Text = "Navigation";
@@ -306,42 +362,154 @@
             // 
             // pnlTimeLine
             // 
-            this.pnlTimeLine.Controls.Add(this.tbrTimeLine);
+            this.pnlTimeLine.Controls.Add(this.trbNaviSlider);
             this.pnlTimeLine.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlTimeLine.Location = new System.Drawing.Point(154, 414);
             this.pnlTimeLine.Name = "pnlTimeLine";
             this.pnlTimeLine.Size = new System.Drawing.Size(438, 49);
             this.pnlTimeLine.TabIndex = 10;
             // 
-            // tbrTimeLine
+            // trbNaviSlider
             // 
-            this.tbrTimeLine.Location = new System.Drawing.Point(3, 4);
-            this.tbrTimeLine.Name = "tbrTimeLine";
-            this.tbrTimeLine.Size = new System.Drawing.Size(428, 42);
-            this.tbrTimeLine.TabIndex = 0;
+            this.trbNaviSlider.Location = new System.Drawing.Point(3, 4);
+            this.trbNaviSlider.Name = "trbNaviSlider";
+            this.trbNaviSlider.Size = new System.Drawing.Size(428, 42);
+            this.trbNaviSlider.TabIndex = 0;
             // 
-            // editToolStripMenuItem
+            // lblNaviCurrFrame
             // 
-            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuTraceCreate,
-            this.menuTraceDelete});
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.editToolStripMenuItem.Text = "Edit";
+            this.lblNaviCurrFrame.AutoSize = true;
+            this.lblNaviCurrFrame.Location = new System.Drawing.Point(7, 20);
+            this.lblNaviCurrFrame.Name = "lblNaviCurrFrame";
+            this.lblNaviCurrFrame.Size = new System.Drawing.Size(73, 13);
+            this.lblNaviCurrFrame.TabIndex = 0;
+            this.lblNaviCurrFrame.Text = "Current Frame";
             // 
-            // menuTraceCreate
+            // txtNaviCurrFrame
             // 
-            this.menuTraceCreate.Name = "menuTraceCreate";
-            this.menuTraceCreate.Size = new System.Drawing.Size(152, 22);
-            this.menuTraceCreate.Text = "Trace Create";
-            this.menuTraceCreate.Click += new System.EventHandler(this.menuTraceCreate_Click);
+            this.txtNaviCurrFrame.Location = new System.Drawing.Point(86, 17);
+            this.txtNaviCurrFrame.Name = "txtNaviCurrFrame";
+            this.txtNaviCurrFrame.ReadOnly = true;
+            this.txtNaviCurrFrame.Size = new System.Drawing.Size(55, 20);
+            this.txtNaviCurrFrame.TabIndex = 1;
             // 
-            // menuTraceDelete
+            // btnNaviGotoFrame
             // 
-            this.menuTraceDelete.Name = "menuTraceDelete";
-            this.menuTraceDelete.Size = new System.Drawing.Size(152, 22);
-            this.menuTraceDelete.Text = "Trace Delete";
-            this.menuTraceDelete.Click += new System.EventHandler(this.menuTraceDelete_Click);
+            this.btnNaviGotoFrame.Location = new System.Drawing.Point(7, 37);
+            this.btnNaviGotoFrame.Name = "btnNaviGotoFrame";
+            this.btnNaviGotoFrame.Size = new System.Drawing.Size(75, 23);
+            this.btnNaviGotoFrame.TabIndex = 2;
+            this.btnNaviGotoFrame.Text = "Go to Frame";
+            this.btnNaviGotoFrame.UseVisualStyleBackColor = true;
+            // 
+            // txtNaviGotoFrame
+            // 
+            this.txtNaviGotoFrame.Location = new System.Drawing.Point(86, 39);
+            this.txtNaviGotoFrame.Name = "txtNaviGotoFrame";
+            this.txtNaviGotoFrame.Size = new System.Drawing.Size(55, 20);
+            this.txtNaviGotoFrame.TabIndex = 3;
+            // 
+            // lblNaviTotalFrames
+            // 
+            this.lblNaviTotalFrames.AutoSize = true;
+            this.lblNaviTotalFrames.Location = new System.Drawing.Point(7, 65);
+            this.lblNaviTotalFrames.Name = "lblNaviTotalFrames";
+            this.lblNaviTotalFrames.Size = new System.Drawing.Size(68, 13);
+            this.lblNaviTotalFrames.TabIndex = 4;
+            this.lblNaviTotalFrames.Text = "Total Frames";
+            // 
+            // txtNaviTotalFrames
+            // 
+            this.txtNaviTotalFrames.Location = new System.Drawing.Point(86, 61);
+            this.txtNaviTotalFrames.Name = "txtNaviTotalFrames";
+            this.txtNaviTotalFrames.ReadOnly = true;
+            this.txtNaviTotalFrames.Size = new System.Drawing.Size(55, 20);
+            this.txtNaviTotalFrames.TabIndex = 5;
+            // 
+            // btnNaviPrevious
+            // 
+            this.btnNaviPrevious.Location = new System.Drawing.Point(7, 85);
+            this.btnNaviPrevious.Name = "btnNaviPrevious";
+            this.btnNaviPrevious.Size = new System.Drawing.Size(63, 23);
+            this.btnNaviPrevious.TabIndex = 6;
+            this.btnNaviPrevious.Text = "Previous";
+            this.btnNaviPrevious.UseVisualStyleBackColor = true;
+            // 
+            // btnNaviNext
+            // 
+            this.btnNaviNext.Location = new System.Drawing.Point(77, 85);
+            this.btnNaviNext.Name = "btnNaviNext";
+            this.btnNaviNext.Size = new System.Drawing.Size(64, 23);
+            this.btnNaviNext.TabIndex = 7;
+            this.btnNaviNext.Text = "Next";
+            this.btnNaviNext.UseVisualStyleBackColor = true;
+            // 
+            // lblNaviPlayDir
+            // 
+            this.lblNaviPlayDir.AutoSize = true;
+            this.lblNaviPlayDir.Location = new System.Drawing.Point(7, 113);
+            this.lblNaviPlayDir.Name = "lblNaviPlayDir";
+            this.lblNaviPlayDir.Size = new System.Drawing.Size(43, 13);
+            this.lblNaviPlayDir.TabIndex = 8;
+            this.lblNaviPlayDir.Text = "Play Dir";
+            // 
+            // chkNaviPlayReverse
+            // 
+            this.chkNaviPlayReverse.AutoSize = true;
+            this.chkNaviPlayReverse.Location = new System.Drawing.Point(69, 112);
+            this.chkNaviPlayReverse.Name = "chkNaviPlayReverse";
+            this.chkNaviPlayReverse.Size = new System.Drawing.Size(72, 17);
+            this.chkNaviPlayReverse.TabIndex = 9;
+            this.chkNaviPlayReverse.Text = "Reversed";
+            this.chkNaviPlayReverse.UseVisualStyleBackColor = true;
+            // 
+            // lblNaviPlaySpeed
+            // 
+            this.lblNaviPlaySpeed.AutoSize = true;
+            this.lblNaviPlaySpeed.Location = new System.Drawing.Point(7, 135);
+            this.lblNaviPlaySpeed.Name = "lblNaviPlaySpeed";
+            this.lblNaviPlaySpeed.Size = new System.Drawing.Size(61, 13);
+            this.lblNaviPlaySpeed.TabIndex = 10;
+            this.lblNaviPlaySpeed.Text = "Play Speed";
+            // 
+            // cmbNaviPlaySpeed
+            // 
+            this.cmbNaviPlaySpeed.FormattingEnabled = true;
+            this.cmbNaviPlaySpeed.Location = new System.Drawing.Point(86, 132);
+            this.cmbNaviPlaySpeed.Name = "cmbNaviPlaySpeed";
+            this.cmbNaviPlaySpeed.Size = new System.Drawing.Size(55, 21);
+            this.cmbNaviPlaySpeed.TabIndex = 11;
+            // 
+            // radNaviBoxMajor
+            // 
+            this.radNaviBoxMajor.AutoSize = true;
+            this.radNaviBoxMajor.Location = new System.Drawing.Point(11, 191);
+            this.radNaviBoxMajor.Name = "radNaviBoxMajor";
+            this.radNaviBoxMajor.Size = new System.Drawing.Size(43, 17);
+            this.radNaviBoxMajor.TabIndex = 12;
+            this.radNaviBoxMajor.TabStop = true;
+            this.radNaviBoxMajor.Text = "Box";
+            this.radNaviBoxMajor.UseVisualStyleBackColor = true;
+            // 
+            // radNaviMarkerMajor
+            // 
+            this.radNaviMarkerMajor.AutoSize = true;
+            this.radNaviMarkerMajor.Location = new System.Drawing.Point(69, 191);
+            this.radNaviMarkerMajor.Name = "radNaviMarkerMajor";
+            this.radNaviMarkerMajor.Size = new System.Drawing.Size(58, 17);
+            this.radNaviMarkerMajor.TabIndex = 13;
+            this.radNaviMarkerMajor.TabStop = true;
+            this.radNaviMarkerMajor.Text = "Marker";
+            this.radNaviMarkerMajor.UseVisualStyleBackColor = true;
+            // 
+            // btnNaviPlayStop
+            // 
+            this.btnNaviPlayStop.Location = new System.Drawing.Point(7, 159);
+            this.btnNaviPlayStop.Name = "btnNaviPlayStop";
+            this.btnNaviPlayStop.Size = new System.Drawing.Size(63, 23);
+            this.btnNaviPlayStop.TabIndex = 14;
+            this.btnNaviPlayStop.Text = "Play";
+            this.btnNaviPlayStop.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -367,10 +535,12 @@
             this.pnlFilesOpened.ResumeLayout(false);
             this.pnlFilesOpened.PerformLayout();
             this.pnlTools.ResumeLayout(false);
+            this.grpNavigation.ResumeLayout(false);
+            this.grpNavigation.PerformLayout();
             this.pnlAttributes.ResumeLayout(false);
             this.pnlTimeLine.ResumeLayout(false);
             this.pnlTimeLine.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrTimeLine)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trbNaviSlider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -408,10 +578,26 @@
         private System.Windows.Forms.Panel pnlAttributes;
         private System.Windows.Forms.GroupBox grpAttributes;
         private System.Windows.Forms.Panel pnlTimeLine;
-        private System.Windows.Forms.TrackBar tbrTimeLine;
+        private System.Windows.Forms.TrackBar trbNaviSlider;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem menuTraceCreate;
         private System.Windows.Forms.ToolStripMenuItem menuTraceDelete;
+        private System.Windows.Forms.Timer tmrPlayTimer;
+        private System.Windows.Forms.Button btnNaviNext;
+        private System.Windows.Forms.Button btnNaviPrevious;
+        private System.Windows.Forms.TextBox txtNaviTotalFrames;
+        private System.Windows.Forms.Label lblNaviTotalFrames;
+        private System.Windows.Forms.TextBox txtNaviGotoFrame;
+        private System.Windows.Forms.Button btnNaviGotoFrame;
+        private System.Windows.Forms.TextBox txtNaviCurrFrame;
+        private System.Windows.Forms.Label lblNaviCurrFrame;
+        private System.Windows.Forms.ComboBox cmbNaviPlaySpeed;
+        private System.Windows.Forms.Label lblNaviPlaySpeed;
+        private System.Windows.Forms.CheckBox chkNaviPlayReverse;
+        private System.Windows.Forms.Label lblNaviPlayDir;
+        private System.Windows.Forms.RadioButton radNaviMarkerMajor;
+        private System.Windows.Forms.RadioButton radNaviBoxMajor;
+        private System.Windows.Forms.Button btnNaviPlayStop;
     }
 }
 
