@@ -187,11 +187,21 @@ namespace UniversalAnnotationApp
 
             int nview = m_Viewers[iviewer].ViewID;
             int nzoom = m_Viewers[iviewer].ZoomID;
-            double scale = 1.0 / m_ZoomValues[nzoom];
+            double zoomValue = m_ZoomValues[nzoom];
 
-            // Масштабируем изображение по текущему зуму
-            CameraImageResize(m_ViewBuffers[nview], scale, 
-                out m_Viewers[iviewer].ZoomedImage);
+            if (zoomValue == 1.0 || zoomValue < 1e-3)
+            {
+                // Выполняем простое копирование изображения
+                m_Viewers[iviewer].ZoomedImage = 
+                    (Image) m_ViewBuffers[nview].Clone();
+            }
+            else
+            {
+                // Масштабируем изображение по текущему зуму
+                double scale = 1.0 / zoomValue;
+                CameraImageResize(m_ViewBuffers[nview], scale,
+                    out m_Viewers[iviewer].ZoomedImage);
+            }
 
             m_UpdateMarkup(iviewer);
         }

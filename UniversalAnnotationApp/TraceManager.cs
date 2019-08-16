@@ -140,12 +140,15 @@ namespace UniversalAnnotationApp
         // Отменить выбор траектории
         private void m_TraceUnSelect()
         {
-            m_IsTraceSelected = false;
-            if (MarkupIsOpened)
-                DisplayUpdate(DisplayCanvasModeID.FocusPoint);
-            else
-                DisplayUpdate(DisplayCanvasModeID.Passive);
-            m_ControlsUpdate();
+            if (m_IsTraceSelected)
+            {
+                m_IsTraceSelected = false;
+                if (MarkupIsOpened)
+                    DisplayUpdate(DisplayCanvasModeID.FocusPoint);
+                else
+                    DisplayUpdate(DisplayCanvasModeID.Passive);
+                m_ControlsUpdate();
+            }
         }
 
         // Обслуживание элементов графического интерфейса
