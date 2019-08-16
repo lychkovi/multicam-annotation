@@ -48,12 +48,13 @@ namespace UniversalAnnotationApp
 
             TraceManagerControls traceControls;
             traceControls = new TraceManagerControls();
+            // Понель воспроизведения
             traceControls.grpNavigation = grpNavigation;
             traceControls.btnNaviGotoFrame = btnNaviGotoFrame;
             traceControls.btnNaviNext = btnNaviNext;
             traceControls.btnNaviPlayStop = btnNaviPlayStop;
             traceControls.btnNaviPrevious = btnNaviPrevious;
-            traceControls.chkNaviPlayReversed = chkNaviPlayReverse;
+            traceControls.chkNaviPlayReverse = chkNaviPlayReverse;
             traceControls.cmbNaviPlaySpeed = cmbNaviPlaySpeed;
             traceControls.radNaviBoxMajor = radNaviBoxMajor;
             traceControls.radNaviMarkerMajor = radNaviMarkerMajor;
@@ -62,6 +63,15 @@ namespace UniversalAnnotationApp
             traceControls.txtNaviTotalFrames = txtNaviTotalFrames;
             traceControls.trbNaviSlider = trbNaviSlider;
             traceControls.tmrPlayTimer = tmrPlayTimer;
+            // Панель отслеживания объекта
+            traceControls.grpTracking = grpTracking;
+            traceControls.cmbTrackingMethod = cmbTrackingMethod;
+            traceControls.chkTrackingReverse = chkTrackingReverse;
+            traceControls.chkTrackingIsOccluded = chkTrackingIsOccluded;
+            traceControls.chkTrackingIsShaded = chkTrackingIsShaded;
+            traceControls.btnTrackingSeekExtent = btnTrackingSeekExtent;
+            traceControls.btnTrackingTruncate = btnTrackingTruncate;
+            traceControls.btnTrackingTrack = btnTrackingTrack;
             engine.TraceGuiBind(traceControls);
 
             FileManagerControls fileControls;

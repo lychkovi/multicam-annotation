@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing;       // class Image
 
 using MarkupData;
 using DisplayControlWpf;    // режимы работы и события дисплея
@@ -14,6 +15,15 @@ using DisplayControlWpf;    // режимы работы и события ди�
 
 namespace UniversalAnnotationApp
 {
+    public enum TrackingMethodID
+    {
+        OnlyAttrUpdate,     // только обновление свойств IsOccluded и 
+                            // IsShaded для существующей траектории
+        Manual,             // простое копирование текущей рамки
+        KLT,                // Tomasi-Lucas-Kanade
+        TLD                 // часть алгоритма Track-Learn-Detect
+    }
+
     public class TraceManagerControls
     {
         // Панель навигации
@@ -24,13 +34,23 @@ namespace UniversalAnnotationApp
         public TextBox txtNaviTotalFrames;
         public Button btnNaviPrevious;
         public Button btnNaviNext;
-        public CheckBox chkNaviPlayReversed;
+        public CheckBox chkNaviPlayReverse;
         public ComboBox cmbNaviPlaySpeed;
         public Button btnNaviPlayStop;
         public RadioButton radNaviBoxMajor;     // радиокнопки рамка-маркер
         public RadioButton radNaviMarkerMajor;
         public TrackBar trbNaviSlider;
         public Timer tmrPlayTimer;
+
+        // Панель отслеживания объекта
+        public GroupBox grpTracking;
+        public ComboBox cmbTrackingMethod;
+        public CheckBox chkTrackingReverse;
+        public CheckBox chkTrackingIsOccluded;
+        public CheckBox chkTrackingIsShaded;
+        public Button btnTrackingSeekExtent;
+        public Button btnTrackingTruncate;
+        public Button btnTrackingTrack;
     }
 
     public interface ITrace
@@ -84,6 +104,15 @@ namespace UniversalAnnotationApp
         private int m_PlaySpeedDefaultID;
         double m_PlaySpeed;
         private bool m_IsPlayTimerLocked;
+
+        // Отслеживание объекта на видеозаписи
+        private List<TrackingMethodID> m_TrackingMethodValues;
+        private List<string> m_TrackingMethodNames;
+        private int m_TrackingMethodDefaultID;
+        private TrackingMethodID m_TrackingMethod;
+        private int m_TrackingDir;   // (+1) - вперед, (-1) - назад
+        private bool m_TrackingIsOccluded;
+        private bool m_TrackingIsShaded;
 
         // Выбрать траекторию N
         private bool m_TraceSelect(int traceID)
@@ -147,8 +176,8 @@ namespace UniversalAnnotationApp
                     DisplayUpdate(DisplayCanvasModeID.FocusPoint);
                 else
                     DisplayUpdate(DisplayCanvasModeID.Passive);
-                m_ControlsUpdate();
             }
+            m_ControlsUpdate();
         }
 
         // Обслуживание элементов графического интерфейса
@@ -157,6 +186,7 @@ namespace UniversalAnnotationApp
             if (m_gui != null)
             {
                 m_ControlNaviUpdate();
+                m_ControlTrackingUpdate();
             }
         }
 
@@ -165,10 +195,16 @@ namespace UniversalAnnotationApp
             if (m_gui != null)
             {
                 m_ControlNaviInit();
+                m_ControlTrackingInit();
             }
         }
 
         // ************************** Навигация *****************************
+        private void m_PlaybackStart()
+        {
+
+        }
+
         private void m_PlaybackStop()
         {
 
@@ -190,9 +226,9 @@ namespace UniversalAnnotationApp
             // Проверяем, присутствует ли текущая выбранная траектория на 
             // интересующем кадре и соответственно обновляем элементы 
             // управления на форме
-            if (MarkupIsOpened && m_IsTraceSelected && 
-                m_CurrTrace.FrameStart >= frameID && 
-                m_CurrTrace.FrameEnd <= frameID)
+            if (m_IsTraceSelected && 
+                frameID >= m_CurrTrace.FrameStart && 
+                frameID <= m_CurrTrace.FrameEnd)
             {
                 m_TraceSelect(m_CurrTrace.ID);
             }
@@ -249,10 +285,10 @@ namespace UniversalAnnotationApp
         }
 
         // Обработчик нажатия на галочку Play Direction Reversed
-        private void m_ControlNavi_OnPlayReversedChecked(
+        private void m_ControlNavi_OnPlayReverseChange(
             object sender, EventArgs e)
         {
-            m_PlayDir = (m_gui.chkNaviPlayReversed.Checked) ? -1 : +1 ;
+            m_PlayDir = (m_gui.chkNaviPlayReverse.Checked) ? (-1) : (+1);
         }
 
         // Обновление содержания панели навигации на форме
@@ -317,6 +353,297 @@ namespace UniversalAnnotationApp
                 }
             }
             m_ControlNaviUpdate();
+        }
+
+        // ***************** Отслеживание объекта на видеозаписи ************
+
+        // Метод переходит к крайнему узлу траектории
+        private void m_TrackingSeekExtent()
+        {
+            if (!m_IsTraceSelected || m_IsPlaybackMode) return;
+            
+            if (m_TrackingDir > 0)
+                TraceMoveToFrame(m_CurrTrace.FrameEnd);
+            else
+                TraceMoveToFrame(m_CurrTrace.FrameStart);
+        }
+
+        // Метод обрезает хвост траектории, начиная со следующего кадра
+        private void m_TrackingTruncate()
+        {
+            if (!m_IsTraceSelected || m_IsPlaybackMode) return;
+
+            DialogResult result = MessageBox.Show(
+                "Are you sure that you want to truncate selected trace " +
+                (m_TrackingDir > 0 ? "forward?" : "backward?"), 
+                "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, 
+                MessageBoxDefaultButton.Button2);
+
+            if (result != DialogResult.Yes) return;
+
+            // Удаляем все узлы траектории, начиная со следующего кадра до
+            // конца траектории
+            for (int i = m_CurrFrameID + m_TrackingDir;
+                i <= m_CurrTrace.FrameEnd && i >= m_CurrTrace.FrameStart;
+                i += m_TrackingDir)
+            {
+                if (m_CurrTrace.HasBox)
+                    MarkupBoxDelete(m_CurrTrace.ID, i);
+                else
+                    MarkupMarkerDelete(m_CurrTrace.ID, i);
+            }
+
+            // Изменяем границы траектории
+            if (m_TrackingDir > 0)
+                m_CurrTrace.FrameEnd = m_CurrFrameID;
+            else
+                m_CurrTrace.FrameStart = m_CurrFrameID; 
+            MarkupTraceUpdate(m_CurrTrace);
+
+            m_ControlsUpdate();
+        }
+
+        // Метод реализует расчет положения рамки объекта на следующем кадре
+        // по её известным координатам на текущем кадре
+        private void m_TrackingTrack()
+        {
+            bool onlyAttrUpdate = false;
+            if (m_TrackingMethod == TrackingMethodID.OnlyAttrUpdate)
+                onlyAttrUpdate = true;
+
+            // 1. Проверяем выход следующего кадра за границы видеозаписи
+            int nextFrameID = m_CurrFrameID + m_TrackingDir;
+            if (!onlyAttrUpdate && (nextFrameID < 0 ||
+                nextFrameID >= CameraRecordingInfo.FramesCount))
+                return;
+
+            // 2. Применяем атрибуты рамки объекта
+            if (m_CurrTrace.HasBox && m_gui != null)
+            {
+                m_CurrBox.IsOccluded = m_TrackingIsOccluded;
+                m_CurrBox.IsShaded = m_TrackingIsShaded;
+                MarkupBoxUpdate(m_CurrBox);
+            }
+            
+            // 3. Запрашиваем изображение текущего и следующего кадров из
+            // видеозаписи для последующего отслеживания объекта
+            List<Image> currFrame, nextFrame;
+            Image currImage, nextImage;
+            switch (m_TrackingMethod)
+            {
+                case TrackingMethodID.OnlyAttrUpdate:
+                case TrackingMethodID.Manual:
+                    // Обрабатывать изображения не потребуется
+                    currImage = new Bitmap(1, 1);
+                    nextImage = new Bitmap(1, 1);
+                    break;
+                default:
+                    // Нужно загрузить изображения
+                    CameraLoadFrame(m_CurrFrameID, out currFrame);
+                    CameraLoadFrame(nextFrameID, out nextFrame);
+                    currImage = currFrame[m_CurrTrace.ViewID];
+                    nextImage = nextFrame[m_CurrTrace.ViewID];
+                    break;
+            }
+
+            // 4. Вычисляем координаты следущего узла траектории
+            Box nextBox = new Box();
+            Marker nextMarker = new Marker();
+            try
+            {
+                switch (m_TrackingMethod)
+                {
+                    case TrackingMethodID.OnlyAttrUpdate:
+                        // Ничего не надо делать
+                        break;
+                    case TrackingMethodID.Manual:
+                        // Копируем координаты рамки на текущем кадре
+                        if (m_CurrTrace.HasBox)
+                        {
+                            nextBox = m_CurrBox;
+                            nextBox.FrameID = nextFrameID;
+                        }
+                        else
+                        {
+                            nextMarker = m_CurrMarker;
+                            nextMarker.FrameID = nextFrameID;
+                        }
+                        break;
+                    case TrackingMethodID.TLD:
+                        if (m_CurrTrace.HasBox)
+                            throw new Exception("TLD not implemented!");
+                        else
+                            throw new Exception("Trace should have box!");
+                    default:
+                        throw new Exception("Unsupported method!");
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "ERROR!", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+
+            // 5. Сохраняем изменения в базу
+            // признак изменения внутреннего узла траектории
+            bool updateNodeInner =
+                (nextFrameID >= m_CurrTrace.FrameStart &&
+                    nextFrameID <= m_CurrTrace.FrameEnd);
+
+            // признак добавления нового узла в конец траектории
+            bool addNodeToEnd =
+                (nextFrameID == m_CurrTrace.FrameEnd + 1);
+
+            // признак добавления нового узла в начало траектории
+            bool addNodeToStart =
+                (nextFrameID == m_CurrTrace.FrameStart - 1);
+
+            if (!onlyAttrUpdate) try
+            {
+                if (updateNodeInner)
+                {
+                    // Нужно обновить существующий узел траектории
+                    if (m_CurrTrace.HasBox)
+                        MarkupBoxUpdate(nextBox);
+                    else
+                        MarkupMarkerUpdate(nextMarker);
+                }
+                else
+                {
+                    if (addNodeToEnd || addNodeToStart)
+                    {
+                        // Создаем новый узел траектории
+                        if (m_CurrTrace.HasBox)
+                            MarkupBoxCreate(nextBox);
+                        else
+                            MarkupMarkerCreate(nextMarker);
+
+                        // Обновляем границы траектории
+                        if (addNodeToStart)
+                            m_CurrTrace.FrameStart--;
+                        else if (addNodeToEnd)
+                            m_CurrTrace.FrameEnd++;
+                        MarkupTraceUpdate(m_CurrTrace);
+                    }
+                    else
+                        throw new Exception("Inconsistent trace detected!");
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "ERROR!", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            // 6. Переходим к следующему кадру
+            if (updateNodeInner || !onlyAttrUpdate)
+                TraceMoveToFrame(nextFrameID);
+            else
+                m_ControlsUpdate();
+        }
+
+        // Обработчик изменения атрибута Is Occluded
+        private void m_ControlTracking_OnOccludedChange(
+            object sender, EventArgs e)
+        {
+            m_TrackingIsOccluded = m_gui.chkTrackingIsOccluded.Checked;
+        }
+
+        // Обработчик изменения атрибута Is Shaded
+        private void m_ControlTracking_OnShadedChange(
+            object sender, EventArgs e)
+        {
+            m_TrackingIsShaded = m_gui.chkTrackingIsShaded.Checked;
+        }
+
+        // Обработчик изменения направления отслеживания
+        private void m_ControlTracking_OnReverseChanged(
+            object sender, EventArgs e)
+        {
+            m_TrackingDir = m_gui.chkTrackingReverse.Checked ? (-1) : (+1);
+            m_ControlTrackingUpdate();
+        }
+
+        // Обработчик выбора метода отслеживания из выпадающего списка
+        private void m_ControlTracking_OnMethodChanged(
+            object sender, EventArgs e)
+        {
+            int index = m_gui.cmbTrackingMethod.SelectedIndex;
+            m_TrackingMethod = m_TrackingMethodValues[index];
+        }
+
+        // Обработчик нажатия на кнопку "Seek Trace End/Start"
+        private void m_ControlTracking_OnSeekExtentClick(
+            object sender, EventArgs e)
+        {
+            m_TrackingSeekExtent();
+        }
+
+        // Обработчик нажатия на кнопку "Truncate Trace End/Start"
+        private void m_ControlTracking_OnTruncateClick(
+            object sender, EventArgs e)
+        {
+            m_TrackingTruncate();
+        }
+
+        // Обработчик нажатия на кнопку "Track"
+        private void m_ControlTracking_OnTrackClick(
+            object sender, EventArgs e)
+        {
+            m_TrackingTrack();
+        }
+
+        // Обновление содержания панели отслеживания на форме
+        private void m_ControlTrackingUpdate()
+        {
+            if (m_gui == null) return;
+
+            if (!m_IsTraceSelected || m_IsPlaybackMode)
+            {
+                m_gui.grpTracking.Enabled = false;
+            }
+            else
+            {
+                m_gui.grpTracking.Enabled = true;
+
+                // Если находимся на краю траектории, отключаем две кнопки
+                bool isTraceExtent;
+                bool isCameraExtent;
+                if (m_TrackingDir < 0)
+                {
+                    isTraceExtent = (m_CurrFrameID == m_CurrTrace.FrameStart);
+                    isCameraExtent = (m_CurrFrameID == 0);
+                }
+                else
+                {
+                    isTraceExtent = (m_CurrFrameID == m_CurrTrace.FrameEnd);
+                    isCameraExtent =
+                        (m_CurrFrameID == CameraRecordingInfo.FramesCount - 1);
+                }
+                m_gui.btnTrackingTruncate.Enabled = !isTraceExtent;
+                m_gui.btnTrackingTrack.Enabled = !isCameraExtent;
+
+                // Обновляем надписи на кнопках
+                if (m_TrackingDir < 0)
+                {
+                    m_gui.btnTrackingSeekExtent.Text = "Seek Trace Start";
+                    m_gui.btnTrackingTruncate.Text = "Truncate Trace Start";
+                }
+                else
+                {
+                    m_gui.btnTrackingSeekExtent.Text = "Seek Trace End";
+                    m_gui.btnTrackingTruncate.Text = "Truncate Trace End";
+                }
+            }
+        }
+
+        // Начальная инициализация содержания панели отслеживания на форме
+        private void m_ControlTrackingInit()
+        {
+            if (m_gui == null) return;
+
+            m_ControlTrackingUpdate();
         }
 
         // ***************** Общие манипуляции с траекторией ****************
@@ -651,15 +978,43 @@ namespace UniversalAnnotationApp
             m_gui.btnNaviNext.Click +=
                 new EventHandler(m_ControlNavi_OnNextClick);
 
-            m_gui.chkNaviPlayReversed.Checked = (m_PlayDir < 0);
-            m_gui.chkNaviPlayReversed.CheckedChanged +=
-                new EventHandler(m_ControlNavi_OnPlayReversedChecked);
+            m_gui.chkNaviPlayReverse.Checked = (m_PlayDir < 0);
+            m_gui.chkNaviPlayReverse.CheckedChanged +=
+                new EventHandler(m_ControlNavi_OnPlayReverseChange);
 
             for (int i = 0; i < m_PlaySpeedValues.Count; i++)
                 m_gui.cmbNaviPlaySpeed.Items.Add(m_PlaySpeedCaptions[i]);
             m_gui.cmbNaviPlaySpeed.SelectedIndex = m_PlaySpeedDefaultID;
             //m_gui.cmbNaviPlaySpeed.SelectedIndexChanged +=
             //    new EventHandler(m_ControlNavi_OnPlaySpeedChanged);
+
+            // Панель Tracking
+            for (int i = 0; i < m_TrackingMethodValues.Count; i++)
+                m_gui.cmbTrackingMethod.Items.Add(m_TrackingMethodNames[i]);
+            m_gui.cmbTrackingMethod.SelectedIndex = 
+                m_TrackingMethodDefaultID;
+            m_gui.cmbTrackingMethod.SelectedIndexChanged +=
+                new EventHandler(m_ControlTracking_OnMethodChanged);
+
+            m_gui.chkTrackingReverse.Checked = (m_TrackingDir < 0);
+            m_gui.chkTrackingReverse.CheckedChanged +=
+                new EventHandler(m_ControlTracking_OnReverseChanged);
+            m_gui.chkTrackingIsOccluded.Checked = m_TrackingIsOccluded;
+            m_gui.chkTrackingIsOccluded.CheckedChanged +=
+                new EventHandler(m_ControlTracking_OnOccludedChange);
+            m_gui.chkTrackingIsShaded.Checked = m_TrackingIsShaded;
+            m_gui.chkTrackingIsShaded.CheckedChanged +=
+                new EventHandler(m_ControlTracking_OnShadedChange);
+
+            m_gui.btnTrackingSeekExtent.Click += 
+                new EventHandler(m_ControlTracking_OnSeekExtentClick);
+            m_gui.btnTrackingTruncate.Click +=
+                new EventHandler(m_ControlTracking_OnTruncateClick);
+            m_gui.btnTrackingTrack.Click +=
+                new EventHandler(m_ControlTracking_OnTrackClick);
+
+            // Обновлям все элементы управления
+            m_ControlsInit();
         }
 
         public TraceManager()
@@ -688,6 +1043,23 @@ namespace UniversalAnnotationApp
             m_PlaySpeedValues = playSpeedValues.ToList();
             m_PlaySpeedDefaultID = 2;
             m_PlaySpeed = m_PlaySpeedValues[m_PlaySpeedDefaultID];
+
+            // Параметры отслеживания объекта
+            m_TrackingIsOccluded = false;
+            m_TrackingIsShaded = false;
+            m_TrackingDir = (+1);
+            string[] trackingMethodNames = new string[] {
+                "OnlyAttrUpdate", "Manual", "TLD", "KLT"
+            };
+            m_TrackingMethodNames = trackingMethodNames.ToList();
+            m_TrackingMethodValues = new List<TrackingMethodID>();
+            m_TrackingMethodValues.Add(TrackingMethodID.OnlyAttrUpdate);
+            m_TrackingMethodValues.Add(TrackingMethodID.Manual);
+            m_TrackingMethodValues.Add(TrackingMethodID.TLD); 
+            m_TrackingMethodValues.Add(TrackingMethodID.KLT);
+            m_TrackingMethodDefaultID = 1;
+            m_TrackingMethod = 
+                m_TrackingMethodValues[m_TrackingMethodDefaultID];
 
             // Это должно инициализироваться методом TraceGuiBind
             m_gui = null;
