@@ -116,7 +116,7 @@ namespace DisplayControlWpf
             m_rubberBand.Height = height;
             Canvas.SetLeft(m_rubberBand, left);
             Canvas.SetTop(m_rubberBand, top);
-            m_rubberBand.BringIntoView();
+            //m_rubberBand.BringIntoView();
         }
 
         // Создание графической примитива прямоугольника
@@ -202,7 +202,7 @@ namespace DisplayControlWpf
             m_anchors[anchorID].Height = height;
             Canvas.SetLeft(m_anchors[anchorID], left);
             Canvas.SetTop(m_anchors[anchorID], top);
-            m_anchors[anchorID].BringIntoView();
+            //m_anchors[anchorID].BringIntoView();
         }
 
         public AnchorManager()
