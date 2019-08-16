@@ -58,6 +58,16 @@
             this.pnlFilesOpened = new System.Windows.Forms.Panel();
             this.pnlTools = new System.Windows.Forms.Panel();
             this.grpTracking = new System.Windows.Forms.GroupBox();
+            this.btnTrackingTrack = new System.Windows.Forms.Button();
+            this.chkTrackingIsShaded = new System.Windows.Forms.CheckBox();
+            this.chkTrackingIsOccluded = new System.Windows.Forms.CheckBox();
+            this.btnTrackingTruncate = new System.Windows.Forms.Button();
+            this.btnTrackingSeekExtent = new System.Windows.Forms.Button();
+            this.lblTrackingAttributes = new System.Windows.Forms.Label();
+            this.chkTrackingReverse = new System.Windows.Forms.CheckBox();
+            this.lblTrackingDir = new System.Windows.Forms.Label();
+            this.lblTrackingMethod = new System.Windows.Forms.Label();
+            this.cmbTrackingMethod = new System.Windows.Forms.ComboBox();
             this.grpNavigation = new System.Windows.Forms.GroupBox();
             this.btnNaviPlayStop = new System.Windows.Forms.Button();
             this.radNaviMarkerMajor = new System.Windows.Forms.RadioButton();
@@ -79,16 +89,6 @@
             this.pnlTimeLine = new System.Windows.Forms.Panel();
             this.trbNaviSlider = new System.Windows.Forms.TrackBar();
             this.tmrPlayTimer = new System.Windows.Forms.Timer(this.components);
-            this.cmbTrackingMethod = new System.Windows.Forms.ComboBox();
-            this.lblTrackingMethod = new System.Windows.Forms.Label();
-            this.lblTrackingDir = new System.Windows.Forms.Label();
-            this.chkTrackingReverse = new System.Windows.Forms.CheckBox();
-            this.lblTrackingAttributes = new System.Windows.Forms.Label();
-            this.btnTrackingSeekExtent = new System.Windows.Forms.Button();
-            this.btnTrackingTruncate = new System.Windows.Forms.Button();
-            this.chkTrackingIsOccluded = new System.Windows.Forms.CheckBox();
-            this.chkTrackingIsShaded = new System.Windows.Forms.CheckBox();
-            this.btnTrackingTrack = new System.Windows.Forms.Button();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.pnlFilesOpened.SuspendLayout();
@@ -339,6 +339,100 @@
             this.grpTracking.TabStop = false;
             this.grpTracking.Text = "Tracking";
             // 
+            // btnTrackingTrack
+            // 
+            this.btnTrackingTrack.Location = new System.Drawing.Point(7, 193);
+            this.btnTrackingTrack.Name = "btnTrackingTrack";
+            this.btnTrackingTrack.Size = new System.Drawing.Size(63, 23);
+            this.btnTrackingTrack.TabIndex = 9;
+            this.btnTrackingTrack.Text = "Track";
+            this.btnTrackingTrack.UseVisualStyleBackColor = true;
+            // 
+            // chkTrackingIsShaded
+            // 
+            this.chkTrackingIsShaded.AutoSize = true;
+            this.chkTrackingIsShaded.Location = new System.Drawing.Point(10, 169);
+            this.chkTrackingIsShaded.Name = "chkTrackingIsShaded";
+            this.chkTrackingIsShaded.Size = new System.Drawing.Size(74, 17);
+            this.chkTrackingIsShaded.TabIndex = 8;
+            this.chkTrackingIsShaded.Text = "Is Shaded";
+            this.chkTrackingIsShaded.UseVisualStyleBackColor = true;
+            // 
+            // chkTrackingIsOccluded
+            // 
+            this.chkTrackingIsOccluded.AutoSize = true;
+            this.chkTrackingIsOccluded.Location = new System.Drawing.Point(10, 146);
+            this.chkTrackingIsOccluded.Name = "chkTrackingIsOccluded";
+            this.chkTrackingIsOccluded.Size = new System.Drawing.Size(83, 17);
+            this.chkTrackingIsOccluded.TabIndex = 7;
+            this.chkTrackingIsOccluded.Text = "Is Occluded";
+            this.chkTrackingIsOccluded.UseVisualStyleBackColor = true;
+            // 
+            // btnTrackingTruncate
+            // 
+            this.btnTrackingTruncate.BackColor = System.Drawing.SystemColors.Control;
+            this.btnTrackingTruncate.Location = new System.Drawing.Point(7, 98);
+            this.btnTrackingTruncate.Name = "btnTrackingTruncate";
+            this.btnTrackingTruncate.Size = new System.Drawing.Size(134, 23);
+            this.btnTrackingTruncate.TabIndex = 6;
+            this.btnTrackingTruncate.Text = "Truncate Trace End";
+            this.btnTrackingTruncate.UseVisualStyleBackColor = false;
+            // 
+            // btnTrackingSeekExtent
+            // 
+            this.btnTrackingSeekExtent.Location = new System.Drawing.Point(7, 69);
+            this.btnTrackingSeekExtent.Name = "btnTrackingSeekExtent";
+            this.btnTrackingSeekExtent.Size = new System.Drawing.Size(107, 23);
+            this.btnTrackingSeekExtent.TabIndex = 5;
+            this.btnTrackingSeekExtent.Text = "Seek Trace End";
+            this.btnTrackingSeekExtent.UseVisualStyleBackColor = true;
+            // 
+            // lblTrackingAttributes
+            // 
+            this.lblTrackingAttributes.AutoSize = true;
+            this.lblTrackingAttributes.Location = new System.Drawing.Point(6, 129);
+            this.lblTrackingAttributes.Name = "lblTrackingAttributes";
+            this.lblTrackingAttributes.Size = new System.Drawing.Size(54, 13);
+            this.lblTrackingAttributes.TabIndex = 4;
+            this.lblTrackingAttributes.Text = "Attributes:";
+            // 
+            // chkTrackingReverse
+            // 
+            this.chkTrackingReverse.AutoSize = true;
+            this.chkTrackingReverse.Location = new System.Drawing.Point(69, 46);
+            this.chkTrackingReverse.Name = "chkTrackingReverse";
+            this.chkTrackingReverse.Size = new System.Drawing.Size(72, 17);
+            this.chkTrackingReverse.TabIndex = 3;
+            this.chkTrackingReverse.Text = "Reversed";
+            this.chkTrackingReverse.UseVisualStyleBackColor = true;
+            // 
+            // lblTrackingDir
+            // 
+            this.lblTrackingDir.AutoSize = true;
+            this.lblTrackingDir.Location = new System.Drawing.Point(7, 47);
+            this.lblTrackingDir.Name = "lblTrackingDir";
+            this.lblTrackingDir.Size = new System.Drawing.Size(51, 13);
+            this.lblTrackingDir.TabIndex = 2;
+            this.lblTrackingDir.Text = "Track Dir";
+            // 
+            // lblTrackingMethod
+            // 
+            this.lblTrackingMethod.AutoSize = true;
+            this.lblTrackingMethod.Location = new System.Drawing.Point(7, 20);
+            this.lblTrackingMethod.Name = "lblTrackingMethod";
+            this.lblTrackingMethod.Size = new System.Drawing.Size(43, 13);
+            this.lblTrackingMethod.TabIndex = 1;
+            this.lblTrackingMethod.Text = "Method";
+            // 
+            // cmbTrackingMethod
+            // 
+            this.cmbTrackingMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTrackingMethod.FormattingEnabled = true;
+            this.cmbTrackingMethod.Location = new System.Drawing.Point(56, 17);
+            this.cmbTrackingMethod.Name = "cmbTrackingMethod";
+            this.cmbTrackingMethod.Size = new System.Drawing.Size(85, 21);
+            this.cmbTrackingMethod.TabIndex = 0;
+            // 
             // grpNavigation
             // 
             this.grpNavigation.Controls.Add(this.btnNaviPlayStop);
@@ -396,6 +490,7 @@
             // 
             // cmbNaviPlaySpeed
             // 
+            this.cmbNaviPlaySpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbNaviPlaySpeed.FormattingEnabled = true;
             this.cmbNaviPlaySpeed.Location = new System.Drawing.Point(86, 132);
             this.cmbNaviPlaySpeed.Name = "cmbNaviPlaySpeed";
@@ -531,99 +626,6 @@
             this.trbNaviSlider.Name = "trbNaviSlider";
             this.trbNaviSlider.Size = new System.Drawing.Size(428, 42);
             this.trbNaviSlider.TabIndex = 0;
-            // 
-            // cmbTrackingMethod
-            // 
-            this.cmbTrackingMethod.FormattingEnabled = true;
-            this.cmbTrackingMethod.Location = new System.Drawing.Point(56, 17);
-            this.cmbTrackingMethod.Name = "cmbTrackingMethod";
-            this.cmbTrackingMethod.Size = new System.Drawing.Size(85, 21);
-            this.cmbTrackingMethod.TabIndex = 0;
-            // 
-            // lblTrackingMethod
-            // 
-            this.lblTrackingMethod.AutoSize = true;
-            this.lblTrackingMethod.Location = new System.Drawing.Point(7, 20);
-            this.lblTrackingMethod.Name = "lblTrackingMethod";
-            this.lblTrackingMethod.Size = new System.Drawing.Size(43, 13);
-            this.lblTrackingMethod.TabIndex = 1;
-            this.lblTrackingMethod.Text = "Method";
-            // 
-            // lblTrackingDir
-            // 
-            this.lblTrackingDir.AutoSize = true;
-            this.lblTrackingDir.Location = new System.Drawing.Point(7, 47);
-            this.lblTrackingDir.Name = "lblTrackingDir";
-            this.lblTrackingDir.Size = new System.Drawing.Size(51, 13);
-            this.lblTrackingDir.TabIndex = 2;
-            this.lblTrackingDir.Text = "Track Dir";
-            // 
-            // chkTrackingReverse
-            // 
-            this.chkTrackingReverse.AutoSize = true;
-            this.chkTrackingReverse.Location = new System.Drawing.Point(69, 46);
-            this.chkTrackingReverse.Name = "chkTrackingReverse";
-            this.chkTrackingReverse.Size = new System.Drawing.Size(72, 17);
-            this.chkTrackingReverse.TabIndex = 3;
-            this.chkTrackingReverse.Text = "Reversed";
-            this.chkTrackingReverse.UseVisualStyleBackColor = true;
-            // 
-            // lblTrackingAttributes
-            // 
-            this.lblTrackingAttributes.AutoSize = true;
-            this.lblTrackingAttributes.Location = new System.Drawing.Point(6, 129);
-            this.lblTrackingAttributes.Name = "lblTrackingAttributes";
-            this.lblTrackingAttributes.Size = new System.Drawing.Size(54, 13);
-            this.lblTrackingAttributes.TabIndex = 4;
-            this.lblTrackingAttributes.Text = "Attributes:";
-            // 
-            // btnTrackingSeekExtent
-            // 
-            this.btnTrackingSeekExtent.Location = new System.Drawing.Point(7, 69);
-            this.btnTrackingSeekExtent.Name = "btnTrackingSeekExtent";
-            this.btnTrackingSeekExtent.Size = new System.Drawing.Size(107, 23);
-            this.btnTrackingSeekExtent.TabIndex = 5;
-            this.btnTrackingSeekExtent.Text = "Seek Trace End";
-            this.btnTrackingSeekExtent.UseVisualStyleBackColor = true;
-            // 
-            // btnTrackingTruncate
-            // 
-            this.btnTrackingTruncate.BackColor = System.Drawing.SystemColors.Control;
-            this.btnTrackingTruncate.Location = new System.Drawing.Point(7, 98);
-            this.btnTrackingTruncate.Name = "btnTrackingTruncate";
-            this.btnTrackingTruncate.Size = new System.Drawing.Size(134, 23);
-            this.btnTrackingTruncate.TabIndex = 6;
-            this.btnTrackingTruncate.Text = "Truncate Trace End";
-            this.btnTrackingTruncate.UseVisualStyleBackColor = false;
-            // 
-            // chkTrackingIsOccluded
-            // 
-            this.chkTrackingIsOccluded.AutoSize = true;
-            this.chkTrackingIsOccluded.Location = new System.Drawing.Point(10, 146);
-            this.chkTrackingIsOccluded.Name = "chkTrackingIsOccluded";
-            this.chkTrackingIsOccluded.Size = new System.Drawing.Size(83, 17);
-            this.chkTrackingIsOccluded.TabIndex = 7;
-            this.chkTrackingIsOccluded.Text = "Is Occluded";
-            this.chkTrackingIsOccluded.UseVisualStyleBackColor = true;
-            // 
-            // chkTrackingIsShaded
-            // 
-            this.chkTrackingIsShaded.AutoSize = true;
-            this.chkTrackingIsShaded.Location = new System.Drawing.Point(10, 169);
-            this.chkTrackingIsShaded.Name = "chkTrackingIsShaded";
-            this.chkTrackingIsShaded.Size = new System.Drawing.Size(74, 17);
-            this.chkTrackingIsShaded.TabIndex = 8;
-            this.chkTrackingIsShaded.Text = "Is Shaded";
-            this.chkTrackingIsShaded.UseVisualStyleBackColor = true;
-            // 
-            // btnTrackingTrack
-            // 
-            this.btnTrackingTrack.Location = new System.Drawing.Point(7, 193);
-            this.btnTrackingTrack.Name = "btnTrackingTrack";
-            this.btnTrackingTrack.Size = new System.Drawing.Size(63, 23);
-            this.btnTrackingTrack.TabIndex = 9;
-            this.btnTrackingTrack.Text = "Track";
-            this.btnTrackingTrack.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 

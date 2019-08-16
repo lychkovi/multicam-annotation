@@ -482,6 +482,7 @@ namespace UniversalAnnotationApp
             {
                 MessageBox.Show(e.Message, "ERROR!", MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+                return;
             }
 
             // 5. Сохраняем изменения в базу
@@ -1049,7 +1050,7 @@ namespace UniversalAnnotationApp
             m_TrackingIsShaded = false;
             m_TrackingDir = (+1);
             string[] trackingMethodNames = new string[] {
-                "OnlyAttrUpdate", "Manual", "TLD", "KLT"
+                "AttrUpdate", "Manual", "TLD", "KLT"
             };
             m_TrackingMethodNames = trackingMethodNames.ToList();
             m_TrackingMethodValues = new List<TrackingMethodID>();
