@@ -85,47 +85,47 @@
             this.txtNaviCurrFrame = new System.Windows.Forms.TextBox();
             this.lblNaviCurrFrame = new System.Windows.Forms.Label();
             this.pnlAttributes = new System.Windows.Forms.Panel();
+            this.grpCategory = new System.Windows.Forms.GroupBox();
+            this.btnCategoryEditSave = new System.Windows.Forms.Button();
+            this.btnCategoryDelete = new System.Windows.Forms.Button();
+            this.btnCategoryNew = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cmbCategoryID = new System.Windows.Forms.ComboBox();
+            this.lblCategoryID = new System.Windows.Forms.Label();
+            this.txtCategoryName = new System.Windows.Forms.TextBox();
+            this.grpTag = new System.Windows.Forms.GroupBox();
+            this.btnTagEditSave = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.lblTagName = new System.Windows.Forms.Label();
+            this.cmbTagID = new System.Windows.Forms.ComboBox();
+            this.btnTagDelete = new System.Windows.Forms.Button();
+            this.btnTagNew = new System.Windows.Forms.Button();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.lblTagCategoryID = new System.Windows.Forms.Label();
+            this.lblTagID = new System.Windows.Forms.Label();
+            this.grpNode = new System.Windows.Forms.GroupBox();
+            this.chkNodeIsShaded = new System.Windows.Forms.CheckBox();
+            this.chkNodeIsOccluded = new System.Windows.Forms.CheckBox();
+            this.txtNodeHeight = new System.Windows.Forms.TextBox();
+            this.lblNodeHeight = new System.Windows.Forms.Label();
+            this.txtNodeWidth = new System.Windows.Forms.TextBox();
+            this.lblNodeWidth = new System.Windows.Forms.Label();
+            this.txtNodePosY = new System.Windows.Forms.TextBox();
+            this.lblNodePosY = new System.Windows.Forms.Label();
+            this.txtNodePosX = new System.Windows.Forms.TextBox();
+            this.lblNodePosX = new System.Windows.Forms.Label();
             this.grpTrace = new System.Windows.Forms.GroupBox();
+            this.txtTraceFrameEnd = new System.Windows.Forms.TextBox();
+            this.lblTraceFrameEnd = new System.Windows.Forms.Label();
+            this.txtTraceFrameStart = new System.Windows.Forms.TextBox();
+            this.lblTraceFrameStart = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.lblTraceTagID = new System.Windows.Forms.Label();
+            this.txtTraceID = new System.Windows.Forms.TextBox();
+            this.lblTraceID = new System.Windows.Forms.Label();
             this.pnlTimeLine = new System.Windows.Forms.Panel();
             this.trbNaviSlider = new System.Windows.Forms.TrackBar();
             this.tmrPlayTimer = new System.Windows.Forms.Timer(this.components);
-            this.lblTraceID = new System.Windows.Forms.Label();
-            this.txtTraceID = new System.Windows.Forms.TextBox();
-            this.lblTraceTagID = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.lblTraceFrameStart = new System.Windows.Forms.Label();
-            this.txtTraceFrameStart = new System.Windows.Forms.TextBox();
-            this.lblTraceFrameEnd = new System.Windows.Forms.Label();
-            this.txtTraceFrameEnd = new System.Windows.Forms.TextBox();
-            this.grpNode = new System.Windows.Forms.GroupBox();
-            this.lblNodePosX = new System.Windows.Forms.Label();
-            this.txtNodePosX = new System.Windows.Forms.TextBox();
-            this.lblNodePosY = new System.Windows.Forms.Label();
-            this.txtNodePosY = new System.Windows.Forms.TextBox();
-            this.lblNodeWidth = new System.Windows.Forms.Label();
-            this.txtNodeWidth = new System.Windows.Forms.TextBox();
-            this.lblNodeHeight = new System.Windows.Forms.Label();
-            this.txtNodeHeight = new System.Windows.Forms.TextBox();
-            this.chkNodeIsOccluded = new System.Windows.Forms.CheckBox();
-            this.chkNodeIsShaded = new System.Windows.Forms.CheckBox();
-            this.grpTag = new System.Windows.Forms.GroupBox();
-            this.lblTagID = new System.Windows.Forms.Label();
-            this.txtCategoryName = new System.Windows.Forms.TextBox();
-            this.lblTagCategoryID = new System.Windows.Forms.Label();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.btnTagNew = new System.Windows.Forms.Button();
-            this.btnTagDelete = new System.Windows.Forms.Button();
-            this.grpCategory = new System.Windows.Forms.GroupBox();
-            this.lblCategoryID = new System.Windows.Forms.Label();
-            this.cmbCategoryID = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.btnCategoryNew = new System.Windows.Forms.Button();
-            this.btnCategoryDelete = new System.Windows.Forms.Button();
-            this.btnCategoryEditSave = new System.Windows.Forms.Button();
-            this.cmbTagID = new System.Windows.Forms.ComboBox();
-            this.lblTagName = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.btnTagEditSave = new System.Windows.Forms.Button();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.pnlFilesOpened.SuspendLayout();
@@ -133,12 +133,12 @@
             this.grpTracking.SuspendLayout();
             this.grpNavigation.SuspendLayout();
             this.pnlAttributes.SuspendLayout();
+            this.grpCategory.SuspendLayout();
+            this.grpTag.SuspendLayout();
+            this.grpNode.SuspendLayout();
             this.grpTrace.SuspendLayout();
             this.pnlTimeLine.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trbNaviSlider)).BeginInit();
-            this.grpNode.SuspendLayout();
-            this.grpTag.SuspendLayout();
-            this.grpCategory.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip
@@ -646,108 +646,182 @@
             this.pnlAttributes.Size = new System.Drawing.Size(154, 541);
             this.pnlAttributes.TabIndex = 9;
             // 
-            // grpTrace
+            // grpCategory
             // 
-            this.grpTrace.Controls.Add(this.txtTraceFrameEnd);
-            this.grpTrace.Controls.Add(this.lblTraceFrameEnd);
-            this.grpTrace.Controls.Add(this.txtTraceFrameStart);
-            this.grpTrace.Controls.Add(this.lblTraceFrameStart);
-            this.grpTrace.Controls.Add(this.comboBox1);
-            this.grpTrace.Controls.Add(this.lblTraceTagID);
-            this.grpTrace.Controls.Add(this.txtTraceID);
-            this.grpTrace.Controls.Add(this.lblTraceID);
-            this.grpTrace.Location = new System.Drawing.Point(4, 4);
-            this.grpTrace.Name = "grpTrace";
-            this.grpTrace.Size = new System.Drawing.Size(147, 115);
-            this.grpTrace.TabIndex = 0;
-            this.grpTrace.TabStop = false;
-            this.grpTrace.Text = "Trace";
+            this.grpCategory.Controls.Add(this.btnCategoryEditSave);
+            this.grpCategory.Controls.Add(this.btnCategoryDelete);
+            this.grpCategory.Controls.Add(this.btnCategoryNew);
+            this.grpCategory.Controls.Add(this.label1);
+            this.grpCategory.Controls.Add(this.cmbCategoryID);
+            this.grpCategory.Controls.Add(this.lblCategoryID);
+            this.grpCategory.Controls.Add(this.txtCategoryName);
+            this.grpCategory.Location = new System.Drawing.Point(4, 408);
+            this.grpCategory.Name = "grpCategory";
+            this.grpCategory.Size = new System.Drawing.Size(147, 101);
+            this.grpCategory.TabIndex = 3;
+            this.grpCategory.TabStop = false;
+            this.grpCategory.Text = "Category";
             // 
-            // pnlTimeLine
+            // btnCategoryEditSave
             // 
-            this.pnlTimeLine.Controls.Add(this.trbNaviSlider);
-            this.pnlTimeLine.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlTimeLine.Location = new System.Drawing.Point(154, 586);
-            this.pnlTimeLine.Name = "pnlTimeLine";
-            this.pnlTimeLine.Size = new System.Drawing.Size(485, 49);
-            this.pnlTimeLine.TabIndex = 10;
+            this.btnCategoryEditSave.Location = new System.Drawing.Point(98, 67);
+            this.btnCategoryEditSave.Name = "btnCategoryEditSave";
+            this.btnCategoryEditSave.Size = new System.Drawing.Size(40, 23);
+            this.btnCategoryEditSave.TabIndex = 5;
+            this.btnCategoryEditSave.Text = "Edit";
+            this.btnCategoryEditSave.UseVisualStyleBackColor = true;
             // 
-            // trbNaviSlider
+            // btnCategoryDelete
             // 
-            this.trbNaviSlider.Location = new System.Drawing.Point(3, 4);
-            this.trbNaviSlider.Name = "trbNaviSlider";
-            this.trbNaviSlider.Size = new System.Drawing.Size(428, 42);
-            this.trbNaviSlider.TabIndex = 0;
+            this.btnCategoryDelete.Location = new System.Drawing.Point(52, 67);
+            this.btnCategoryDelete.Name = "btnCategoryDelete";
+            this.btnCategoryDelete.Size = new System.Drawing.Size(40, 23);
+            this.btnCategoryDelete.TabIndex = 4;
+            this.btnCategoryDelete.Text = "Del";
+            this.btnCategoryDelete.UseVisualStyleBackColor = true;
             // 
-            // lblTraceID
+            // btnCategoryNew
             // 
-            this.lblTraceID.AutoSize = true;
-            this.lblTraceID.Location = new System.Drawing.Point(6, 23);
-            this.lblTraceID.Name = "lblTraceID";
-            this.lblTraceID.Size = new System.Drawing.Size(49, 13);
-            this.lblTraceID.TabIndex = 0;
-            this.lblTraceID.Text = "Trace ID";
+            this.btnCategoryNew.Location = new System.Drawing.Point(6, 67);
+            this.btnCategoryNew.Name = "btnCategoryNew";
+            this.btnCategoryNew.Size = new System.Drawing.Size(40, 23);
+            this.btnCategoryNew.TabIndex = 3;
+            this.btnCategoryNew.Text = "New";
+            this.btnCategoryNew.UseVisualStyleBackColor = true;
             // 
-            // txtTraceID
+            // label1
             // 
-            this.txtTraceID.Location = new System.Drawing.Point(83, 20);
-            this.txtTraceID.Name = "txtTraceID";
-            this.txtTraceID.ReadOnly = true;
-            this.txtTraceID.Size = new System.Drawing.Size(58, 20);
-            this.txtTraceID.TabIndex = 1;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 44);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(35, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Name";
             // 
-            // lblTraceTagID
+            // cmbCategoryID
             // 
-            this.lblTraceTagID.AutoSize = true;
-            this.lblTraceTagID.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.lblTraceTagID.Location = new System.Drawing.Point(6, 45);
-            this.lblTraceTagID.Name = "lblTraceTagID";
-            this.lblTraceTagID.Size = new System.Drawing.Size(44, 13);
-            this.lblTraceTagID.TabIndex = 2;
-            this.lblTraceTagID.Text = "Tag ID*";
+            this.cmbCategoryID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCategoryID.FormattingEnabled = true;
+            this.cmbCategoryID.Location = new System.Drawing.Point(47, 17);
+            this.cmbCategoryID.Name = "cmbCategoryID";
+            this.cmbCategoryID.Size = new System.Drawing.Size(94, 21);
+            this.cmbCategoryID.TabIndex = 1;
             // 
-            // comboBox1
+            // lblCategoryID
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(83, 42);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(58, 21);
-            this.comboBox1.TabIndex = 3;
+            this.lblCategoryID.AutoSize = true;
+            this.lblCategoryID.Location = new System.Drawing.Point(6, 20);
+            this.lblCategoryID.Name = "lblCategoryID";
+            this.lblCategoryID.Size = new System.Drawing.Size(18, 13);
+            this.lblCategoryID.TabIndex = 0;
+            this.lblCategoryID.Text = "ID";
             // 
-            // lblTraceFrameStart
+            // txtCategoryName
             // 
-            this.lblTraceFrameStart.AutoSize = true;
-            this.lblTraceFrameStart.Location = new System.Drawing.Point(6, 67);
-            this.lblTraceFrameStart.Name = "lblTraceFrameStart";
-            this.lblTraceFrameStart.Size = new System.Drawing.Size(61, 13);
-            this.lblTraceFrameStart.TabIndex = 4;
-            this.lblTraceFrameStart.Text = "Frame Start";
+            this.txtCategoryName.Location = new System.Drawing.Point(47, 41);
+            this.txtCategoryName.Name = "txtCategoryName";
+            this.txtCategoryName.ReadOnly = true;
+            this.txtCategoryName.Size = new System.Drawing.Size(94, 20);
+            this.txtCategoryName.TabIndex = 1;
             // 
-            // txtTraceFrameStart
+            // grpTag
             // 
-            this.txtTraceFrameStart.Location = new System.Drawing.Point(83, 64);
-            this.txtTraceFrameStart.Name = "txtTraceFrameStart";
-            this.txtTraceFrameStart.ReadOnly = true;
-            this.txtTraceFrameStart.Size = new System.Drawing.Size(58, 20);
-            this.txtTraceFrameStart.TabIndex = 5;
+            this.grpTag.Controls.Add(this.btnTagEditSave);
+            this.grpTag.Controls.Add(this.textBox1);
+            this.grpTag.Controls.Add(this.lblTagName);
+            this.grpTag.Controls.Add(this.cmbTagID);
+            this.grpTag.Controls.Add(this.btnTagDelete);
+            this.grpTag.Controls.Add(this.btnTagNew);
+            this.grpTag.Controls.Add(this.comboBox2);
+            this.grpTag.Controls.Add(this.lblTagCategoryID);
+            this.grpTag.Controls.Add(this.lblTagID);
+            this.grpTag.Location = new System.Drawing.Point(4, 284);
+            this.grpTag.Name = "grpTag";
+            this.grpTag.Size = new System.Drawing.Size(147, 118);
+            this.grpTag.TabIndex = 2;
+            this.grpTag.TabStop = false;
+            this.grpTag.Text = "Tag";
             // 
-            // lblTraceFrameEnd
+            // btnTagEditSave
             // 
-            this.lblTraceFrameEnd.AutoSize = true;
-            this.lblTraceFrameEnd.Location = new System.Drawing.Point(6, 88);
-            this.lblTraceFrameEnd.Name = "lblTraceFrameEnd";
-            this.lblTraceFrameEnd.Size = new System.Drawing.Size(58, 13);
-            this.lblTraceFrameEnd.TabIndex = 6;
-            this.lblTraceFrameEnd.Text = "Frame End";
+            this.btnTagEditSave.Location = new System.Drawing.Point(98, 84);
+            this.btnTagEditSave.Name = "btnTagEditSave";
+            this.btnTagEditSave.Size = new System.Drawing.Size(40, 23);
+            this.btnTagEditSave.TabIndex = 9;
+            this.btnTagEditSave.Text = "Edit";
+            this.btnTagEditSave.UseVisualStyleBackColor = true;
             // 
-            // txtTraceFrameEnd
+            // textBox1
             // 
-            this.txtTraceFrameEnd.Location = new System.Drawing.Point(83, 85);
-            this.txtTraceFrameEnd.Name = "txtTraceFrameEnd";
-            this.txtTraceFrameEnd.ReadOnly = true;
-            this.txtTraceFrameEnd.Size = new System.Drawing.Size(58, 20);
-            this.txtTraceFrameEnd.TabIndex = 7;
+            this.textBox1.Location = new System.Drawing.Point(56, 36);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(85, 20);
+            this.textBox1.TabIndex = 8;
+            // 
+            // lblTagName
+            // 
+            this.lblTagName.AutoSize = true;
+            this.lblTagName.Location = new System.Drawing.Point(6, 39);
+            this.lblTagName.Name = "lblTagName";
+            this.lblTagName.Size = new System.Drawing.Size(35, 13);
+            this.lblTagName.TabIndex = 7;
+            this.lblTagName.Text = "Name";
+            // 
+            // cmbTagID
+            // 
+            this.cmbTagID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTagID.FormattingEnabled = true;
+            this.cmbTagID.Location = new System.Drawing.Point(83, 14);
+            this.cmbTagID.Name = "cmbTagID";
+            this.cmbTagID.Size = new System.Drawing.Size(58, 21);
+            this.cmbTagID.TabIndex = 6;
+            // 
+            // btnTagDelete
+            // 
+            this.btnTagDelete.Location = new System.Drawing.Point(52, 84);
+            this.btnTagDelete.Name = "btnTagDelete";
+            this.btnTagDelete.Size = new System.Drawing.Size(40, 23);
+            this.btnTagDelete.TabIndex = 5;
+            this.btnTagDelete.Text = "Del";
+            this.btnTagDelete.UseVisualStyleBackColor = true;
+            // 
+            // btnTagNew
+            // 
+            this.btnTagNew.Location = new System.Drawing.Point(6, 84);
+            this.btnTagNew.Name = "btnTagNew";
+            this.btnTagNew.Size = new System.Drawing.Size(40, 23);
+            this.btnTagNew.TabIndex = 4;
+            this.btnTagNew.Text = "New";
+            this.btnTagNew.UseVisualStyleBackColor = true;
+            // 
+            // comboBox2
+            // 
+            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Location = new System.Drawing.Point(83, 57);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(58, 21);
+            this.comboBox2.TabIndex = 3;
+            // 
+            // lblTagCategoryID
+            // 
+            this.lblTagCategoryID.AutoSize = true;
+            this.lblTagCategoryID.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTagCategoryID.Location = new System.Drawing.Point(6, 60);
+            this.lblTagCategoryID.Name = "lblTagCategoryID";
+            this.lblTagCategoryID.Size = new System.Drawing.Size(67, 13);
+            this.lblTagCategoryID.TabIndex = 2;
+            this.lblTagCategoryID.Text = "Category ID*";
+            // 
+            // lblTagID
+            // 
+            this.lblTagID.AutoSize = true;
+            this.lblTagID.Location = new System.Drawing.Point(6, 19);
+            this.lblTagID.Name = "lblTagID";
+            this.lblTagID.Size = new System.Drawing.Size(40, 13);
+            this.lblTagID.TabIndex = 0;
+            this.lblTagID.Text = "Tag ID";
             // 
             // grpNode
             // 
@@ -768,73 +842,16 @@
             this.grpNode.TabStop = false;
             this.grpNode.Text = "Box";
             // 
-            // lblNodePosX
+            // chkNodeIsShaded
             // 
-            this.lblNodePosX.AutoSize = true;
-            this.lblNodePosX.Location = new System.Drawing.Point(6, 20);
-            this.lblNodePosX.Name = "lblNodePosX";
-            this.lblNodePosX.Size = new System.Drawing.Size(35, 13);
-            this.lblNodePosX.TabIndex = 0;
-            this.lblNodePosX.Text = "Pos X";
-            // 
-            // txtNodePosX
-            // 
-            this.txtNodePosX.Location = new System.Drawing.Point(56, 17);
-            this.txtNodePosX.Name = "txtNodePosX";
-            this.txtNodePosX.ReadOnly = true;
-            this.txtNodePosX.Size = new System.Drawing.Size(85, 20);
-            this.txtNodePosX.TabIndex = 1;
-            // 
-            // lblNodePosY
-            // 
-            this.lblNodePosY.AutoSize = true;
-            this.lblNodePosY.Location = new System.Drawing.Point(6, 43);
-            this.lblNodePosY.Name = "lblNodePosY";
-            this.lblNodePosY.Size = new System.Drawing.Size(35, 13);
-            this.lblNodePosY.TabIndex = 2;
-            this.lblNodePosY.Text = "Pos Y";
-            // 
-            // txtNodePosY
-            // 
-            this.txtNodePosY.Location = new System.Drawing.Point(56, 39);
-            this.txtNodePosY.Name = "txtNodePosY";
-            this.txtNodePosY.ReadOnly = true;
-            this.txtNodePosY.Size = new System.Drawing.Size(85, 20);
-            this.txtNodePosY.TabIndex = 3;
-            // 
-            // lblNodeWidth
-            // 
-            this.lblNodeWidth.AutoSize = true;
-            this.lblNodeWidth.Location = new System.Drawing.Point(6, 64);
-            this.lblNodeWidth.Name = "lblNodeWidth";
-            this.lblNodeWidth.Size = new System.Drawing.Size(35, 13);
-            this.lblNodeWidth.TabIndex = 4;
-            this.lblNodeWidth.Text = "Width";
-            // 
-            // txtNodeWidth
-            // 
-            this.txtNodeWidth.Location = new System.Drawing.Point(56, 61);
-            this.txtNodeWidth.Name = "txtNodeWidth";
-            this.txtNodeWidth.ReadOnly = true;
-            this.txtNodeWidth.Size = new System.Drawing.Size(85, 20);
-            this.txtNodeWidth.TabIndex = 5;
-            // 
-            // lblNodeHeight
-            // 
-            this.lblNodeHeight.AutoSize = true;
-            this.lblNodeHeight.Location = new System.Drawing.Point(6, 86);
-            this.lblNodeHeight.Name = "lblNodeHeight";
-            this.lblNodeHeight.Size = new System.Drawing.Size(38, 13);
-            this.lblNodeHeight.TabIndex = 6;
-            this.lblNodeHeight.Text = "Height";
-            // 
-            // txtNodeHeight
-            // 
-            this.txtNodeHeight.Location = new System.Drawing.Point(56, 83);
-            this.txtNodeHeight.Name = "txtNodeHeight";
-            this.txtNodeHeight.ReadOnly = true;
-            this.txtNodeHeight.Size = new System.Drawing.Size(85, 20);
-            this.txtNodeHeight.TabIndex = 7;
+            this.chkNodeIsShaded.AutoSize = true;
+            this.chkNodeIsShaded.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.chkNodeIsShaded.Location = new System.Drawing.Point(9, 128);
+            this.chkNodeIsShaded.Name = "chkNodeIsShaded";
+            this.chkNodeIsShaded.Size = new System.Drawing.Size(78, 17);
+            this.chkNodeIsShaded.TabIndex = 9;
+            this.chkNodeIsShaded.Text = "Is Shaded*";
+            this.chkNodeIsShaded.UseVisualStyleBackColor = true;
             // 
             // chkNodeIsOccluded
             // 
@@ -847,193 +864,176 @@
             this.chkNodeIsOccluded.Text = "Is Occluded*";
             this.chkNodeIsOccluded.UseVisualStyleBackColor = true;
             // 
-            // chkNodeIsShaded
+            // txtNodeHeight
             // 
-            this.chkNodeIsShaded.AutoSize = true;
-            this.chkNodeIsShaded.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.chkNodeIsShaded.Location = new System.Drawing.Point(9, 128);
-            this.chkNodeIsShaded.Name = "chkNodeIsShaded";
-            this.chkNodeIsShaded.Size = new System.Drawing.Size(78, 17);
-            this.chkNodeIsShaded.TabIndex = 9;
-            this.chkNodeIsShaded.Text = "Is Shaded*";
-            this.chkNodeIsShaded.UseVisualStyleBackColor = true;
+            this.txtNodeHeight.Location = new System.Drawing.Point(56, 83);
+            this.txtNodeHeight.Name = "txtNodeHeight";
+            this.txtNodeHeight.ReadOnly = true;
+            this.txtNodeHeight.Size = new System.Drawing.Size(85, 20);
+            this.txtNodeHeight.TabIndex = 7;
             // 
-            // grpTag
+            // lblNodeHeight
             // 
-            this.grpTag.Controls.Add(this.btnTagEditSave);
-            this.grpTag.Controls.Add(this.textBox1);
-            this.grpTag.Controls.Add(this.lblTagName);
-            this.grpTag.Controls.Add(this.cmbTagID);
-            this.grpTag.Controls.Add(this.btnTagDelete);
-            this.grpTag.Controls.Add(this.btnTagNew);
-            this.grpTag.Controls.Add(this.comboBox2);
-            this.grpTag.Controls.Add(this.lblTagCategoryID);
-            this.grpTag.Controls.Add(this.lblTagID);
-            this.grpTag.Location = new System.Drawing.Point(4, 284);
-            this.grpTag.Name = "grpTag";
-            this.grpTag.Size = new System.Drawing.Size(147, 118);
-            this.grpTag.TabIndex = 2;
-            this.grpTag.TabStop = false;
-            this.grpTag.Text = "Tag";
+            this.lblNodeHeight.AutoSize = true;
+            this.lblNodeHeight.Location = new System.Drawing.Point(6, 86);
+            this.lblNodeHeight.Name = "lblNodeHeight";
+            this.lblNodeHeight.Size = new System.Drawing.Size(38, 13);
+            this.lblNodeHeight.TabIndex = 6;
+            this.lblNodeHeight.Text = "Height";
             // 
-            // lblTagID
+            // txtNodeWidth
             // 
-            this.lblTagID.AutoSize = true;
-            this.lblTagID.Location = new System.Drawing.Point(6, 19);
-            this.lblTagID.Name = "lblTagID";
-            this.lblTagID.Size = new System.Drawing.Size(40, 13);
-            this.lblTagID.TabIndex = 0;
-            this.lblTagID.Text = "Tag ID";
+            this.txtNodeWidth.Location = new System.Drawing.Point(56, 61);
+            this.txtNodeWidth.Name = "txtNodeWidth";
+            this.txtNodeWidth.ReadOnly = true;
+            this.txtNodeWidth.Size = new System.Drawing.Size(85, 20);
+            this.txtNodeWidth.TabIndex = 5;
             // 
-            // txtCategoryName
+            // lblNodeWidth
             // 
-            this.txtCategoryName.Location = new System.Drawing.Point(47, 41);
-            this.txtCategoryName.Name = "txtCategoryName";
-            this.txtCategoryName.ReadOnly = true;
-            this.txtCategoryName.Size = new System.Drawing.Size(94, 20);
-            this.txtCategoryName.TabIndex = 1;
+            this.lblNodeWidth.AutoSize = true;
+            this.lblNodeWidth.Location = new System.Drawing.Point(6, 64);
+            this.lblNodeWidth.Name = "lblNodeWidth";
+            this.lblNodeWidth.Size = new System.Drawing.Size(35, 13);
+            this.lblNodeWidth.TabIndex = 4;
+            this.lblNodeWidth.Text = "Width";
             // 
-            // lblTagCategoryID
+            // txtNodePosY
             // 
-            this.lblTagCategoryID.AutoSize = true;
-            this.lblTagCategoryID.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.lblTagCategoryID.Location = new System.Drawing.Point(6, 60);
-            this.lblTagCategoryID.Name = "lblTagCategoryID";
-            this.lblTagCategoryID.Size = new System.Drawing.Size(67, 13);
-            this.lblTagCategoryID.TabIndex = 2;
-            this.lblTagCategoryID.Text = "Category ID*";
+            this.txtNodePosY.Location = new System.Drawing.Point(56, 39);
+            this.txtNodePosY.Name = "txtNodePosY";
+            this.txtNodePosY.ReadOnly = true;
+            this.txtNodePosY.Size = new System.Drawing.Size(85, 20);
+            this.txtNodePosY.TabIndex = 3;
             // 
-            // comboBox2
+            // lblNodePosY
             // 
-            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(83, 57);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(58, 21);
-            this.comboBox2.TabIndex = 3;
+            this.lblNodePosY.AutoSize = true;
+            this.lblNodePosY.Location = new System.Drawing.Point(6, 43);
+            this.lblNodePosY.Name = "lblNodePosY";
+            this.lblNodePosY.Size = new System.Drawing.Size(35, 13);
+            this.lblNodePosY.TabIndex = 2;
+            this.lblNodePosY.Text = "Pos Y";
             // 
-            // btnTagNew
+            // txtNodePosX
             // 
-            this.btnTagNew.Location = new System.Drawing.Point(6, 84);
-            this.btnTagNew.Name = "btnTagNew";
-            this.btnTagNew.Size = new System.Drawing.Size(40, 23);
-            this.btnTagNew.TabIndex = 4;
-            this.btnTagNew.Text = "New";
-            this.btnTagNew.UseVisualStyleBackColor = true;
+            this.txtNodePosX.Location = new System.Drawing.Point(56, 17);
+            this.txtNodePosX.Name = "txtNodePosX";
+            this.txtNodePosX.ReadOnly = true;
+            this.txtNodePosX.Size = new System.Drawing.Size(85, 20);
+            this.txtNodePosX.TabIndex = 1;
             // 
-            // btnTagDelete
+            // lblNodePosX
             // 
-            this.btnTagDelete.Location = new System.Drawing.Point(52, 84);
-            this.btnTagDelete.Name = "btnTagDelete";
-            this.btnTagDelete.Size = new System.Drawing.Size(40, 23);
-            this.btnTagDelete.TabIndex = 5;
-            this.btnTagDelete.Text = "Del";
-            this.btnTagDelete.UseVisualStyleBackColor = true;
+            this.lblNodePosX.AutoSize = true;
+            this.lblNodePosX.Location = new System.Drawing.Point(6, 20);
+            this.lblNodePosX.Name = "lblNodePosX";
+            this.lblNodePosX.Size = new System.Drawing.Size(35, 13);
+            this.lblNodePosX.TabIndex = 0;
+            this.lblNodePosX.Text = "Pos X";
             // 
-            // grpCategory
+            // grpTrace
             // 
-            this.grpCategory.Controls.Add(this.btnCategoryEditSave);
-            this.grpCategory.Controls.Add(this.btnCategoryDelete);
-            this.grpCategory.Controls.Add(this.btnCategoryNew);
-            this.grpCategory.Controls.Add(this.label1);
-            this.grpCategory.Controls.Add(this.cmbCategoryID);
-            this.grpCategory.Controls.Add(this.lblCategoryID);
-            this.grpCategory.Controls.Add(this.txtCategoryName);
-            this.grpCategory.Location = new System.Drawing.Point(4, 408);
-            this.grpCategory.Name = "grpCategory";
-            this.grpCategory.Size = new System.Drawing.Size(147, 101);
-            this.grpCategory.TabIndex = 3;
-            this.grpCategory.TabStop = false;
-            this.grpCategory.Text = "Category";
+            this.grpTrace.Controls.Add(this.txtTraceFrameEnd);
+            this.grpTrace.Controls.Add(this.lblTraceFrameEnd);
+            this.grpTrace.Controls.Add(this.txtTraceFrameStart);
+            this.grpTrace.Controls.Add(this.lblTraceFrameStart);
+            this.grpTrace.Controls.Add(this.comboBox1);
+            this.grpTrace.Controls.Add(this.lblTraceTagID);
+            this.grpTrace.Controls.Add(this.txtTraceID);
+            this.grpTrace.Controls.Add(this.lblTraceID);
+            this.grpTrace.Location = new System.Drawing.Point(4, 4);
+            this.grpTrace.Name = "grpTrace";
+            this.grpTrace.Size = new System.Drawing.Size(147, 115);
+            this.grpTrace.TabIndex = 0;
+            this.grpTrace.TabStop = false;
+            this.grpTrace.Text = "Trace";
             // 
-            // lblCategoryID
+            // txtTraceFrameEnd
             // 
-            this.lblCategoryID.AutoSize = true;
-            this.lblCategoryID.Location = new System.Drawing.Point(6, 20);
-            this.lblCategoryID.Name = "lblCategoryID";
-            this.lblCategoryID.Size = new System.Drawing.Size(63, 13);
-            this.lblCategoryID.TabIndex = 0;
-            this.lblCategoryID.Text = "Category ID";
+            this.txtTraceFrameEnd.Location = new System.Drawing.Point(83, 85);
+            this.txtTraceFrameEnd.Name = "txtTraceFrameEnd";
+            this.txtTraceFrameEnd.ReadOnly = true;
+            this.txtTraceFrameEnd.Size = new System.Drawing.Size(58, 20);
+            this.txtTraceFrameEnd.TabIndex = 7;
             // 
-            // cmbCategoryID
+            // lblTraceFrameEnd
             // 
-            this.cmbCategoryID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbCategoryID.FormattingEnabled = true;
-            this.cmbCategoryID.Location = new System.Drawing.Point(83, 17);
-            this.cmbCategoryID.Name = "cmbCategoryID";
-            this.cmbCategoryID.Size = new System.Drawing.Size(58, 21);
-            this.cmbCategoryID.TabIndex = 1;
+            this.lblTraceFrameEnd.AutoSize = true;
+            this.lblTraceFrameEnd.Location = new System.Drawing.Point(6, 88);
+            this.lblTraceFrameEnd.Name = "lblTraceFrameEnd";
+            this.lblTraceFrameEnd.Size = new System.Drawing.Size(58, 13);
+            this.lblTraceFrameEnd.TabIndex = 6;
+            this.lblTraceFrameEnd.Text = "Frame End";
             // 
-            // label1
+            // txtTraceFrameStart
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 44);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Name";
+            this.txtTraceFrameStart.Location = new System.Drawing.Point(83, 64);
+            this.txtTraceFrameStart.Name = "txtTraceFrameStart";
+            this.txtTraceFrameStart.ReadOnly = true;
+            this.txtTraceFrameStart.Size = new System.Drawing.Size(58, 20);
+            this.txtTraceFrameStart.TabIndex = 5;
             // 
-            // btnCategoryNew
+            // lblTraceFrameStart
             // 
-            this.btnCategoryNew.Location = new System.Drawing.Point(6, 67);
-            this.btnCategoryNew.Name = "btnCategoryNew";
-            this.btnCategoryNew.Size = new System.Drawing.Size(40, 23);
-            this.btnCategoryNew.TabIndex = 3;
-            this.btnCategoryNew.Text = "New";
-            this.btnCategoryNew.UseVisualStyleBackColor = true;
+            this.lblTraceFrameStart.AutoSize = true;
+            this.lblTraceFrameStart.Location = new System.Drawing.Point(6, 67);
+            this.lblTraceFrameStart.Name = "lblTraceFrameStart";
+            this.lblTraceFrameStart.Size = new System.Drawing.Size(61, 13);
+            this.lblTraceFrameStart.TabIndex = 4;
+            this.lblTraceFrameStart.Text = "Frame Start";
             // 
-            // btnCategoryDelete
+            // comboBox1
             // 
-            this.btnCategoryDelete.Location = new System.Drawing.Point(52, 67);
-            this.btnCategoryDelete.Name = "btnCategoryDelete";
-            this.btnCategoryDelete.Size = new System.Drawing.Size(40, 23);
-            this.btnCategoryDelete.TabIndex = 4;
-            this.btnCategoryDelete.Text = "Del";
-            this.btnCategoryDelete.UseVisualStyleBackColor = true;
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(83, 42);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(58, 21);
+            this.comboBox1.TabIndex = 3;
             // 
-            // btnCategoryEditSave
+            // lblTraceTagID
             // 
-            this.btnCategoryEditSave.Location = new System.Drawing.Point(98, 67);
-            this.btnCategoryEditSave.Name = "btnCategoryEditSave";
-            this.btnCategoryEditSave.Size = new System.Drawing.Size(40, 23);
-            this.btnCategoryEditSave.TabIndex = 5;
-            this.btnCategoryEditSave.Text = "Edit";
-            this.btnCategoryEditSave.UseVisualStyleBackColor = true;
+            this.lblTraceTagID.AutoSize = true;
+            this.lblTraceTagID.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTraceTagID.Location = new System.Drawing.Point(6, 45);
+            this.lblTraceTagID.Name = "lblTraceTagID";
+            this.lblTraceTagID.Size = new System.Drawing.Size(44, 13);
+            this.lblTraceTagID.TabIndex = 2;
+            this.lblTraceTagID.Text = "Tag ID*";
             // 
-            // cmbTagID
+            // txtTraceID
             // 
-            this.cmbTagID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbTagID.FormattingEnabled = true;
-            this.cmbTagID.Location = new System.Drawing.Point(83, 14);
-            this.cmbTagID.Name = "cmbTagID";
-            this.cmbTagID.Size = new System.Drawing.Size(58, 21);
-            this.cmbTagID.TabIndex = 6;
+            this.txtTraceID.Location = new System.Drawing.Point(83, 20);
+            this.txtTraceID.Name = "txtTraceID";
+            this.txtTraceID.ReadOnly = true;
+            this.txtTraceID.Size = new System.Drawing.Size(58, 20);
+            this.txtTraceID.TabIndex = 1;
             // 
-            // lblTagName
+            // lblTraceID
             // 
-            this.lblTagName.AutoSize = true;
-            this.lblTagName.Location = new System.Drawing.Point(6, 39);
-            this.lblTagName.Name = "lblTagName";
-            this.lblTagName.Size = new System.Drawing.Size(35, 13);
-            this.lblTagName.TabIndex = 7;
-            this.lblTagName.Text = "Name";
+            this.lblTraceID.AutoSize = true;
+            this.lblTraceID.Location = new System.Drawing.Point(6, 23);
+            this.lblTraceID.Name = "lblTraceID";
+            this.lblTraceID.Size = new System.Drawing.Size(49, 13);
+            this.lblTraceID.TabIndex = 0;
+            this.lblTraceID.Text = "Trace ID";
             // 
-            // textBox1
+            // pnlTimeLine
             // 
-            this.textBox1.Location = new System.Drawing.Point(56, 36);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(85, 20);
-            this.textBox1.TabIndex = 8;
+            this.pnlTimeLine.Controls.Add(this.trbNaviSlider);
+            this.pnlTimeLine.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlTimeLine.Location = new System.Drawing.Point(154, 586);
+            this.pnlTimeLine.Name = "pnlTimeLine";
+            this.pnlTimeLine.Size = new System.Drawing.Size(485, 49);
+            this.pnlTimeLine.TabIndex = 10;
             // 
-            // btnTagEditSave
+            // trbNaviSlider
             // 
-            this.btnTagEditSave.Location = new System.Drawing.Point(98, 84);
-            this.btnTagEditSave.Name = "btnTagEditSave";
-            this.btnTagEditSave.Size = new System.Drawing.Size(40, 23);
-            this.btnTagEditSave.TabIndex = 9;
-            this.btnTagEditSave.Text = "Edit";
-            this.btnTagEditSave.UseVisualStyleBackColor = true;
+            this.trbNaviSlider.Location = new System.Drawing.Point(3, 4);
+            this.trbNaviSlider.Name = "trbNaviSlider";
+            this.trbNaviSlider.Size = new System.Drawing.Size(428, 42);
+            this.trbNaviSlider.TabIndex = 0;
             // 
             // Form1
             // 
@@ -1064,17 +1064,17 @@
             this.grpNavigation.ResumeLayout(false);
             this.grpNavigation.PerformLayout();
             this.pnlAttributes.ResumeLayout(false);
+            this.grpCategory.ResumeLayout(false);
+            this.grpCategory.PerformLayout();
+            this.grpTag.ResumeLayout(false);
+            this.grpTag.PerformLayout();
+            this.grpNode.ResumeLayout(false);
+            this.grpNode.PerformLayout();
             this.grpTrace.ResumeLayout(false);
             this.grpTrace.PerformLayout();
             this.pnlTimeLine.ResumeLayout(false);
             this.pnlTimeLine.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trbNaviSlider)).EndInit();
-            this.grpNode.ResumeLayout(false);
-            this.grpNode.PerformLayout();
-            this.grpTag.ResumeLayout(false);
-            this.grpTag.PerformLayout();
-            this.grpCategory.ResumeLayout(false);
-            this.grpCategory.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

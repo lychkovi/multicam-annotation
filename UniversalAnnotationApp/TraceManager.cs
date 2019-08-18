@@ -697,7 +697,14 @@ namespace UniversalAnnotationApp
         {
             int categoryID;
 
-            categoryID = int.Parse(m_gui.cmbCategoryID.Text);
+            string [] words = m_gui.cmbCategoryID.Text.Split(' ');
+            if (!int.TryParse(words[0], out categoryID))
+            {
+                MessageBox.Show("Wrong category string!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             if (MarkupCategoryGetByID(categoryID, out m_CurrCategory))
             {
                 m_ControlCategoryUpdate();
@@ -734,14 +741,11 @@ namespace UniversalAnnotationApp
             if (MarkupIsOpened && !m_IsPlaybackMode)
             {
                 m_gui.grpCategory.Enabled = true;
-                //m_gui.cmbCategoryID.SelectedIndexChanged -=
-                //    new EventHandler(m_ControlCategory_OnCategoryIdChange);
-                m_gui.cmbCategoryID.Text = m_CurrCategory.ID.ToString();
-                //m_gui.cmbCategoryID.SelectedIndexChanged +=
-                //    new EventHandler(m_ControlCategory_OnCategoryIdChange);
+                m_gui.cmbCategoryID.Text = string.Format("{0} ({1})", 
+                    m_CurrCategory.ID, m_CurrCategory.Name);
                 m_gui.txtCategoryName.Text = m_CurrCategory.Name;
                 if (m_CurrCategory.ID == 0)
-                    m_gui.btnCategoryDelete.Enabled = false; // нельзя удалять
+                    m_gui.btnCategoryDelete.Enabled = false; //нельзя удалять
                 else
                     m_gui.btnCategoryDelete.Enabled = true;
             }
@@ -764,7 +768,10 @@ namespace UniversalAnnotationApp
                 List<Category> categories = MarkupCategoryGetAll();
                 m_gui.cmbCategoryID.Items.Clear();
                 foreach (Category category in categories)
-                    m_gui.cmbCategoryID.Items.Add(category.ID.ToString());
+                {
+                    m_gui.cmbCategoryID.Items.Add(string.Format("{0} ({1})",
+                        category.ID, category.Name));
+                }
             }
             m_ControlCategoryUpdate();
         }
@@ -792,11 +799,22 @@ namespace UniversalAnnotationApp
             if (m_IsCategoryEdit)
             {
                 // Редактирование завершено - сохраняем иземенения в базу
-                m_CurrCategory.Name = m_gui.txtCategoryName.Text;
-                MarkupCategoryUpdate(m_CurrCategory);
+                try
+                {
+                    Category newCategory = m_CurrCategory;
+                    newCategory.Name = m_gui.txtCategoryName.Text;
+                    MarkupCategoryUpdate(newCategory);
+                    m_CurrCategory = newCategory;
+                }
+                catch (Exception exception)
+                {
+                    MessageBox.Show(exception.Message, "ERROR!", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
 
                 // Выходим из режима редактирования
                 m_ControlCategoryEditEnd();
+                m_ControlCategoryInit();
             }
             else
             {
@@ -1079,6 +1097,9 @@ namespace UniversalAnnotationApp
             if (DisplayCameraOpen(rec))
             {
                 TraceMoveToFrame(0);
+                // Загружаем тэг и категорию по умолчанию
+                MarkupCategoryGetByID(0, out m_CurrCategory);
+                MarkupTagGetByID(0, out m_CurrTag);
                 m_ControlsInit();
                 return true;
             }

@@ -27,7 +27,6 @@ namespace MarkupData
 
             DataColumn NameColumn = new DataColumn("Name", typeof(string));
             NameColumn.AllowDBNull = false;
-            NameColumn.Unique = true;
 
             DataColumn CommentColumn = 
                 new DataColumn("Comment", typeof(string));
