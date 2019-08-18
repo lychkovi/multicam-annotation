@@ -51,6 +51,39 @@ namespace UniversalAnnotationApp
         public Button btnTrackingSeekExtent;
         public Button btnTrackingTruncate;
         public Button btnTrackingTrack;
+
+        // Панель траектории
+        public GroupBox grpTrace;
+        public TextBox txtTraceID;
+        public ComboBox cmbTraceTagID;
+        public TextBox txtTraceFrameStart;
+        public TextBox txtTraceFrameEnd;
+
+        // Панель узла траектории Box/Marker
+        public GroupBox grpNode;
+        public TextBox txtNodePosX;
+        public TextBox txtNodePosY;
+        public TextBox txtNodeWidth;
+        public TextBox txtNodeHeight;
+        public CheckBox chkNodeIsOccluded;
+        public CheckBox chkNodeIsShaded;
+
+        // Панель тэга
+        public GroupBox grpTag;
+        public ComboBox cmbTagID;
+        public TextBox txtTagName;
+        public ComboBox cmbTagCategoryID;
+        public Button btnTagNew;
+        public Button btnTagDelete;
+        public Button btnTagEditSave;
+
+        // Панель категории
+        public GroupBox grpCategory;
+        public ComboBox cmbCategoryID;
+        public TextBox txtCategoryName;
+        public Button btnCategoryNew;
+        public Button btnCategoryDelete;
+        public Button btnCategoryEditSave;
     }
 
     public interface ITrace
@@ -187,6 +220,7 @@ namespace UniversalAnnotationApp
             {
                 m_ControlNaviUpdate();
                 m_ControlTrackingUpdate();
+                m_ControlCategoryUpdate();
             }
         }
 
@@ -196,6 +230,7 @@ namespace UniversalAnnotationApp
             {
                 m_ControlNaviInit();
                 m_ControlTrackingInit();
+                m_ControlCategoryInit();
             }
         }
 
@@ -647,6 +682,161 @@ namespace UniversalAnnotationApp
             m_ControlTrackingUpdate();
         }
 
+        // ************************** Панель тэга ***************************
+
+        // Начальная инициализация содержания панели тэга на форме
+        private void m_ControlTagInit()
+        {
+        }
+
+        // ************************ Панель категории ************************
+
+        // Обработчик события изменения выпадающего списка категорий
+        private void m_ControlCategory_OnCategoryIdChange(
+            object sender, EventArgs e)
+        {
+            int categoryID;
+
+            categoryID = int.Parse(m_gui.cmbCategoryID.Text);
+            if (MarkupCategoryGetByID(categoryID, out m_CurrCategory))
+            {
+                m_ControlCategoryUpdate();
+            }
+            else
+            {
+                MessageBox.Show("Missing category ID!", "ERROR!", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+        }
+
+        // Вход в режим редактирования текущей категории
+        private void m_ControlCategoryEditBegin()
+        {
+            m_gui.txtCategoryName.ReadOnly = false;
+            m_gui.btnCategoryEditSave.Text = "Save";
+            m_IsCategoryEdit = true;
+        }
+
+        // Выход из режима редактирования текущей категории
+        private void m_ControlCategoryEditEnd()
+        {
+            m_gui.txtCategoryName.ReadOnly = true;
+            m_gui.btnCategoryEditSave.Text = "Edit";
+            m_IsCategoryEdit = false;
+        }
+
+        // Обновление содержания панели категории на форме
+        private void m_ControlCategoryUpdate()
+        {
+            if (m_gui == null) return;
+
+            if (MarkupIsOpened && !m_IsPlaybackMode)
+            {
+                m_gui.grpCategory.Enabled = true;
+                //m_gui.cmbCategoryID.SelectedIndexChanged -=
+                //    new EventHandler(m_ControlCategory_OnCategoryIdChange);
+                m_gui.cmbCategoryID.Text = m_CurrCategory.ID.ToString();
+                //m_gui.cmbCategoryID.SelectedIndexChanged +=
+                //    new EventHandler(m_ControlCategory_OnCategoryIdChange);
+                m_gui.txtCategoryName.Text = m_CurrCategory.Name;
+                if (m_CurrCategory.ID == 0)
+                    m_gui.btnCategoryDelete.Enabled = false; // нельзя удалять
+                else
+                    m_gui.btnCategoryDelete.Enabled = true;
+            }
+            else
+                m_gui.grpCategory.Enabled = false;
+
+            // В любом случае выходим из режима редактирования категории
+            if (m_IsCategoryEdit)
+                m_ControlCategoryEditEnd();
+        }
+
+        // Начальная инициализация содержания панели категории на форме
+        private void m_ControlCategoryInit()
+        {
+            if (m_gui == null) return;
+
+            if (MarkupIsOpened)
+            {
+                // Заполняем список номеров категорий
+                List<Category> categories = MarkupCategoryGetAll();
+                m_gui.cmbCategoryID.Items.Clear();
+                foreach (Category category in categories)
+                    m_gui.cmbCategoryID.Items.Add(category.ID.ToString());
+            }
+            m_ControlCategoryUpdate();
+        }
+
+        // Обработчик нажатия на кнопку "New"
+        private void m_ControlCategory_OnNewClick(object sender, EventArgs e)
+        {
+            // Регистрируем новую запись в базе
+            m_CurrCategory.Name = "";
+            m_CurrCategory.ID = MarkupCategoryCreate(m_CurrCategory);
+
+            // Обновляем списки категорий в выпадающих списках
+            m_ControlTagInit();
+            m_ControlCategoryInit();
+
+            // Переводим панель категории в режим редактирования
+            m_gui.txtCategoryName.Text = m_CurrCategory.Name;
+            m_ControlCategoryEditBegin();
+        }
+
+        // Обработчик нажатия на кнопку "Edit/Save"
+        private void m_ControlCategory_OnEditSaveClick(
+            object sender, EventArgs e)
+        {
+            if (m_IsCategoryEdit)
+            {
+                // Редактирование завершено - сохраняем иземенения в базу
+                m_CurrCategory.Name = m_gui.txtCategoryName.Text;
+                MarkupCategoryUpdate(m_CurrCategory);
+
+                // Выходим из режима редактирования
+                m_ControlCategoryEditEnd();
+            }
+            else
+            {
+                // Входим в режим редактирования
+                m_ControlCategoryEditBegin();
+            }
+        }
+
+        // Обработчик нажатия на кнопку "Del"
+        private void m_ControlCategory_OnDelClick(object sender, EventArgs e)
+        {
+            if (m_CurrCategory.ID == 0)
+            {
+                MessageBox.Show("Unable to delete category 0!", "ERROR!", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                MarkupCategoryDelete(m_CurrCategory.ID);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, "ERROR!", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Обновляем текущую выбранную траекторию
+            List<Category> categories = MarkupCategoryGetAll();
+            if (categories.Count == 0)
+                throw new Exception("No categories remaining!");
+            m_CurrCategory = categories[categories.Count - 1];
+
+            // Обновляем списки категорий в выпадающщих списках
+            m_ControlTagInit();
+            m_ControlCategoryInit();
+        }
+
         // ***************** Общие манипуляции с траекторией ****************
 
         // Метод переводит пользовательский элемент управления в режим
@@ -1013,6 +1203,16 @@ namespace UniversalAnnotationApp
                 new EventHandler(m_ControlTracking_OnTruncateClick);
             m_gui.btnTrackingTrack.Click +=
                 new EventHandler(m_ControlTracking_OnTrackClick);
+
+            // Панель Category
+            m_gui.cmbCategoryID.SelectedIndexChanged += 
+                new EventHandler(m_ControlCategory_OnCategoryIdChange);
+            m_gui.btnCategoryNew.Click += 
+                new EventHandler(m_ControlCategory_OnNewClick);
+            m_gui.btnCategoryDelete.Click +=
+                new EventHandler(m_ControlCategory_OnDelClick);
+            m_gui.btnCategoryEditSave.Click +=
+                new EventHandler(m_ControlCategory_OnEditSaveClick);
 
             // Обновлям все элементы управления
             m_ControlsInit();

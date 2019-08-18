@@ -72,6 +72,14 @@ namespace UniversalAnnotationApp
             traceControls.btnTrackingSeekExtent = btnTrackingSeekExtent;
             traceControls.btnTrackingTruncate = btnTrackingTruncate;
             traceControls.btnTrackingTrack = btnTrackingTrack;
+            // Панель категории
+            traceControls.grpCategory = grpCategory;
+            traceControls.cmbCategoryID = cmbCategoryID;
+            traceControls.txtCategoryName = txtCategoryName;
+            traceControls.btnCategoryNew = btnCategoryNew;
+            traceControls.btnCategoryDelete = btnCategoryDelete;
+            traceControls.btnCategoryEditSave = btnCategoryEditSave;
+            // Регистрируем все элементы управления в слое TraceManager
             engine.TraceGuiBind(traceControls);
 
             FileManagerControls fileControls;
