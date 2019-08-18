@@ -87,6 +87,20 @@ namespace UniversalAnnotationApp
             traceControls.btnTagNew = btnTagNew;
             traceControls.btnTagDelete = btnTagDelete;
             traceControls.btnTagEditSave = btnTagEditSave;
+            // Панель траектории
+            traceControls.grpTrace = grpTrace;
+            traceControls.txtTraceID = txtTraceID;
+            traceControls.cmbTraceTagID = cmbTraceTagID;
+            traceControls.txtTraceFrameStart = txtTraceFrameStart;
+            traceControls.txtTraceFrameEnd = txtTraceFrameEnd;
+            // Панель узла траектории
+            traceControls.grpNode = grpNode;
+            traceControls.txtNodePosX = txtNodePosX;
+            traceControls.txtNodePosY = txtNodePosY;
+            traceControls.txtNodeWidth = txtNodeWidth;
+            traceControls.txtNodeHeight = txtNodeHeight;
+            traceControls.chkNodeIsOccluded = chkNodeIsOccluded;
+            traceControls.chkNodeIsShaded = chkNodeIsShaded;
             // Регистрируем все элементы управления в слое TraceManager
             engine.TraceGuiBind(traceControls);
 

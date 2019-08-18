@@ -220,6 +220,8 @@ namespace UniversalAnnotationApp
             if (m_gui != null)
             {
                 m_ControlNaviUpdate();
+                m_ControlTraceUpdate();
+                m_ControlNodeUpdate();
                 m_ControlTagUpdate();
                 m_ControlCategoryUpdate();
                 m_ControlTrackingUpdate();
@@ -233,6 +235,8 @@ namespace UniversalAnnotationApp
                 m_ControlNaviInit();
                 m_ControlCategoryInit();
                 m_ControlTagInit();
+                m_ControlNodeInit();
+                m_ControlTraceInit();
                 m_ControlTrackingInit();
             }
         }
@@ -686,9 +690,171 @@ namespace UniversalAnnotationApp
         }
 
         // *********************** Панель траектории ************************
+        
+        // Обновление содержания панели траектории на форме
+        private void m_ControlTraceUpdate()
+        {
+            if (m_gui == null) return;
 
+            if (m_IsTraceSelected && !m_IsPlaybackMode)
+            {
+                m_gui.grpTrace.Enabled = true;
+                m_gui.txtTraceID.Text = m_CurrTrace.ID.ToString();
+                Tag tag;
+                MarkupTagGetByID(m_CurrTrace.TagID, out tag);
+                m_gui.cmbTraceTagID.Text = string.Format("{0} ({1})",
+                    tag.ID, tag.Name);
+                m_gui.txtTraceFrameStart.Text =
+                    m_CurrTrace.FrameStart.ToString();
+                m_gui.txtTraceFrameEnd.Text =
+                    m_CurrTrace.FrameEnd.ToString();
+            }
+            else
+                m_gui.grpTrace.Enabled = false;
+        }
+
+        // Начальная инициализация содержания панели траектории на форме
         private void m_ControlTraceInit()
         {
+            if (m_gui == null) return;
+
+            if (MarkupIsOpened)
+            {
+                // Заполняем выпадающий список тэгов
+                List<Tag> tags = MarkupTagGetAll();
+                m_gui.cmbTraceTagID.Items.Clear();
+                foreach (Tag tag in tags)
+                {
+                    m_gui.cmbTraceTagID.Items.Add(string.Format("{0} ({1})",
+                        tag.ID, tag.Name));
+                }
+            }
+            m_ControlTraceUpdate();
+        }
+
+        // Обработчик изменения выпадающего списка тэгов
+        private void m_ControlTrace_OnTagIdChange(object sender, EventArgs e)
+        {
+            int tagID;
+            int categoryID;
+
+            // Декодируем выбранный номер тэга для траектории
+            string[] words = m_gui.cmbTraceTagID.Text.Split(' ');
+            if (!int.TryParse(words[0], out tagID))
+            {
+                MessageBox.Show("Wrong tag string!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Сохраняем изменения в базу данных
+            m_CurrTrace.TagID = tagID;
+            MarkupTraceUpdate(m_CurrTrace);
+
+            // Обновляем содержание панели тэга
+            if (MarkupTagGetByID(tagID, out m_CurrTag))
+            {
+                m_ControlTagUpdate();
+            }
+            else
+            {
+                MessageBox.Show("Missing tag ID!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Обновляем содержание панели категории
+            categoryID = m_CurrTag.CategoryID;
+            if (MarkupCategoryGetByID(categoryID, out m_CurrCategory))
+            {
+                m_ControlCategoryUpdate();
+            }
+            else
+            {
+                MessageBox.Show("Missing category ID!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+        }
+
+        // ******************** Панель узла траектории **********************
+
+        // Обработчик изменения галочки Is Occluded (только для Box)
+        private void m_ControlNode_OnOccludedChange(
+            object sender, EventArgs e)
+        {
+            m_CurrBox.IsOccluded = m_gui.chkNodeIsOccluded.Checked;
+            MarkupBoxUpdate(m_CurrBox);
+        }
+
+        // Обработчик изменения галочки Is Shaded
+        private void m_ControlNode_OnShadedChange(
+            object sender, EventArgs e)
+        {
+            if (m_CurrTrace.HasBox)
+            {
+                m_CurrBox.IsShaded = m_gui.chkNodeIsShaded.Checked;
+                MarkupBoxUpdate(m_CurrBox);
+            }
+            else
+            {
+                m_CurrMarker.IsShaded = m_gui.chkNodeIsShaded.Checked;
+                MarkupMarkerUpdate(m_CurrMarker);
+            }
+        }
+
+        // Обновление содержания панели узла траектории на форме
+        private void m_ControlNodeUpdate()
+        {
+            if (m_gui == null) return;
+
+            if (m_IsTraceSelected && !m_IsPlaybackMode)
+            {
+                m_gui.grpNode.Enabled = true;
+                if (m_CurrTrace.HasBox)
+                {
+                    m_gui.txtNodePosX.Text = m_CurrBox.PosX.ToString();
+                    m_gui.txtNodePosY.Text = m_CurrBox.PosY.ToString();
+                    m_gui.txtNodeWidth.Text = m_CurrBox.Width.ToString();
+                    m_gui.txtNodeWidth.Visible = true;
+                    m_gui.txtNodeHeight.Text = m_CurrBox.Height.ToString();
+                    m_gui.txtNodeHeight.Visible = true;
+                    m_gui.chkNodeIsShaded.CheckedChanged -=
+                        new EventHandler(m_ControlNode_OnShadedChange);
+                    m_gui.chkNodeIsShaded.Checked = m_CurrBox.IsShaded;
+                    m_gui.chkNodeIsShaded.CheckedChanged +=
+                        new EventHandler(m_ControlNode_OnShadedChange);
+                    m_gui.chkNodeIsOccluded.CheckedChanged -=
+                        new EventHandler(m_ControlNode_OnOccludedChange);
+                    m_gui.chkNodeIsOccluded.Checked = m_CurrBox.IsOccluded;
+                    m_gui.chkNodeIsOccluded.Visible = true;
+                    m_gui.chkNodeIsOccluded.CheckedChanged +=
+                        new EventHandler(m_ControlNode_OnOccludedChange);
+                }
+                else
+                {
+                    m_gui.txtNodePosX.Text = m_CurrMarker.PosX.ToString();
+                    m_gui.txtNodePosY.Text = m_CurrMarker.PosY.ToString();
+                    m_gui.txtNodeWidth.Visible = false;
+                    m_gui.txtNodeHeight.Visible = false;
+                    m_gui.chkNodeIsShaded.CheckedChanged -=
+                        new EventHandler(m_ControlNode_OnShadedChange);
+                    m_gui.chkNodeIsShaded.Checked = m_CurrMarker.IsShaded;
+                    m_gui.chkNodeIsShaded.CheckedChanged +=
+                        new EventHandler(m_ControlNode_OnShadedChange);
+                    m_gui.chkNodeIsOccluded.Visible = false;
+                }
+            }
+            else
+                m_gui.grpNode.Enabled = false;
+        }
+
+        // Начальная инициализация содержания панели узла траектории на форме
+        private void m_ControlNodeInit()
+        {
+            if (m_gui == null) return;
+
+            m_ControlNodeUpdate();
         }
 
         // ************************** Панель тэга ***************************
@@ -842,7 +1008,9 @@ namespace UniversalAnnotationApp
             m_CurrTag.ID = MarkupTagCreate(m_CurrTag);
 
             // Обновляем списки тэгов в выпадающих списках
+            Tag currTag = m_CurrTag;
             m_ControlTraceInit();
+            m_CurrTag = currTag;
             m_ControlTagInit();
 
             // Переводим панель тэга в режим редактирования
@@ -872,7 +1040,11 @@ namespace UniversalAnnotationApp
 
                 // Выходим из режима редактирования
                 m_ControlTagEditEnd();
+
+                // Обновляем содержание панелей
+                Tag currTag = m_CurrTag;
                 m_ControlTraceInit();
+                m_CurrTag = currTag;
                 m_ControlTagInit();
             }
             else
@@ -1113,7 +1285,7 @@ namespace UniversalAnnotationApp
             // Регистрируем новую траекторию в базе
             Trace trace = new Trace();
             trace.ViewID = args.ViewID;
-            trace.TagID = 0;
+            trace.TagID = m_CurrTag.ID;
             trace.FrameStart = m_CurrFrameID;
             trace.FrameEnd = m_CurrFrameID;
             trace.HasBox = args.HasBox;
@@ -1477,6 +1649,16 @@ namespace UniversalAnnotationApp
             m_gui.btnTagEditSave.Click +=
                 new EventHandler(m_ControlTag_OnEditSaveClick);
 
+            // Панель Node
+            m_gui.chkNodeIsOccluded.CheckedChanged +=
+                new EventHandler(m_ControlNode_OnOccludedChange);
+            m_gui.chkNodeIsShaded.CheckedChanged +=
+                new EventHandler(m_ControlNode_OnShadedChange);
+
+            // Панель Trace
+            m_gui.cmbTraceTagID.SelectedIndexChanged +=
+                new EventHandler(m_ControlTrace_OnTagIdChange);
+
             // Обновлям все элементы управления
             m_ControlsInit();
         }
@@ -1491,6 +1673,7 @@ namespace UniversalAnnotationApp
             m_CurrTag = new Tag();
             m_CurrCategory = new Category();
             m_IsCategoryEdit = false;
+            m_IsTagEdit = false;
             m_IsBoxMajor = true;
 
             m_CurrFrameID = -1;

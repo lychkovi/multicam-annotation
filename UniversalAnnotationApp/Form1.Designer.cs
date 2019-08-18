@@ -119,7 +119,7 @@
             this.lblTraceFrameEnd = new System.Windows.Forms.Label();
             this.txtTraceFrameStart = new System.Windows.Forms.TextBox();
             this.lblTraceFrameStart = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.cmbTraceTagID = new System.Windows.Forms.ComboBox();
             this.lblTraceTagID = new System.Windows.Forms.Label();
             this.txtTraceID = new System.Windows.Forms.TextBox();
             this.lblTraceID = new System.Windows.Forms.Label();
@@ -938,7 +938,7 @@
             this.grpTrace.Controls.Add(this.lblTraceFrameEnd);
             this.grpTrace.Controls.Add(this.txtTraceFrameStart);
             this.grpTrace.Controls.Add(this.lblTraceFrameStart);
-            this.grpTrace.Controls.Add(this.comboBox1);
+            this.grpTrace.Controls.Add(this.cmbTraceTagID);
             this.grpTrace.Controls.Add(this.lblTraceTagID);
             this.grpTrace.Controls.Add(this.txtTraceID);
             this.grpTrace.Controls.Add(this.lblTraceID);
@@ -983,14 +983,14 @@
             this.lblTraceFrameStart.TabIndex = 4;
             this.lblTraceFrameStart.Text = "Frame Start";
             // 
-            // comboBox1
+            // cmbTraceTagID
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(83, 42);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(58, 21);
-            this.comboBox1.TabIndex = 3;
+            this.cmbTraceTagID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTraceTagID.FormattingEnabled = true;
+            this.cmbTraceTagID.Location = new System.Drawing.Point(47, 42);
+            this.cmbTraceTagID.Name = "cmbTraceTagID";
+            this.cmbTraceTagID.Size = new System.Drawing.Size(94, 21);
+            this.cmbTraceTagID.TabIndex = 3;
             // 
             // lblTraceTagID
             // 
@@ -998,9 +998,9 @@
             this.lblTraceTagID.ForeColor = System.Drawing.SystemColors.Desktop;
             this.lblTraceTagID.Location = new System.Drawing.Point(6, 45);
             this.lblTraceTagID.Name = "lblTraceTagID";
-            this.lblTraceTagID.Size = new System.Drawing.Size(44, 13);
+            this.lblTraceTagID.Size = new System.Drawing.Size(40, 13);
             this.lblTraceTagID.TabIndex = 2;
-            this.lblTraceTagID.Text = "Tag ID*";
+            this.lblTraceTagID.Text = "Tag ID";
             // 
             // txtTraceID
             // 
@@ -1146,7 +1146,7 @@
         private System.Windows.Forms.Label lblTraceFrameEnd;
         private System.Windows.Forms.TextBox txtTraceFrameStart;
         private System.Windows.Forms.Label lblTraceFrameStart;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox cmbTraceTagID;
         private System.Windows.Forms.Label lblTraceTagID;
         private System.Windows.Forms.TextBox txtTraceID;
         private System.Windows.Forms.Label lblTraceID;
