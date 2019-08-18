@@ -53,8 +53,8 @@ namespace MarkupData
     public struct Tag
     {
         public int ID;              // идентификатор объекта
+        public string Name;         // название
         public int CategoryID;      // идентификатор категории объекта
-        public string Comment;      // комментарий
     }
 
     /* Trace: Траектория объекта или его элемента в кадре отдельной камеры */

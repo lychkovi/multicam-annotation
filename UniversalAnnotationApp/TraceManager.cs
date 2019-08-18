@@ -124,6 +124,7 @@ namespace UniversalAnnotationApp
         private Marker m_CurrMarker; // если m_CurrTrace.HasBox == false
         private Tag m_CurrTag;
         private Category m_CurrCategory;
+        private bool m_IsTagEdit;
         private bool m_IsCategoryEdit;
 
         private int m_CurrFrameID;
@@ -219,8 +220,9 @@ namespace UniversalAnnotationApp
             if (m_gui != null)
             {
                 m_ControlNaviUpdate();
-                m_ControlTrackingUpdate();
+                m_ControlTagUpdate();
                 m_ControlCategoryUpdate();
+                m_ControlTrackingUpdate();
             }
         }
 
@@ -229,8 +231,9 @@ namespace UniversalAnnotationApp
             if (m_gui != null)
             {
                 m_ControlNaviInit();
-                m_ControlTrackingInit();
                 m_ControlCategoryInit();
+                m_ControlTagInit();
+                m_ControlTrackingInit();
             }
         }
 
@@ -682,11 +685,233 @@ namespace UniversalAnnotationApp
             m_ControlTrackingUpdate();
         }
 
+        // *********************** Панель траектории ************************
+
+        private void m_ControlTraceInit()
+        {
+        }
+
         // ************************** Панель тэга ***************************
+
+        // Вход в режим редактирования текущего тэга
+        private void m_ControlTagEditBegin()
+        {
+            m_gui.txtTagName.ReadOnly = false;
+            m_gui.btnTagEditSave.Text = "Save";
+            m_IsTagEdit = true;
+        }
+
+        // Выход из режима редактирования текущего тэга
+        private void m_ControlTagEditEnd()
+        {
+            m_gui.txtTagName.ReadOnly = true;
+            m_gui.btnTagEditSave.Text = "Edit";
+            m_IsTagEdit = false;
+        }
+
+        // Обновление содержания панели тэга на форме
+        private void m_ControlTagUpdate()
+        {
+            if (m_gui == null) return;
+
+            if (MarkupIsOpened && !m_IsPlaybackMode)
+            {
+                m_gui.grpTag.Enabled = true;
+                m_gui.cmbTagID.Text = string.Format("{0} ({1})",
+                    m_CurrTag.ID, m_CurrTag.Name);
+                m_gui.txtTagName.Text = m_CurrTag.Name;
+                Category category;
+                MarkupCategoryGetByID(m_CurrTag.CategoryID, out category);
+                m_gui.cmbTagCategoryID.Text = string.Format("{0} ({1})",
+                    category.ID, category.Name);
+                if (m_CurrTag.ID == 0)
+                {
+                    m_gui.btnTagDelete.Enabled = false; //нельзя удалять
+                    m_gui.cmbTagCategoryID.Enabled = false; //и менять категорию
+                }
+                else
+                {
+                    m_gui.btnTagDelete.Enabled = true;
+                    m_gui.cmbTagCategoryID.Enabled = true;
+                }
+            }
+            else
+                m_gui.grpTag.Enabled = false;
+
+            // В любом случае выходим из режима редактирования тэга
+            if (m_IsTagEdit)
+                m_ControlTagEditEnd();
+        }
 
         // Начальная инициализация содержания панели тэга на форме
         private void m_ControlTagInit()
         {
+            if (m_gui == null) return;
+
+            if (MarkupIsOpened)
+            {
+                // Заполняем список номеров тэгов
+                List<Tag> tags = MarkupTagGetAll();
+                m_gui.cmbTagID.Items.Clear();
+                foreach (Tag tag in tags)
+                {
+                    m_gui.cmbTagID.Items.Add(string.Format("{0} ({1})",
+                        tag.ID, tag.Name));
+                }
+
+                // Заполняем массив номеров категорий
+                List<Category> categories = MarkupCategoryGetAll();
+                m_gui.cmbTagCategoryID.Items.Clear();
+                foreach (Category category in categories)
+                {
+                    m_gui.cmbTagCategoryID.Items.Add(string.Format(
+                        "{0} ({1})", category.ID, category.Name));
+                }
+            }
+            m_ControlTagUpdate();
+        }
+
+        // Обработчик события изменения выпадающего списка тэгов
+        private void m_ControlTag_OnTagIdChange(
+            object sender, EventArgs e)
+        {
+            int tagID;
+            int categoryID;
+
+            string[] words = m_gui.cmbTagID.Text.Split(' ');
+            if (!int.TryParse(words[0], out tagID))
+            {
+                MessageBox.Show("Wrong tag string!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (MarkupTagGetByID(tagID, out m_CurrTag))
+            {
+                m_ControlTagUpdate();
+            }
+            else
+            {
+                MessageBox.Show("Missing tag ID!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            categoryID = m_CurrTag.CategoryID;
+            if (MarkupCategoryGetByID(categoryID, out m_CurrCategory))
+            {
+                m_ControlCategoryUpdate();
+            }
+            else
+            {
+                MessageBox.Show("Missing category ID!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+        }
+
+        // Обработчик события изменения выпадающего списка категорий тэгов
+        private void m_ControlTag_OnCategoryIdChange(
+            object sender, EventArgs e)
+        {
+            int categoryID;
+
+            string[] words = m_gui.cmbTagCategoryID.Text.Split(' ');
+            if (!int.TryParse(words[0], out categoryID))
+            {
+                MessageBox.Show("Wrong category string!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Обновляем значение полей тэга в базе
+            m_CurrTag.CategoryID = categoryID;
+            MarkupTagUpdate(m_CurrTag);
+
+            // Обновляем содержимое панели категории
+            MarkupCategoryGetByID(categoryID, out m_CurrCategory);
+            m_ControlCategoryUpdate();
+        }
+
+        // Обработчик нажатия на кнопку "New"
+        private void m_ControlTag_OnNewClick(object sender, EventArgs e)
+        {
+            // Регистрируем новую запись в базе
+            m_CurrTag.Name = "";
+            m_CurrTag.CategoryID = m_CurrCategory.ID;
+            m_CurrTag.ID = MarkupTagCreate(m_CurrTag);
+
+            // Обновляем списки тэгов в выпадающих списках
+            m_ControlTraceInit();
+            m_ControlTagInit();
+
+            // Переводим панель тэга в режим редактирования
+            m_gui.txtTagName.Text = m_CurrTag.Name;
+            m_ControlTagEditBegin();
+        }
+
+        // Обработчик нажатия на кнопку "Edit/Save"
+        private void m_ControlTag_OnEditSaveClick(
+            object sender, EventArgs e)
+        {
+            if (m_IsTagEdit)
+            {
+                // Редактирование завершено - сохраняем иземенения в базу
+                try
+                {
+                    Tag newTag = m_CurrTag;
+                    newTag.Name = m_gui.txtTagName.Text;
+                    MarkupTagUpdate(newTag);
+                    m_CurrTag = newTag;
+                }
+                catch (Exception exception)
+                {
+                    MessageBox.Show(exception.Message, "ERROR!",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                // Выходим из режима редактирования
+                m_ControlTagEditEnd();
+                m_ControlTraceInit();
+                m_ControlTagInit();
+            }
+            else
+            {
+                // Входим в режим редактирования
+                m_ControlTagEditBegin();
+            }
+        }
+
+        // Обработчик нажатия на кнопку "Del"
+        private void m_ControlTag_OnDelClick(object sender, EventArgs e)
+        {
+            if (m_CurrTag.ID == 0)
+            {
+                MessageBox.Show("Unable to delete tag 0!", "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                MarkupTagDelete(m_CurrTag.ID);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, "ERROR!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Обновляем текущий выбранный тэг
+            List<Tag> tags = MarkupTagGetAll();
+            if (tags.Count == 0)
+                throw new Exception("No tags remaining!");
+            m_CurrTag = tags[tags.Count - 1];
+
+            // Обновляем списки тэгов в выпадающщих списках
+            m_ControlTraceInit();
+            m_ControlTagInit();
         }
 
         // ************************ Панель категории ************************
@@ -780,11 +1005,14 @@ namespace UniversalAnnotationApp
         private void m_ControlCategory_OnNewClick(object sender, EventArgs e)
         {
             // Регистрируем новую запись в базе
-            m_CurrCategory.Name = "";
-            m_CurrCategory.ID = MarkupCategoryCreate(m_CurrCategory);
+            Category category = new Category();
+            category.Name = "";
+            category.Comment = "";
+            category.ID = MarkupCategoryCreate(category);
 
             // Обновляем списки категорий в выпадающих списках
             m_ControlTagInit();
+            m_CurrCategory = category;
             m_ControlCategoryInit();
 
             // Переводим панель категории в режим редактирования
@@ -799,21 +1027,23 @@ namespace UniversalAnnotationApp
             if (m_IsCategoryEdit)
             {
                 // Редактирование завершено - сохраняем иземенения в базу
+                Category newCategory = m_CurrCategory;
                 try
                 {
-                    Category newCategory = m_CurrCategory;
                     newCategory.Name = m_gui.txtCategoryName.Text;
                     MarkupCategoryUpdate(newCategory);
-                    m_CurrCategory = newCategory;
                 }
                 catch (Exception exception)
                 {
                     MessageBox.Show(exception.Message, "ERROR!", 
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
 
                 // Выходим из режима редактирования
                 m_ControlCategoryEditEnd();
+                m_ControlTagInit();
+                m_CurrCategory = newCategory;
                 m_ControlCategoryInit();
             }
             else
@@ -844,7 +1074,7 @@ namespace UniversalAnnotationApp
                 return;
             }
 
-            // Обновляем текущую выбранную траекторию
+            // Обновляем текущую выбранную категорию
             List<Category> categories = MarkupCategoryGetAll();
             if (categories.Count == 0)
                 throw new Exception("No categories remaining!");
@@ -1234,6 +1464,18 @@ namespace UniversalAnnotationApp
                 new EventHandler(m_ControlCategory_OnDelClick);
             m_gui.btnCategoryEditSave.Click +=
                 new EventHandler(m_ControlCategory_OnEditSaveClick);
+
+            // Панель Tag
+            m_gui.cmbTagID.SelectedIndexChanged +=
+                new EventHandler(m_ControlTag_OnTagIdChange);
+            m_gui.cmbTagCategoryID.SelectedIndexChanged +=
+                new EventHandler(m_ControlTag_OnCategoryIdChange);
+            m_gui.btnTagNew.Click +=
+                new EventHandler(m_ControlTag_OnNewClick);
+            m_gui.btnTagDelete.Click +=
+                new EventHandler(m_ControlTag_OnDelClick);
+            m_gui.btnTagEditSave.Click +=
+                new EventHandler(m_ControlTag_OnEditSaveClick);
 
             // Обновлям все элементы управления
             m_ControlsInit();

@@ -71,20 +71,20 @@ namespace MarkupData
             IdColumn.AutoIncrementSeed = 0;
             IdColumn.AutoIncrementStep = 1;
 
-            DataColumn categoryIdColumn = 
+            DataColumn CategoryIdColumn = 
                 new DataColumn("CategoryID", typeof(int));
-            categoryIdColumn.AllowDBNull = false;
-            categoryIdColumn.DefaultValue = 0; // категория "Unknown"
+            CategoryIdColumn.AllowDBNull = false;
+            CategoryIdColumn.DefaultValue = 0; // категория "Unknown"
 
             DataColumn CommentColumn =
-                new DataColumn("Comment", typeof(string));
+                new DataColumn("Name", typeof(string));
             CommentColumn.AllowDBNull = false;
             CommentColumn.DefaultValue = "";
 
             /* Создаем саму таблицу. */
             DataTable TagsTable = new DataTable("Tags");
             TagsTable.Columns.AddRange(new DataColumn[] { IdColumn, 
-                categoryIdColumn, CommentColumn });
+                CategoryIdColumn, CommentColumn });
             TagsTable.PrimaryKey = new DataColumn[] 
                 { TagsTable.Columns["ID"] };
 
@@ -372,7 +372,7 @@ namespace MarkupData
             /* Добавляем в таблицу нулевую метку Unknown по умолчанию 
              * для новых траекторий. */
             DataRow DefaultTag = m_data.Tables["Tags"].NewRow();
-            DefaultTag["Comment"] = "Unknown";
+            DefaultTag["Name"] = "Unknown";
             m_data.Tables["Tags"].Rows.Add(DefaultTag);
         }
 
@@ -593,7 +593,7 @@ namespace MarkupData
             Tag tag = new Tag();
             tag.ID = (int)row["ID"];
             tag.CategoryID = (int)row["CategoryID"];
-            tag.Comment = (string)row["Comment"];
+            tag.Name = (string)row["Name"];
             return tag;
         }
 
@@ -601,7 +601,7 @@ namespace MarkupData
         {
             row.BeginEdit();
             row["CategoryID"] = tag.CategoryID;
-            row["Comment"] = tag.Comment;
+            row["Name"] = tag.Name;
             row.EndEdit();
         }
 

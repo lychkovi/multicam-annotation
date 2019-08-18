@@ -95,12 +95,12 @@
             this.txtCategoryName = new System.Windows.Forms.TextBox();
             this.grpTag = new System.Windows.Forms.GroupBox();
             this.btnTagEditSave = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtTagName = new System.Windows.Forms.TextBox();
             this.lblTagName = new System.Windows.Forms.Label();
             this.cmbTagID = new System.Windows.Forms.ComboBox();
             this.btnTagDelete = new System.Windows.Forms.Button();
             this.btnTagNew = new System.Windows.Forms.Button();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.cmbTagCategoryID = new System.Windows.Forms.ComboBox();
             this.lblTagCategoryID = new System.Windows.Forms.Label();
             this.lblTagID = new System.Windows.Forms.Label();
             this.grpNode = new System.Windows.Forms.GroupBox();
@@ -727,12 +727,12 @@
             // grpTag
             // 
             this.grpTag.Controls.Add(this.btnTagEditSave);
-            this.grpTag.Controls.Add(this.textBox1);
+            this.grpTag.Controls.Add(this.txtTagName);
             this.grpTag.Controls.Add(this.lblTagName);
             this.grpTag.Controls.Add(this.cmbTagID);
             this.grpTag.Controls.Add(this.btnTagDelete);
             this.grpTag.Controls.Add(this.btnTagNew);
-            this.grpTag.Controls.Add(this.comboBox2);
+            this.grpTag.Controls.Add(this.cmbTagCategoryID);
             this.grpTag.Controls.Add(this.lblTagCategoryID);
             this.grpTag.Controls.Add(this.lblTagID);
             this.grpTag.Location = new System.Drawing.Point(4, 284);
@@ -751,13 +751,13 @@
             this.btnTagEditSave.Text = "Edit";
             this.btnTagEditSave.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // txtTagName
             // 
-            this.textBox1.Location = new System.Drawing.Point(56, 36);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(85, 20);
-            this.textBox1.TabIndex = 8;
+            this.txtTagName.Location = new System.Drawing.Point(47, 36);
+            this.txtTagName.Name = "txtTagName";
+            this.txtTagName.ReadOnly = true;
+            this.txtTagName.Size = new System.Drawing.Size(94, 20);
+            this.txtTagName.TabIndex = 8;
             // 
             // lblTagName
             // 
@@ -772,9 +772,9 @@
             // 
             this.cmbTagID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbTagID.FormattingEnabled = true;
-            this.cmbTagID.Location = new System.Drawing.Point(83, 14);
+            this.cmbTagID.Location = new System.Drawing.Point(47, 14);
             this.cmbTagID.Name = "cmbTagID";
-            this.cmbTagID.Size = new System.Drawing.Size(58, 21);
+            this.cmbTagID.Size = new System.Drawing.Size(94, 21);
             this.cmbTagID.TabIndex = 6;
             // 
             // btnTagDelete
@@ -795,14 +795,14 @@
             this.btnTagNew.Text = "New";
             this.btnTagNew.UseVisualStyleBackColor = true;
             // 
-            // comboBox2
+            // cmbTagCategoryID
             // 
-            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(83, 57);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(58, 21);
-            this.comboBox2.TabIndex = 3;
+            this.cmbTagCategoryID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTagCategoryID.FormattingEnabled = true;
+            this.cmbTagCategoryID.Location = new System.Drawing.Point(47, 57);
+            this.cmbTagCategoryID.Name = "cmbTagCategoryID";
+            this.cmbTagCategoryID.Size = new System.Drawing.Size(94, 21);
+            this.cmbTagCategoryID.TabIndex = 3;
             // 
             // lblTagCategoryID
             // 
@@ -810,18 +810,18 @@
             this.lblTagCategoryID.ForeColor = System.Drawing.SystemColors.Desktop;
             this.lblTagCategoryID.Location = new System.Drawing.Point(6, 60);
             this.lblTagCategoryID.Name = "lblTagCategoryID";
-            this.lblTagCategoryID.Size = new System.Drawing.Size(67, 13);
+            this.lblTagCategoryID.Size = new System.Drawing.Size(38, 13);
             this.lblTagCategoryID.TabIndex = 2;
-            this.lblTagCategoryID.Text = "Category ID*";
+            this.lblTagCategoryID.Text = "Categ.";
             // 
             // lblTagID
             // 
             this.lblTagID.AutoSize = true;
             this.lblTagID.Location = new System.Drawing.Point(6, 19);
             this.lblTagID.Name = "lblTagID";
-            this.lblTagID.Size = new System.Drawing.Size(40, 13);
+            this.lblTagID.Size = new System.Drawing.Size(18, 13);
             this.lblTagID.TabIndex = 0;
-            this.lblTagID.Text = "Tag ID";
+            this.lblTagID.Text = "ID";
             // 
             // grpNode
             // 
@@ -848,9 +848,9 @@
             this.chkNodeIsShaded.ForeColor = System.Drawing.SystemColors.Desktop;
             this.chkNodeIsShaded.Location = new System.Drawing.Point(9, 128);
             this.chkNodeIsShaded.Name = "chkNodeIsShaded";
-            this.chkNodeIsShaded.Size = new System.Drawing.Size(78, 17);
+            this.chkNodeIsShaded.Size = new System.Drawing.Size(74, 17);
             this.chkNodeIsShaded.TabIndex = 9;
-            this.chkNodeIsShaded.Text = "Is Shaded*";
+            this.chkNodeIsShaded.Text = "Is Shaded";
             this.chkNodeIsShaded.UseVisualStyleBackColor = true;
             // 
             // chkNodeIsOccluded
@@ -859,9 +859,9 @@
             this.chkNodeIsOccluded.ForeColor = System.Drawing.SystemColors.Desktop;
             this.chkNodeIsOccluded.Location = new System.Drawing.Point(9, 107);
             this.chkNodeIsOccluded.Name = "chkNodeIsOccluded";
-            this.chkNodeIsOccluded.Size = new System.Drawing.Size(87, 17);
+            this.chkNodeIsOccluded.Size = new System.Drawing.Size(83, 17);
             this.chkNodeIsOccluded.TabIndex = 8;
-            this.chkNodeIsOccluded.Text = "Is Occluded*";
+            this.chkNodeIsOccluded.Text = "Is Occluded";
             this.chkNodeIsOccluded.UseVisualStyleBackColor = true;
             // 
             // txtNodeHeight
@@ -1161,7 +1161,7 @@
         private System.Windows.Forms.GroupBox grpTag;
         private System.Windows.Forms.Button btnTagDelete;
         private System.Windows.Forms.Button btnTagNew;
-        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.ComboBox cmbTagCategoryID;
         private System.Windows.Forms.Label lblTagCategoryID;
         private System.Windows.Forms.Label lblTagID;
         private System.Windows.Forms.GroupBox grpNode;
@@ -1177,7 +1177,7 @@
         private System.Windows.Forms.Label lblNodePosX;
         private System.Windows.Forms.ComboBox cmbTagID;
         private System.Windows.Forms.Button btnTagEditSave;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtTagName;
         private System.Windows.Forms.Label lblTagName;
     }
 }

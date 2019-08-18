@@ -79,6 +79,14 @@ namespace UniversalAnnotationApp
             traceControls.btnCategoryNew = btnCategoryNew;
             traceControls.btnCategoryDelete = btnCategoryDelete;
             traceControls.btnCategoryEditSave = btnCategoryEditSave;
+            // Панель тэга
+            traceControls.grpTag = grpTag;
+            traceControls.cmbTagID = cmbTagID;
+            traceControls.txtTagName = txtTagName;
+            traceControls.cmbTagCategoryID = cmbTagCategoryID;
+            traceControls.btnTagNew = btnTagNew;
+            traceControls.btnTagDelete = btnTagDelete;
+            traceControls.btnTagEditSave = btnTagEditSave;
             // Регистрируем все элементы управления в слое TraceManager
             engine.TraceGuiBind(traceControls);
 
