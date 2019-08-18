@@ -1100,6 +1100,8 @@ namespace MarkupData
             {
                 // Очищаем все таблицы
                 m_data.Clear();
+                m_data.Reset();
+                m_CreateSchema();
                 m_data.ReadXml(MarkupFilePath);
                 return true;
             }
