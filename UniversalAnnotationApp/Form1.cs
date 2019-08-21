@@ -52,7 +52,7 @@ namespace UniversalAnnotationApp
             traceControls.grpNavigation = grpNavigation;
             traceControls.btnNaviGotoFrame = btnNaviGotoFrame;
             traceControls.btnNaviNext = btnNaviNext;
-            traceControls.btnNaviPlayStop = btnNaviPlayStop;
+            traceControls.btnNaviPlayStartStop = btnNaviPlayStartStop;
             traceControls.btnNaviPrevious = btnNaviPrevious;
             traceControls.chkNaviPlayReverse = chkNaviPlayReverse;
             traceControls.cmbNaviPlaySpeed = cmbNaviPlaySpeed;

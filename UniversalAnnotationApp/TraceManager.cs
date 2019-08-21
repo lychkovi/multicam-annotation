@@ -36,7 +36,7 @@ namespace UniversalAnnotationApp
         public Button btnNaviNext;
         public CheckBox chkNaviPlayReverse;
         public ComboBox cmbNaviPlaySpeed;
-        public Button btnNaviPlayStop;
+        public Button btnNaviPlayStartStop;
         public RadioButton radNaviBoxMajor;     // радиокнопки рамка-маркер
         public RadioButton radNaviMarkerMajor;
         public TrackBar trbNaviSlider;
@@ -242,16 +242,113 @@ namespace UniversalAnnotationApp
         }
 
         // ************************** Навигация *****************************
+
+        // Переход в режим воспроизведения видеозаписи
         private void m_PlaybackStart()
         {
+            if (CameraIsOpened && !m_IsPlaybackMode && m_gui != null)
+            {
+                // Обновляем состояние графического интерфейса
+                m_IsPlaybackMode = true;
+                m_ControlsUpdate();
 
+                // На всякий случай останавливаем таймер
+                m_gui.tmrPlayTimer.Stop(); 
+                m_IsPlayTimerLocked = false;
+
+                // Заводим таймер для переключения кадров
+                m_PlaybackSetSpeed();
+                m_gui.tmrPlayTimer.Start();
+            }
         }
 
+        // Выход из режима воспроизведения видеозаписи
         private void m_PlaybackStop()
         {
+            if (m_IsPlaybackMode && m_gui != null)
+            {
+                // Ждем, пока освободится таймер
+                while (m_IsPlayTimerLocked);
 
+                m_IsPlayTimerLocked = true;
+                // Останавливаем таймер
+                m_gui.tmrPlayTimer.Stop();
+                // Обновляем состояние элементов управления
+                m_IsPlaybackMode = false;
+                m_ControlsUpdate();
+                m_IsPlayTimerLocked = false;
+            }
         }
 
+        // Метод обновляет скорость воспроизведения
+        private void m_PlaybackSetSpeed()
+        {
+            double speedSlowFactor = Math.Min(m_PlaySpeed, 1.0);
+            double timeIntervalMs = 
+                (1000.0 / speedSlowFactor) / CameraRecordingInfo.Fps;
+            if (timeIntervalMs != m_gui.tmrPlayTimer.Interval)
+                m_gui.tmrPlayTimer.Interval = (int)timeIntervalMs;
+        }
+
+        // Обработчик события от таймера
+        private void m_ControlNavi_OnPlayTimerTick
+            (object sender, EventArgs e)
+        {
+            // Защита от повторного вызова обработчика до его завершения
+            if (m_IsPlayTimerLocked) return;
+
+            // Останавливаем таймер
+            m_IsPlayTimerLocked = true;
+            m_gui.tmrPlayTimer.Stop();
+
+            // Переключаемся на следующий кадр
+            int playFastFactor = Math.Max(1, (int) m_PlaySpeed);
+            int frameID = m_CurrFrameID + m_PlayDir * playFastFactor;
+            try
+            {
+                TraceMoveToFrame(frameID);
+            }
+            catch (Exception exception)
+            {
+                m_IsPlayTimerLocked = false;
+                m_PlaybackStop();
+                return;
+            }
+
+            // При необходимости обновляем скорость воспроизведения
+            m_PlaybackSetSpeed();
+
+            // Запускаем таймер
+            m_gui.tmrPlayTimer.Start();
+            m_IsPlayTimerLocked = false;
+        }
+
+        // Обработчик нажатия кнопки запуска/остановки воспроизведения
+        private void m_ControlNavi_OnPlayStartStopClick(
+            object sender, EventArgs e)
+        {
+            if (!m_IsPlaybackMode)
+                m_PlaybackStart();
+            else
+                m_PlaybackStop();
+        }
+
+        // Обработчик изменения списка скорости воспроизведения
+        private void m_ControlNavi_OnPlaySpeedChanged(
+            object sender, EventArgs e)
+        {
+            m_PlaySpeed = 
+                m_PlaySpeedValues[m_gui.cmbNaviPlaySpeed.SelectedIndex];
+        }
+
+        // Обработчик нажатия на галочку Play Direction Reversed
+        private void m_ControlNavi_OnPlayReverseChange(
+            object sender, EventArgs e)
+        {
+            m_PlayDir = (m_gui.chkNaviPlayReverse.Checked) ? (-1) : (+1);
+        }
+
+        // Метод перехода к заданному кадру видеозаписи
         override protected void TraceMoveToFrame(int frameID)
         {
             if (!CameraIsOpened)
@@ -326,13 +423,6 @@ namespace UniversalAnnotationApp
                 TraceMoveToFrame(frameID);
         }
 
-        // Обработчик нажатия на галочку Play Direction Reversed
-        private void m_ControlNavi_OnPlayReverseChange(
-            object sender, EventArgs e)
-        {
-            m_PlayDir = (m_gui.chkNaviPlayReverse.Checked) ? (-1) : (+1);
-        }
-
         // Обновление содержания панели навигации на форме
         private void m_ControlNaviUpdate()
         {
@@ -352,7 +442,7 @@ namespace UniversalAnnotationApp
                     m_gui.btnNaviGotoFrame.Enabled = false;
                     m_gui.btnNaviPrevious.Enabled = false;
                     m_gui.btnNaviNext.Enabled = false;
-                    m_gui.btnNaviPlayStop.Text = "Stop";
+                    m_gui.btnNaviPlayStartStop.Text = "Stop";
                     m_gui.trbNaviSlider.Enabled = false;
                 }
                 else
@@ -361,7 +451,7 @@ namespace UniversalAnnotationApp
                     m_gui.btnNaviPrevious.Enabled = (m_CurrFrameID >= 1);
                     m_gui.btnNaviNext.Enabled = (m_CurrFrameID <
                         CameraRecordingInfo.FramesCount - 1);
-                    m_gui.btnNaviPlayStop.Text = "Play";
+                    m_gui.btnNaviPlayStartStop.Text = "Play";
                     m_gui.trbNaviSlider.Enabled = true;
                 }
             }
@@ -1595,12 +1685,16 @@ namespace UniversalAnnotationApp
             m_gui.chkNaviPlayReverse.Checked = (m_PlayDir < 0);
             m_gui.chkNaviPlayReverse.CheckedChanged +=
                 new EventHandler(m_ControlNavi_OnPlayReverseChange);
+            m_gui.btnNaviPlayStartStop.Click +=
+                new EventHandler(m_ControlNavi_OnPlayStartStopClick);
+            m_gui.tmrPlayTimer.Tick +=
+                new EventHandler(m_ControlNavi_OnPlayTimerTick);
 
             for (int i = 0; i < m_PlaySpeedValues.Count; i++)
                 m_gui.cmbNaviPlaySpeed.Items.Add(m_PlaySpeedCaptions[i]);
             m_gui.cmbNaviPlaySpeed.SelectedIndex = m_PlaySpeedDefaultID;
-            //m_gui.cmbNaviPlaySpeed.SelectedIndexChanged +=
-            //    new EventHandler(m_ControlNavi_OnPlaySpeedChanged);
+            m_gui.cmbNaviPlaySpeed.SelectedIndexChanged +=
+                new EventHandler(m_ControlNavi_OnPlaySpeedChanged);
 
             // Панель Tracking
             for (int i = 0; i < m_TrackingMethodValues.Count; i++)
@@ -1683,12 +1777,12 @@ namespace UniversalAnnotationApp
             m_IsPlayTimerLocked = false;
             m_PlayDir = 1;
             string[] playSpeedCaptions = new string[] 
-                {"1/4x", "1/2x", "1x", "2x", "4x"};
+                {/*"1/4x", "1/2x",*/ "1x", "2x", "4x", "8x", "16x"};
             m_PlaySpeedCaptions = playSpeedCaptions.ToList();
             double[] playSpeedValues = new double[] 
-                {0.25, 0.5, 1.0, 2.0, 4.0};
+                {/*0.25, 0.5,*/ 1.0, 2.0, 4.0, 8.0, 16.0};
             m_PlaySpeedValues = playSpeedValues.ToList();
-            m_PlaySpeedDefaultID = 2;
+            m_PlaySpeedDefaultID = 0;
             m_PlaySpeed = m_PlaySpeedValues[m_PlaySpeedDefaultID];
 
             // Параметры отслеживания объекта

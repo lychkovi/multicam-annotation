@@ -69,7 +69,7 @@
             this.lblTrackingMethod = new System.Windows.Forms.Label();
             this.cmbTrackingMethod = new System.Windows.Forms.ComboBox();
             this.grpNavigation = new System.Windows.Forms.GroupBox();
-            this.btnNaviPlayStop = new System.Windows.Forms.Button();
+            this.btnNaviPlayStartStop = new System.Windows.Forms.Button();
             this.radNaviMarkerMajor = new System.Windows.Forms.RadioButton();
             this.radNaviBoxMajor = new System.Windows.Forms.RadioButton();
             this.cmbNaviPlaySpeed = new System.Windows.Forms.ComboBox();
@@ -476,7 +476,7 @@
             // 
             // grpNavigation
             // 
-            this.grpNavigation.Controls.Add(this.btnNaviPlayStop);
+            this.grpNavigation.Controls.Add(this.btnNaviPlayStartStop);
             this.grpNavigation.Controls.Add(this.radNaviMarkerMajor);
             this.grpNavigation.Controls.Add(this.radNaviBoxMajor);
             this.grpNavigation.Controls.Add(this.cmbNaviPlaySpeed);
@@ -498,29 +498,30 @@
             this.grpNavigation.TabStop = false;
             this.grpNavigation.Text = "Navigation";
             // 
-            // btnNaviPlayStop
+            // btnNaviPlayStartStop
             // 
-            this.btnNaviPlayStop.Location = new System.Drawing.Point(7, 159);
-            this.btnNaviPlayStop.Name = "btnNaviPlayStop";
-            this.btnNaviPlayStop.Size = new System.Drawing.Size(63, 23);
-            this.btnNaviPlayStop.TabIndex = 14;
-            this.btnNaviPlayStop.Text = "Play";
-            this.btnNaviPlayStop.UseVisualStyleBackColor = true;
+            this.btnNaviPlayStartStop.Location = new System.Drawing.Point(7, 159);
+            this.btnNaviPlayStartStop.Name = "btnNaviPlayStartStop";
+            this.btnNaviPlayStartStop.Size = new System.Drawing.Size(63, 23);
+            this.btnNaviPlayStartStop.TabIndex = 14;
+            this.btnNaviPlayStartStop.Text = "Play";
+            this.btnNaviPlayStartStop.UseVisualStyleBackColor = true;
             // 
             // radNaviMarkerMajor
             // 
             this.radNaviMarkerMajor.AutoSize = true;
+            this.radNaviMarkerMajor.Enabled = false;
             this.radNaviMarkerMajor.Location = new System.Drawing.Point(69, 191);
             this.radNaviMarkerMajor.Name = "radNaviMarkerMajor";
             this.radNaviMarkerMajor.Size = new System.Drawing.Size(58, 17);
             this.radNaviMarkerMajor.TabIndex = 13;
-            this.radNaviMarkerMajor.TabStop = true;
             this.radNaviMarkerMajor.Text = "Marker";
             this.radNaviMarkerMajor.UseVisualStyleBackColor = true;
             // 
             // radNaviBoxMajor
             // 
             this.radNaviBoxMajor.AutoSize = true;
+            this.radNaviBoxMajor.Checked = true;
             this.radNaviBoxMajor.Location = new System.Drawing.Point(11, 191);
             this.radNaviBoxMajor.Name = "radNaviBoxMajor";
             this.radNaviBoxMajor.Size = new System.Drawing.Size(43, 17);
@@ -1131,7 +1132,7 @@
         private System.Windows.Forms.Label lblNaviPlayDir;
         private System.Windows.Forms.RadioButton radNaviMarkerMajor;
         private System.Windows.Forms.RadioButton radNaviBoxMajor;
-        private System.Windows.Forms.Button btnNaviPlayStop;
+        private System.Windows.Forms.Button btnNaviPlayStartStop;
         private System.Windows.Forms.Label lblTrackingAttributes;
         private System.Windows.Forms.CheckBox chkTrackingReverse;
         private System.Windows.Forms.Label lblTrackingDir;
