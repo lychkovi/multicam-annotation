@@ -11,6 +11,7 @@ using System.Drawing;       // class Image
 
 using MarkupData;
 using DisplayControlWpf;    // режимы работы и события дисплея
+using Tracking;             // алгоритмы отслеживания
 
 
 namespace UniversalAnnotationApp
@@ -140,6 +141,7 @@ namespace UniversalAnnotationApp
         private bool m_IsPlayTimerLocked;
 
         // Отслеживание объекта на видеозаписи
+        Trackers m_tracker;
         private List<TrackingMethodID> m_TrackingMethodValues;
         private List<string> m_TrackingMethodNames;
         private int m_TrackingMethodDefaultID;
@@ -549,12 +551,17 @@ namespace UniversalAnnotationApp
                 nextFrameID >= CameraRecordingInfo.FramesCount))
                 return;
 
-            // 2. Применяем атрибуты рамки объекта
-            if (m_CurrTrace.HasBox && m_gui != null)
+            // 2. Применяем атрибуты рамки/маркера объекта
+            if (m_CurrTrace.HasBox)
             {
                 m_CurrBox.IsOccluded = m_TrackingIsOccluded;
                 m_CurrBox.IsShaded = m_TrackingIsShaded;
                 MarkupBoxUpdate(m_CurrBox);
+            }
+            else
+            {
+                m_CurrMarker.IsShaded = m_TrackingIsShaded;
+                MarkupMarkerUpdate(m_CurrMarker);
             }
             
             // 3. Запрашиваем изображение текущего и следующего кадров из
@@ -591,21 +598,19 @@ namespace UniversalAnnotationApp
                     case TrackingMethodID.Manual:
                         // Копируем координаты рамки на текущем кадре
                         if (m_CurrTrace.HasBox)
-                        {
                             nextBox = m_CurrBox;
-                            nextBox.FrameID = nextFrameID;
-                        }
                         else
-                        {
                             nextMarker = m_CurrMarker;
-                            nextMarker.FrameID = nextFrameID;
-                        }
                         break;
                     case TrackingMethodID.TLD:
                         if (m_CurrTrace.HasBox)
-                            throw new Exception("TLD not implemented!");
+                        {
+                            m_tracker.TLD.TrackBox(
+                                currImage, nextImage, m_CurrBox, out nextBox);
+                        }
                         else
                             throw new Exception("Trace should have box!");
+                        break;
                     default:
                         throw new Exception("Unsupported method!");
                 }
@@ -616,6 +621,12 @@ namespace UniversalAnnotationApp
                     MessageBoxIcon.Error);
                 return;
             }
+
+            // Переключаем номер кадра в результате отслеживания
+            if (m_CurrTrace.HasBox)
+                nextBox.FrameID = nextFrameID;
+            else
+                nextMarker.FrameID = nextFrameID;
 
             // 5. Сохраняем изменения в базу
             // признак изменения внутреннего узла траектории
@@ -1786,6 +1797,7 @@ namespace UniversalAnnotationApp
             m_PlaySpeed = m_PlaySpeedValues[m_PlaySpeedDefaultID];
 
             // Параметры отслеживания объекта
+            m_tracker = new Trackers();
             m_TrackingIsOccluded = false;
             m_TrackingIsShaded = false;
             m_TrackingDir = (+1);

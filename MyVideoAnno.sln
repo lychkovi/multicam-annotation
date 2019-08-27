@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TraceData", "TraceData\Trac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplayControlWin", "DisplayControlWin\DisplayControlWin.csproj", "{C3A915C4-943E-4ED8-B8F2-FC38B726C3A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tracking", "Tracking\Tracking.csproj", "{D7771A72-8782-47E2-978A-FE1F53488CD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +197,18 @@ Global
 		{C3A915C4-943E-4ED8-B8F2-FC38B726C3A0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{C3A915C4-943E-4ED8-B8F2-FC38B726C3A0}.Release|Win32.ActiveCfg = Release|Any CPU
 		{C3A915C4-943E-4ED8-B8F2-FC38B726C3A0}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Release|Win32.ActiveCfg = Release|Any CPU
+		{D7771A72-8782-47E2-978A-FE1F53488CD3}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

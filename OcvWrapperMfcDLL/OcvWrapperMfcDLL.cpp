@@ -68,9 +68,9 @@ BOOL COcvWrapperMfcDLLApp::InitInstance()
 
 // Хранимые данные
 
-vector<VideoCapture> caps;  // массив объектов для чтения кадров из видео файла
-vector<Mat> prevFrames;      // последний считанный из видео файла кадр
-vector<int> prevFrameNums;   // номер последнего считанного из видео файла кадра
+vector<VideoCapture> caps; // массив объектов для чтения кадров из видеофайла
+vector<Mat> prevFrames;    // последний считанный из видео файла кадр
+vector<int> prevFrameNums; // номер последнего считанного из видеофайла кадра
 
 // Экспортируемые функции
 
@@ -257,4 +257,66 @@ extern "C"
         prevFrameNums[videoHandle] = -1;
         return S_OK;
     }
+
+	// Функция реализует расчет разряженного оптического потока Лукаса-Канаде
+	__declspec(dllexport) HRESULT __stdcall CalcOpticalFlowPyrLK(
+		HBITMAP hSrcBitmap, 
+        HBITMAP hDstBitmap, 
+        int nlevels,
+        int npts,
+        float* srcPtsX,
+        float* srcPtsY,
+        /* out */ float** dstPtsX,
+        /* out */ float** dstPtsY,
+        /* out */ unsigned char** status,
+        /* out */ float** error)
+	{
+		// Готовим исходные изображения
+		Mat src;
+		Mat dst;
+        if (!copyHbitmapToMat(hSrcBitmap, src))
+            return S_FALSE;
+		if (!copyHbitmapToMat(hDstBitmap, dst))
+            return S_FALSE;
+		
+		// Готовим массив координат исходных точек
+		vector<Point2f> srcPtsVec;
+		srcPtsVec.reserve(npts);
+		for (int i = 0; i < npts; i++)
+		{
+			Point2f pt = Point2f(srcPtsX[i], srcPtsY[i]);
+			srcPtsVec.push_back(pt);
+		}
+
+		// Готовим критерий завершения поиска
+		TermCriteria termcrit = TermCriteria(
+			TermCriteria::COUNT + TermCriteria::EPS, 20, 0.01);
+
+		// Готовим массивы для выходных данных
+		vector<Point2f> dstPtsVec;
+		vector<uchar> statVec;
+		vector<float> errVec;
+
+		// Выполняем вызов функции OpenCV
+		calcOpticalFlowPyrLK(src, dst, srcPtsVec, dstPtsVec, statVec, errVec,
+			Size(31, 31), nlevels, termcrit, 0, 0.001); 
+
+		// Преобразуем выходные массивы к формату, подходящему для
+		// передачи в Microsoft.NET Framework
+        size_t floatSize = npts * sizeof(float);
+        *dstPtsX = static_cast<float*>(CoTaskMemAlloc(floatSize));
+		*dstPtsY = static_cast<float*>(CoTaskMemAlloc(floatSize));
+		*error = static_cast<float*>(CoTaskMemAlloc(floatSize));
+		size_t ucharSize = npts * sizeof(unsigned char);
+		*status = static_cast<unsigned char*>(CoTaskMemAlloc(ucharSize));
+        for (int i = 0; i < npts; i++)
+		{
+			(*dstPtsX)[i] = dstPtsVec[i].x;
+			(*dstPtsY)[i] = dstPtsVec[i].y;
+			(*error)[i] = errVec[i];
+			(*status)[i] = statVec[i];
+		}
+
+        return S_OK;
+	}
 }
